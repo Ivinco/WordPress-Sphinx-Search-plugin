@@ -1,0 +1,58 @@
+<script type="text/javascript" >
+function toggle_sidebar(){
+	style = document.getElementById('searchform_advanced_bar').style.display;
+	if (style == 'block') 
+	{
+		document.getElementById('searchform_advanced_bar').style.display = 'none';
+		document.getElementById('searchform_advanced_bar').innerHTML = '';
+	}
+	else 
+	{
+		document.getElementById('searchform_advanced_bar').style.display = 'block';
+		document.getElementById('searchform_advanced_bar').innerHTML = document.getElementById('searchform_advanced_options_bar').innerHTML;
+	}
+}
+</script>
+
+<li id="search">
+		<label for="s"><a href="http://www.sphinxsearch.com/" title="Powered By Sphinx Search Engine"><img src="/wp-content/sphinx.png" alt="Powered By Sphinx Search Engine" /></a> <?php _e('Search'); ?></label>
+		<form id="searchform" method="get" action="/">
+			<ul>
+				<li>
+				<input type="text" name="s" id="sbar" size="15" value="<?php echo htmlspecialchars($_GET['s']);?>"/> 
+				<input type="submit" id="submit" value="<?php _e('Search'); ?>" /><br/>
+				<a href="javascript:void(0);" onclick="toggle_sidebar();" style="font-size:10px;">Advanced</a>
+				</li>
+			</ul>
+			
+			<div id="searchform_advanced_bar" style="display:none;"></div>	
+		</form>
+		
+			<div id="searchform_advanced_options_bar" style="display:none;">
+				<ul>
+					<li id="searchin"><?php _e('Search in:'); ?>
+					<br/>
+					<input type="checkbox" id="search_posts" name="search_posts" value="true"
+						<?php echo $search_posts; ?> /><label for="search_posts">posts</label>
+					<br/>
+					<input type="checkbox" id="search_pages" name="search_pages" value="true" 
+						<?php echo $search_pages; ?> /><label for="search_pages">pages</label>
+					<br/>
+					<input type="checkbox" id="search_comments" name="search_comments" value="true"
+						<?php echo $search_comments; ?> /><label for="search_comments">comments</label>
+					</li>
+				</ul>
+				<ul>
+					<li id="sortby"><?php _e('Sort by:'); ?>
+					<br/>
+					<input type="radio" id="search_sortby_rel" name="search_sortby" value="relevance"
+						<?php echo $search_sortby_relevance; ?> /><label for="search_sortby_rel">Relevance</label>
+					/
+					<input type="radio" id="search_sortby_date" name="search_sortby" value="date"
+						<?php echo $search_sortby_date; ?> /><label for="search_sortby_date">Freshness</label>
+					</li>
+				</ul>
+			</div>
+		
+</li>		
+
