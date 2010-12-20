@@ -30,10 +30,16 @@ Author URI: http://percona.com
 define('SPHINXSEARCH_PLUGIN_DIR', dirname(__FILE__));
 
 /**
- * Define path to Sphinx Install Directory 
+ * Define path to Sphinx Install Directory
+ * Sphinx will install in Wordpress default upload directory
  *
  */
-define('SPHINXSEARCH_SPHINX_INSTALL_DIR', dirname($_SERVER['DOCUMENT_ROOT']) .'/sphinx');
+$uploaddir = get_option( 'upload_path' );
+$uploaddir = trim($uploaddir);
+if (empty($uploaddir)){
+    $uploaddir = WP_CONTENT_DIR . '/uploads';
+}
+define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
 /**
  * Use latest sphinx API from Sphinx distributive directory 

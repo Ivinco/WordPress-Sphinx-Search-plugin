@@ -128,8 +128,9 @@ class SphinxSearch_Config
      	if (!empty($options)){
      		$this->admin_options = array_merge($this->admin_options, $options);
      	}
-     	if (!empty($this->admin_options['sphinx_conf']))
-     	$this->admin_options['sphinx_searchd_pid'] = $this->get_searchd_pid($this->admin_options['sphinx_conf']);
+     	if (!empty($this->admin_options['sphinx_conf']) && file_exists($this->admin_options['sphinx_conf'])){
+            $this->admin_options['sphinx_searchd_pid'] = $this->get_searchd_pid($this->admin_options['sphinx_conf']);
+        }
      	update_option($this->adminOptionsName, $this->admin_options);
      }
      

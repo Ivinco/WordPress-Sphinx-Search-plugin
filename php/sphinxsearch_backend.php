@@ -56,7 +56,12 @@ class SphinxSearch_Backend {
 			$this->run_sphinx(false);
 			$ssi = new SphinxSearch_Install($this->config);			
 			$res = $ssi->install();
-			$success_message = 'Sphinx successfully installed.';	
+                        $success_message = '';
+                        if (true === $res){
+                            $success_message = 'Sphinx successfully installed.';
+                        } else {
+                            $success_message = $res['err'];
+                        }
 			require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/sphinx_installation_process.htm');
 		}elseif (isset($_POST['update_SphinxSearchSettings'])) {
 			$this->update_options();

@@ -169,163 +169,186 @@ class SphinxSearch_Install
   		
      	$sphinx_source = $this->get_sphinx_source();
      	if ( is_array($sphinx_source) ){
-			return $sphinx_source;
+            return $sphinx_source;
      	}
      	
-		//////////////////
+	//////////////////
      	//Get Destination dir
      	//////////////////
      	
-		$dir_inst = $this->get_install_dir();
-		if ( is_array($dir_inst) ){
-			return $dir_inst;
-		}
+	$dir_inst = $this->get_install_dir();        
+
+	if ( is_array($dir_inst) ){
+		return $dir_inst;
+        }
+
+        $parentInstDir = dirname($dir_inst);
+        if (!file_exists($parentInstDir)){
+            return array('err' => "Installation: Directory ". $parentInstDir .
+                        " isn't exists, ".
+                        " create the upload directory of you WordPress.");
+        }
+
+        if (!is_writable($parentInstDir)){
+            return array('err' => "Installation: Directory ". $parentInstDir .
+                        " isn't writeable, ".
+                        " check the permissions.");
+        }
 
         if (!file_exists($dir_inst)){
-            mkdir($dir_inst);
+            if ( !mkdir($dir_inst) ){
+                return array('err' => "Installation: Can't create directory ". $dir_inst .
+                        " check the permissions.");
+            }
         } else {
+            if (!is_writable($dir_inst)){
+                return array('err' => "Installation: ". $dir_inst ." isn't writeable, ".
+                        " check the permissions.");
+            }
             //clear previouse installations
             system("rm -fr " . $dir_inst.'/*');
         }
 
-		//////////////////
+	//////////////////
      	//Copy Source Filename
      	//to destionation dir
      	//////////////////
      	
-		$res = copy($sphinx_source.$this->latest_sphinx_filename, $dir_inst.'/'.$this->latest_sphinx_filename);
-		if ($res == false) {
-		    return array('err' => "Installation: Can't copy ".$sphinx_source.$this->latest_sphinx_filename." to ".
-		    					   $dir_inst.'/'.$this->latest_sphinx_filename.", check the file permissions.");
-		}
+	$res = copy($sphinx_source.$this->latest_sphinx_filename, $dir_inst.'/'.$this->latest_sphinx_filename);
+	if ($res == false) {
+            return array('err' => "Installation: Can't copy ".
+                $sphinx_source.$this->latest_sphinx_filename." to ".
+                $dir_inst.'/'.$this->latest_sphinx_filename.
+                    ", check the file permissions.");
+	}
 		
-		//////////////////
+	//////////////////
      	//Extract Archive
      	//with repository
      	//////////////////
      	
-		chdir($dir_inst);
-		$openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
-		system($openarch, $retval);
-		/*if ($retval == 0)
-			return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
-								  'Command: '.$openarch);
+	chdir($dir_inst);
+	$openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
+	system($openarch, $retval);
+	/*if ($retval == 0)
+		return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
+		'Command: '.$openarch);
 		*/
-		$dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename); 			
-		chdir($dir_inst.'/'.$dir_rep);
+	$dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename); 			
+	chdir($dir_inst.'/'.$dir_rep);
 		
-		//////////////////
+	//////////////////
      	//Run:
      	//./configure
      	//make & make install
      	//////////////////
 
-		echo "<pre>";
+	echo "<pre>";
 		
-		//configure
-		$command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
-		system($command, $retval);
-		if (0 != $retval)
-    {
-      $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-      echo '<script>alert("'.$msg.'")</script>';
-			return  array('err' => $msg.'<br/>Command: '.$command);
-    }
+	//configure
+	$command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
+	system($command, $retval);
+	if (0 != $retval)
+        {
+            $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+            echo '<script>alert("'.$msg.'")</script>';
+            return  array('err' => $msg.'<br/>Command: '.$command);
+        }
 
-		flush();
+	flush();
 
-		//making 
-		$command = "make 2>&1";
-		system($command, $retval);
-		if (0 != $retval)
-    {
-      $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-      echo '<script>alert("'.$msg.'")</script>';
-			return  array('err' => $msg.'<br/>Command: '.$command);
-    }
+	//making 
+	$command = "make 2>&1";
+	system($command, $retval);
+	if (0 != $retval)
+        {
+            $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+            echo '<script>alert("'.$msg.'")</script>';
+            return  array('err' => $msg.'<br/>Command: '.$command);
+        }
 
-		flush();
+	flush();
 		
-		//make install
-		$command = "make install 2>&1";
-		system($command, $retval);
-    if (0 != $retval)
-    {
-      $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
-      echo '<script>alert("'.$msg.'")</script>';
-      return array('err' => $msg.'<br/>Command: '.$command);
-    }
+	//make install
+	$command = "make install 2>&1";
+	system($command, $retval);
+        if (0 != $retval)
+        {
+            $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
+            echo '<script>alert("'.$msg.'")</script>';
+            return array('err' => $msg.'<br/>Command: '.$command);
+        }
 
-		echo "</pre>";
-		flush();
+	echo "</pre>";
+	flush();
 								
-		if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
-      $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
-      echo '<script>alert("'.$msg.'")</script>';
-			return array('err' => $msg);
-		}
+	if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
+            $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
+            echo '<script>alert("'.$msg.'")</script>';
+            return array('err' => $msg);
+	}
 		
-		//////////////////
+	//////////////////
      	//copy our config to 
      	//new installation
      	//////////////////
      	
-		//copy our config to new installation
-		$res = copy($this->plugin_sphinx_dir.'/rep/sphinx.conf', $dir_inst.'/etc/sphinx.conf');
-		if ($res == false){ 
-		    return array('err' => "Installation: Can't copy ".$this->plugin_sphinx_dir.'/rep/sphinx.conf'." to ".
-		   						   $dir_inst.'/etc/sphinx.conf'.", check the file permissions.");
-		}
+	//copy our config to new installation
+	$res = copy($this->plugin_sphinx_dir.'/rep/sphinx.conf', $dir_inst.'/etc/sphinx.conf');
+	if ($res == false){ 
+	    return array('err' => "Installation: Can't copy ".$this->plugin_sphinx_dir.'/rep/sphinx.conf'." to ".
+                $dir_inst.'/etc/sphinx.conf'.", check the file permissions.");
+	}
 		
-		if (file_exists($dir_inst.'/bin/indexer') && 
-			file_exists($dir_inst.'/etc/sphinx.conf') && 
-			file_exists($dir_inst.'/bin/searchd')){
-			$admin_options = array(
+	if (file_exists($dir_inst.'/bin/indexer') && 
+            file_exists($dir_inst.'/etc/sphinx.conf') &&
+            file_exists($dir_inst.'/bin/searchd')){
+                $admin_options = array(
 				'sphinx_conf' 		=> "{$dir_inst}/etc/sphinx.conf",
 				'sphinx_indexer'	=> "{$dir_inst}/bin/indexer",
 				'sphinx_searchd'	=> "{$dir_inst}/bin/searchd",
 				'sphinx_installed' 	=> 'true',
 				'sphinx_path' 		=> $dir_inst
 				);
-			//update admin options
-			$this->config->update_admin_options($admin_options);			
-		}else {
-			return array('err' => 'Installation: Installation completed, but configuration files not found.<br/>
-									See installation directory: '.$dir_inst);
-		}
+		//update admin options
+		$this->config->update_admin_options($admin_options);			
+	}else {
+            return array('err' => 'Installation: Installation completed, but configuration files not found.<br/>
+                See installation directory: '.$dir_inst);
+	}
 		
-		//////////////////
+	//////////////////
      	//rewrite pre defined 
      	//variables in config 
      	//file to their values  
      	//////////////////
      	
-		//rewrite pre defined variables in config file  
-		$res = $this->rewrite_config_variables($this->config->admin_options['sphinx_conf']);	
-		if ( is_array($res) ){
-			return $res;
-		}
+	//rewrite pre defined variables in config file  
+	$res = $this->rewrite_config_variables($this->config->admin_options['sphinx_conf']);	
+	if ( is_array($res) ){
+            return $res;
+	}
 			
-		//////////////////
-		//Create sph_counter
-		//table
-		//////////////////
+	//////////////////
+	//Create sph_counter
+	//table
+	//////////////////
 					  
-		$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_counter (            
+	$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_counter (            
                counter_id int(11) NOT NULL,        
                max_doc_id int(11) NOT NULL,        
                PRIMARY KEY  (counter_id)           
              );";
-		$res = $wpdb->query($sql);
-		if (false === $res){
-			return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_counter .<br/>"."Command: ".$wpdb->last_query );
-		}
-		//////////////////
-		//Create sph_stats
-		//table
-		//////////////////
+	$res = $wpdb->query($sql);
+	if (false === $res){
+            return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_counter .<br/>"."Command: ".$wpdb->last_query );
+	}
+	//////////////////
+	//Create sph_stats
+	//table
+	//////////////////
 					  
-		$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_stats(                             
+	$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_stats(                             
                 `id` int(11) unsigned NOT NULL auto_increment,          
                 `keywords` varchar(255) NOT NULL,                       
                 `date_added` datetime NOT NULL,                         
@@ -333,20 +356,20 @@ class SphinxSearch_Install
                 PRIMARY KEY  (`id`),
                 KEY `keywords` (`keywords`) 
               );";
-		$res = $wpdb->query($sql);
-		if (false === $res){
-			return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_stats .<br/>"."Command: ".$wpdb->last_query );	
-		}
+	$res = $wpdb->query($sql);
+	if (false === $res){
+            return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_stats .<br/>"."Command: ".$wpdb->last_query );
+	}
 		
-		//////////////////
-		//run re indexing 
-		//////////////////
-		$ssb = new SphinxSearch_Backend($this->config);		
-		$res = $ssb->reindex_sphinx();
-		if ( is_array($res) ){
-			return $res;
-		}
+	//////////////////
+	//run re indexing 
+	//////////////////
+	$ssb = new SphinxSearch_Backend($this->config);		
+	$res = $ssb->reindex_sphinx();
+	if ( is_array($res) ){
+            return $res;
+	}
 			
-		return true;
+	return true;
      }
 }
