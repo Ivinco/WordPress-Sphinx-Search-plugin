@@ -44,6 +44,8 @@ class SphinxSearch_Install
 	 * Config object
 	 */
 	var $config = '';
+
+        private $_debug = false;
 	
 	/**
 	 * Constructor
@@ -96,43 +98,46 @@ class SphinxSearch_Install
       * @return bool or array
       */
      function rewrite_config_variables($filename)
-     {	
-     	global $wpdb, $table_prefix;
-     	
-     	if( !is_readable($filename) || !is_writeable($filename) ){
+     {
+        if( !is_readable($filename) || !is_writeable($filename) ){
      		return array('err' => 'Installation: '.$filename.' is not writeable.');
      	}
-     	$content = file_get_contents($filename);
 
-      $sql_sock = '';
-      if ( 'localhost' == strtolower(trim(DB_HOST)) || '127.0.0.1' == trim(DB_HOST) || '' == trim(DB_HOST) )
-      {
-        if ('' != trim(ini_get('mysql.default_socket')))
-          $sql_sock = 'sql_sock = '.ini_get('mysql.default_socket');
-      }
+        $template_content = file_get_contents($filename);
+
+     	$rewrited_content = $this->generate_config_content($template_content);
+     		
+     	//file_put_contents in PHP 5
+     	$fp = fopen($filename, 'w+');
+     	fwrite($fp, $rewrited_content);
+     	fclose($fp);
+     		
+     	return true;
+     }
+
+     public function generate_config_content($template_content)
+     {
+         global $wpdb, $table_prefix;
+
+          $sql_sock = '';
+          if ('' != trim(ini_get('mysql.default_socket'))){
+              $sql_sock = 'sql_sock = '.ini_get('mysql.default_socket');
+          }
 
      		/**
      		 * We have to rewrite following variables:
-     		 * {sql_host} to database host
-     		 * {sql_user} to database user
-     		 * {sql_pass} to database pass
-     		 * {sql_db}   to database name
      		 * {sql_sock} to database socket
-     		 * 
+     		 *
      		 * {source}   to Sphinx Index name
-     		 * {sphinx_path} to Sphinx Server root dir 
+     		 * {sphinx_path} to Sphinx Server root dir
      		 * {searchd_port} to Sphinx search daemon port
      		 * {wp_posts} to Wordpress posts table
      		 * {wp_comments} to Wordpress comments table
-     		 * {table_prefix} to Wordpress table prefix, by default wp_
+     		 * {path_to_wp_config_php} path to wp-config.php - requiered by shebung syntax
      		 */
      	$search = array(
-     		'{sql_host}' => DB_HOST,
-     		'{sql_user}' => DB_USER,
-     		'{sql_pass}' => DB_PASSWORD,
-     		'{sql_db}'   => DB_NAME, 
-     		'{sql_sock}' => $sql_sock, 
-     		'{source}'   => $this->config->admin_options['sphinx_index'],
+     		'{sql_sock}' => $sql_sock,
+     		'{prefix}'   => $this->config->admin_options['sphinx_index'],
      		'{sphinx_path}' => $this->config->admin_options['sphinx_path'],
      		'{searchd_port}' => $this->config->admin_options['sphinx_port'],
      		'{wp_posts}' => $wpdb->posts,
@@ -140,17 +145,11 @@ class SphinxSearch_Install
      		'{wp_term_relationships}' => $wpdb->term_relationships,
      		'{wp_term_taxonomy}' => $wpdb->term_taxonomy,
      		'{wp_terms}' => $wpdb->terms,
-     		'{table_prefix}' => $table_prefix
+                '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir)))
      		);
-     		
-     	$content = str_replace(array_keys($search), $search, $content);
-     		
-     	//file_put_contents in PHP 5
-     	$fp = fopen($filename, 'w+');
-     	fwrite($fp, $content);
-     	fclose($fp);
-     		
-     	return true;
+
+     	$rewrited_content = str_replace(array_keys($search), $search, $template_content);
+        return $rewrited_content;
      }
 
      /**
@@ -206,7 +205,9 @@ class SphinxSearch_Install
                         " check the permissions.");
             }
             //clear previouse installations
-            system("rm -fr " . $dir_inst.'/*');
+            if (false == $this->_debug){
+                system("rm -fr " . $dir_inst.'/*');
+            }
         }
 
 	//////////////////
@@ -226,16 +227,17 @@ class SphinxSearch_Install
      	//Extract Archive
      	//with repository
      	//////////////////
-     	
-	chdir($dir_inst);
-	$openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
-	system($openarch, $retval);
-	/*if ($retval == 0)
-		return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
-		'Command: '.$openarch);
-		*/
-	$dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename); 			
-	chdir($dir_inst.'/'.$dir_rep);
+     	if (false == $this->_debug){
+            chdir($dir_inst);
+            $openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
+            system($openarch, $retval);
+            /*if ($retval == 0)
+                    return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
+                    'Command: '.$openarch);
+                    */
+            $dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename);
+            chdir($dir_inst.'/'.$dir_rep);
+        }
 		
 	//////////////////
      	//Run:
@@ -244,49 +246,50 @@ class SphinxSearch_Install
      	//////////////////
 
 	echo "<pre>";
-		
-	//configure
-	$command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
-	system($command, $retval);
-	if (0 != $retval)
-        {
-            $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-            echo '<script>alert("'.$msg.'")</script>';
-            return  array('err' => $msg.'<br/>Command: '.$command);
+	if (false == $this->_debug){
+            //configure
+            $command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
+            system($command, $retval);
+            if (0 != $retval)
+            {
+                $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+                echo '<script>alert("'.$msg.'")</script>';
+                return  array('err' => $msg.'<br/>Command: '.$command);
+            }
+
+            flush();
+
+            //making
+            $command = "make 2>&1";
+            system($command, $retval);
+            if (0 != $retval)
+            {
+                $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+                echo '<script>alert("'.$msg.'")</script>';
+                return  array('err' => $msg.'<br/>Command: '.$command);
+            }
+
+            flush();
+
+            //make install
+            $command = "make install 2>&1";
+            system($command, $retval);
+            if (0 != $retval)
+            {
+                $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
+                echo '<script>alert("'.$msg.'")</script>';
+                return array('err' => $msg.'<br/>Command: '.$command);
+            }
+
+            echo "</pre>";
+            flush();
+
+            if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
+                $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
+                echo '<script>alert("'.$msg.'")</script>';
+                return array('err' => $msg);
+            }
         }
-
-	flush();
-
-	//making 
-	$command = "make 2>&1";
-	system($command, $retval);
-	if (0 != $retval)
-        {
-            $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-            echo '<script>alert("'.$msg.'")</script>';
-            return  array('err' => $msg.'<br/>Command: '.$command);
-        }
-
-	flush();
-		
-	//make install
-	$command = "make install 2>&1";
-	system($command, $retval);
-        if (0 != $retval)
-        {
-            $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
-            echo '<script>alert("'.$msg.'")</script>';
-            return array('err' => $msg.'<br/>Command: '.$command);
-        }
-
-	echo "</pre>";
-	flush();
-								
-	if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
-            $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
-            echo '<script>alert("'.$msg.'")</script>';
-            return array('err' => $msg);
-	}
 		
 	//////////////////
      	//copy our config to 

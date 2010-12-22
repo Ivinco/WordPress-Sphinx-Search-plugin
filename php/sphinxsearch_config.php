@@ -70,6 +70,7 @@ class SphinxSearch_Config
    		if (!empty($this->admin_options)) return $this->admin_options;
    		
    		$adminOptions = array(
+                        'wizard_done'   => 'false',
    			'search_comments' => 'true',
    			'search_pages'    => 'true',
    			'search_posts'    => 'true',
@@ -84,11 +85,13 @@ class SphinxSearch_Config
    			
    			'sphinx_port' => '3312',
    			'sphinx_host' => 'localhost',
-   			'sphinx_index' => 'wordpress',
-   			
+   			'sphinx_index' => 'wp_',
+
+                        'sphinx_path' => '',
    			'sphinx_conf' => '',
    			'sphinx_indexer' => '',
    			'sphinx_searchd' => '',
+
    			'sphinx_searchd_pid' => '',
    			'sphinx_installed' => 'false',
    			'sphinx_path' => 'false',
@@ -159,15 +162,23 @@ class SphinxSearch_Config
       */
      function check_sphinx_running()
      {
-     	$pid = `cat {$this->admin_options['sphinx_searchd_pid']}`;
-     	if ($pid){
-     		$this->admin_options['sphinx_running'] = 'true';
-     		return $pid;
-     	}else {
-     		$this->admin_options['sphinx_running'] = 'false';
-     		return false;
-     	}
-     	
+         if (file_exists($this->admin_options['sphinx_searchd_pid'])){
+             $this->admin_options['sphinx_running'] = 'true';
+             return true;
+         } else {
+             $this->admin_options['sphinx_running'] = 'false';
+             return false;
+         }
+     }
+
+     function get_sphinx_pid()
+     {
+         exec("cat {$this->admin_options['sphinx_searchd_pid']}", $res);
+         if (empty($res)){
+             return false;
+         } else {
+             return $res[0];
+         }
      }
      
      function need_reindex($flag)

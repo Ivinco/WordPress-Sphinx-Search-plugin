@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: WordPress Sphinx Search Plugin
-Plugin URI: http://percona.com
+Plugin URI: http://www.ivinco.com/software/
 Description: Power of Sphinx Search Engine for Your Blog!
 Version: 1.0
-Author: &copy; Percona Ltd
-Author URI: http://percona.com
+Author: &copy; Ivinco Inc
+Author URI: http://www.ivinco.com/
 
-	Copyright 2008  &copy; Percona Ltd  (email : office@percona.com)
+    Copyright 2008  &copy; Ivinco Inc (email : office@ivinco.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -285,9 +285,9 @@ class SphinxSearch{
      *
      */
     function options_page()
-    {
+    {        
     	if (function_exists('add_options_page')) {
-        	add_options_page('Sphinx Search', 'Sphinx Search', 9, basename(__FILE__), array(&$this, 'print_admin_page'));
+            add_options_page('Sphinx Search', 'Sphinx Search', 9, basename(__FILE__), array(&$this, 'print_admin_page'));
         }
     }
 }

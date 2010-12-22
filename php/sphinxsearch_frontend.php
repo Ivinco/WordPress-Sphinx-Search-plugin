@@ -596,7 +596,7 @@ class SphinxSearch_FrontEnd
 					
 		$excerpts = $this->config->sphinx->BuildExcerpts(
 														$post_content,
-														'main_'.$this->config->admin_options['sphinx_index'], 
+														$this->config->admin_options['sphinx_index'].'main',
 														$this->search_string,
 														$opts
 														); 

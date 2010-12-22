@@ -1,0 +1,11 @@
+<div class="updated"><p><strong>Sphinx setup is done</strong></p></div>
+Sphinx.conf is saved at <?php echo $options['sphinx_conf']?><br/>
+<form  action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post">
+    <input type="hidden" name="wizard_process" value="1" />
+    <input type="hidden" name="wizard_step" value="5" />
+    <input type="submit" value="Finish setup" />
+</form>
+
+<h3>Generated sphinx.conf</h3>
+<textarea rows="100" cols="80"><?php echo htmlentities($config_content)?></textarea>
+
