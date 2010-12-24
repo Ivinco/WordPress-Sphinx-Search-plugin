@@ -1,0 +1,22 @@
+<link rel='stylesheet' href='<?php echo plugins_url('styles.css', __FILE__); ?>' type='text/css' media='all' />
+
+
+<script type="text/javascript">
+    function wizard_next() {
+        var formData = $("#wizard_form").serialize();
+        
+        $('#wizard_page').html('<p style="text-align:center;width:100%;"><img src="<?php echo plugins_url('loadinfo.gif', __FILE__); ?> /></p>');
+
+        $.post("<?php echo site_url()?>/wp-admin/admin-ajax.php",
+            formData,
+            function(data)
+            {
+                if (data)
+                  $('#wizard_page').html(data);
+
+            }
+        );
+        return false;
+
+    }
+</script>

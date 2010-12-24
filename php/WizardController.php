@@ -1,0 +1,247 @@
+<?php
+
+class WizardController
+{
+    /**
+     * Special object to get/set plugin configuration parameters
+     * @access private
+     * @var SphinxSearch_Config
+     * 
+     */
+    private $_config = null;
+
+    private $view = null;
+
+    public function  __construct(SphinxSearch_Config $config)
+    {
+        $this->view = new SphinxView();
+        $this->_config = $config;
+    }
+
+    public function connectionAction()
+    {
+        if (!empty($_POST['connection_process'])){
+            if (empty($_POST['sphinx_host']) ||
+                empty($_POST['sphinx_port']) ||
+                empty($_POST['sphinx_index'])){
+                $this->view->error_message = 'Connection parameters can\'t be empty';                
+                $this->view->sphinx_host = $_POST['sphinx_host'];
+                $this->view->sphinx_port = $_POST['sphinx_port'];
+                $this->view->sphinx_index = $_POST['sphinx_index'];                
+                $this->view->render('admin/wizard_sphinx_connection.phtml');
+                exit;
+             } else {
+                $this->_set_sphinx_connect();
+                $this->view->success_message = 'Connection parameters successfully set.';
+                return $this->_nextAction('connection');                
+             }
+        } else {
+            $this->view->sphinx_host = $this->_config->getOption('sphinx_host');
+            $this->view->sphinx_port = $this->_config->getOption('sphinx_port');
+            $this->view->sphinx_index = $this->_config->getOption('sphinx_index');
+            $this->view->render('admin/wizard_sphinx_connection.phtml');
+        }
+        
+    }
+
+    public function detectionAction()
+    {
+        $this->view->detect_searchd = $this->_detect_program('searchd');
+        $this->view->detect_indexer = $this->_detect_program('indexer');
+
+        if (!empty($_POST['detection_process'])){
+            if ('install' == $_POST['detected_install']){                
+                $sphinxService = new SphinxService($this->_config);
+                $sphinxService->stop();
+                
+		$sphinxInstall = new SphinxSearch_Install($this->_config);
+		$res = $sphinxInstall->install();
+                if (true === $res){
+                    $this->view->success_message = 'Sphinx successfully installed.';
+                    return $this->_nextAction('install');
+                } else {
+                    $this->view->error_message = $res['err'];
+                     $this->view->render('admin/wizard_sphinx_detect.phtml');
+                    exit;
+                }
+            } else if('detect' == $_POST['detected_install']) {
+                if (empty($_POST['detected_searchd']) ||
+                    empty($_POST['detected_indexer'])){
+                    $this->view->error_message = 'Path to searchd and indexer can\'t be empty';
+                    $this->view->detect_searchd = $_POST['detected_searchd'];
+                    $this->view->detect_indexer = $_POST['detected_indexer'];
+                    $this->view->render('admin/wizard_sphinx_detect.phtml');
+                    exit;
+                } else {
+                    $this->_set_sphinx_detected();
+                    $this->view->success_message = 'Sphinx binaries are set.';
+                    return $this->_nextAction('detection');
+                }
+            }
+        } 
+        $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
+        $this->view->render('admin/wizard_sphinx_detect.phtml');
+        exit;
+    }
+
+    public function folderAction()
+    {
+        if (!empty($_POST['folder_process'])){
+            $sphinx_install_path = $_POST['sphinx_path'];
+            if (empty($sphinx_install_path)) {
+                $error_message = 'Path can\'t be empty';
+            }
+            if (!file_exists($sphinx_install_path)){
+                @mkdir($sphinx_install_path);
+            }
+            if (!file_exists($sphinx_install_path)){
+                $error_message = 'Path '.$sphinx_install_path.' isn\'t exists!';
+            } else if (!is_writable($sphinx_install_path)){
+                $error_message = 'Path '.$sphinx_install_path.' isn\'t writeable!';
+            } else {
+                $this->_setup_sphinx_path();
+                $config_file_name = $this->_generate_config_file_name();
+                $config_file_content = $this->_generate_config_file_content();
+                $this->_save_config($config_file_name, $config_file_content);
+
+                if (!file_exists($sphinx_install_path.'/var')){
+                    mkdir($sphinx_install_path.'/var');
+                }
+                if (!file_exists($sphinx_install_path.'/var/data')){
+                    mkdir($sphinx_install_path.'/var/data');
+                }
+                if (!file_exists($sphinx_install_path.'/var/log')){
+                    mkdir($sphinx_install_path.'/var/log');
+                }
+                $this->view->success_message = 'Path is set';
+                return $this->_nextAction('folder');
+            }
+
+            $this->view->error_message = $error_message;            
+            $this->view->install_path = $_POST['sphinx_path'];
+        } else {
+            $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
+        }
+        $this->view->render('admin/wizard_sphinx_folder.phtml');
+        exit;
+    }
+
+    public function configAction()
+    {
+        $this->view->config_content = $this->_generate_config_file_content();
+        $this->view->sphinx_conf = $this->_config->getOption('sphinx_conf');
+        $this->view->render('/admin/wizard_sphinx_config.phtml');
+        exit;
+    }
+
+    public function indexingAction()
+    {
+        if (!empty($_POST['process_indexing'])){
+            $sphinxService = new SphinxService($this->_config);
+            $res = $sphinxService->reindex();
+            if (true === $res){
+                $this->view->indexsation_done = true;
+                $this->view->success_message = 'Indexing is done successfuly!';
+                return $this->_nextAction('indexing');
+            } else {
+                $this->view->error_message = $res['err'];
+            }
+        }
+        $this->view->indexsation_done = false;
+        $this->view->render('admin/wizard_sphinx_indexsation.phtml');
+        exit;
+    }
+
+
+
+    private function _set_sphinx_connect()
+    {
+        $options['sphinx_host'] = $_POST['sphinx_host'];
+        $options['sphinx_port'] = $_POST['sphinx_port'];
+        $options['sphinx_index'] = $_POST['sphinx_index'];
+        $this->_config->update_admin_options($options);
+        return true;
+    }
+
+    private function _generate_config_file_name()
+     {
+         $options = $this->_config->get_admin_options();
+         $filename = $options['sphinx_path'].'/sphinx.conf';
+         file_put_contents($filename, '');
+         $options['sphinx_conf'] = $filename;
+         $this->_config->update_admin_options($options);
+         return $filename;
+     }
+
+     private function _generate_config_file_content()
+     {
+         $config_tempate = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.'/rep/sphinx.conf');
+
+         $sphinxInst = new SphinxSearch_Install($this->_config);
+         $content = $sphinxInst->generate_config_content($config_tempate);
+
+         return $content;
+     }
+     private function _save_config($filename, $content)
+     {
+         file_put_contents($filename, $content);
+     }
+
+
+
+
+
+     private function _setup_sphinx_path()
+     {
+         $options['sphinx_path'] = $_POST['sphinx_path'];
+         $this->_config->update_admin_options($options);
+         return true;
+
+     }
+
+    
+
+    private function _set_sphinx_detected()
+    {
+        $options['sphinx_searchd'] = $_POST['detected_searchd'];
+        $options['sphinx_indexer'] = $_POST['detected_indexer'];
+        $this->_config->update_admin_options($options);
+        return true;
+     }
+
+     private function _detect_program($progname)
+     {
+         $progname = escapeshellcmd($progname);
+         $res = exec("whereis {$progname}");
+         if (!preg_match("#{$progname}:\s?([\w/]+)#", $res, $matches)) {
+            return false;
+         }
+         return $matches[1];
+     }
+
+    private function _nextAction($prevAction)
+    {
+        switch ($prevAction) {
+            case 'connection':
+                $this->detectionAction();
+                break;
+            case 'install':
+                case 'folder':
+                $this->indexingAction();
+                break;
+            case 'indexing':
+                $this->configAction();
+                break;
+            case 'config':
+                $this->finishAction();
+                break;
+            case 'detection':
+                $this->folderAction();
+                break;
+            default:
+                $this->connectionAction();
+                break;
+        }
+    }
+
+}

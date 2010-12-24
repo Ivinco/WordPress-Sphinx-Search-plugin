@@ -54,6 +54,9 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_config.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_frontend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_backend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_sphinxinstall.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/WizardController.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxService.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
 /**
  * load tags - each tag you can use in your theme template
  * see README
@@ -114,6 +117,14 @@ class SphinxSearch{
 		
 		//action to prepare admin menu
 		add_action('admin_menu', array(&$this, 'options_page'));
+                add_action('admin_init', array(&$this, 'admin_init'));
+
+                //ajax                
+                if (!empty($_POST['action'])){
+                    $wizard = new WizardController($this->config);
+                    add_action('wp_ajax_'.$_POST['action'],
+                            array(&$wizard, $_POST['action'].'Action'));
+                }
 		
 		//frontend actions
 		add_action('wp_insert_post', array(&$this, 'wp_insert_post'));
@@ -289,6 +300,15 @@ class SphinxSearch{
     	if (function_exists('add_options_page')) {
             add_options_page('Sphinx Search', 'Sphinx Search', 9, basename(__FILE__), array(&$this, 'print_admin_page'));
         }
+    }
+
+    function admin_init()
+    {
+        wp_deregister_script( 'jquery' );
+        wp_register_script( 'jquery', WP_PLUGIN_URL .'/'.
+                dirname(plugin_basename(__FILE__)).
+                '/templates/jquery-1.4.4.min.js');
+        wp_enqueue_script( 'jquery' );
     }
 }
 

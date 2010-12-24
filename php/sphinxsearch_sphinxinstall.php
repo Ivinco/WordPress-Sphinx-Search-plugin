@@ -44,8 +44,6 @@ class SphinxSearch_Install
 	 * Config object
 	 */
 	var $config = '';
-
-        private $_debug = false;
 	
 	/**
 	 * Constructor
@@ -205,9 +203,7 @@ class SphinxSearch_Install
                         " check the permissions.");
             }
             //clear previouse installations
-            if (false == $this->_debug){
-                system("rm -fr " . $dir_inst.'/*');
-            }
+            exec("rm -fr " . $dir_inst.'/*');
         }
 
 	//////////////////
@@ -227,17 +223,15 @@ class SphinxSearch_Install
      	//Extract Archive
      	//with repository
      	//////////////////
-     	if (false == $this->_debug){
             chdir($dir_inst);
             $openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
-            system($openarch, $retval);
+            exec($openarch, $output, $retval);
             /*if ($retval == 0)
                     return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
                     'Command: '.$openarch);
                     */
             $dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename);
             chdir($dir_inst.'/'.$dir_rep);
-        }
 		
 	//////////////////
      	//Run:
@@ -245,15 +239,14 @@ class SphinxSearch_Install
      	//make & make install
      	//////////////////
 
-	echo "<pre>";
-	if (false == $this->_debug){
+	//echo "<pre>";
             //configure
             $command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
-            system($command, $retval);
+            exec($command, $output, $retval);
             if (0 != $retval)
             {
                 $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-                echo '<script>alert("'.$msg.'")</script>';
+                //echo '<script>alert("'.$msg.'")</script>';
                 return  array('err' => $msg.'<br/>Command: '.$command);
             }
 
@@ -261,11 +254,11 @@ class SphinxSearch_Install
 
             //making
             $command = "make 2>&1";
-            system($command, $retval);
+            exec($command, $output, $retval);
             if (0 != $retval)
             {
                 $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
-                echo '<script>alert("'.$msg.'")</script>';
+                //echo '<script>alert("'.$msg.'")</script>';
                 return  array('err' => $msg.'<br/>Command: '.$command);
             }
 
@@ -273,23 +266,22 @@ class SphinxSearch_Install
 
             //make install
             $command = "make install 2>&1";
-            system($command, $retval);
+            exec($command, $output, $retval);
             if (0 != $retval)
             {
                 $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
-                echo '<script>alert("'.$msg.'")</script>';
+                //echo '<script>alert("'.$msg.'")</script>';
                 return array('err' => $msg.'<br/>Command: '.$command);
             }
 
-            echo "</pre>";
+            //echo "</pre>";
             flush();
 
             if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
                 $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
-                echo '<script>alert("'.$msg.'")</script>';
+                //echo '<script>alert("'.$msg.'")</script>';
                 return array('err' => $msg);
             }
-        }
 		
 	//////////////////
      	//copy our config to 
@@ -367,12 +359,12 @@ class SphinxSearch_Install
 	//////////////////
 	//run re indexing 
 	//////////////////
-	$ssb = new SphinxSearch_Backend($this->config);		
+	/*$ssb = new SphinxSearch_Backend($this->config);
 	$res = $ssb->reindex_sphinx();
 	if ( is_array($res) ){
             return $res;
 	}
-			
+	*/
 	return true;
      }
 }

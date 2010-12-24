@@ -1,8 +1,0 @@
-<form  action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post">
-    <input type="hidden" name="wizard_process" value="1" />
-    <input type="hidden" name="wizard_step" value="3" />
-    <h2>Setup path to sphinx indexes</h2>
-        Path: <input type="text" name="sphinx_path" size="50"
-                     value="<?php echo $sphinx_install_path?>" /> <br/>
-        <input type="submit" value="Save path and continue to step 4" />
-</form>

@@ -108,7 +108,12 @@ class SphinxSearch_Config
    			);
    		$this->admin_options = get_option($this->adminOptionsName);
    		if ($this->admin_options['sphinx_installed']){
-   			$this->check_sphinx_running();
+                    $sphinxService = new SphinxService($this);
+                    if ( $sphinxService->isSphinxRunning() ){
+                        $this->admin_options['sphinx_running'] = 'true';
+                    } else {
+                        $this->admin_options['sphinx_running'] = 'false';
+                    }
    		}
    		
 		if (!empty($this->admin_options)) {
@@ -132,66 +137,21 @@ class SphinxSearch_Config
      		$this->admin_options = array_merge($this->admin_options, $options);
      	}
      	if (!empty($this->admin_options['sphinx_conf']) && file_exists($this->admin_options['sphinx_conf'])){
-            $this->admin_options['sphinx_searchd_pid'] = $this->get_searchd_pid($this->admin_options['sphinx_conf']);
+            $sphinxService = new SphinxService($this);
+            $pid = $sphinxService->getSearchdPid($this->admin_options['sphinx_conf']);
+            $this->admin_options['sphinx_searchd_pid'] = $pid;
         }
      	update_option($this->adminOptionsName, $this->admin_options);
      }
-     
-     /**
-      * Parse sphinx conf and grab path to search pid file
-      *
-      * @param unknown_type $sphinx_conf
-      * @return unknown
-      */
-     function get_searchd_pid($sphinx_conf)
-     {
-     	$content = file_get_contents($sphinx_conf);
-     	//pid_file		= {sphinx_path}/var/log/searchd.pid
-     	if (preg_match("#\bpid_file\s+=\s+(.*)\b#", $content, $m))
-     	{
-     		return $m[1];
-     	}
-     	return '';
-     }
-     
-     /**
-      * Check running sphinx search daemon or not
-      *
-      * @param string $path
-      * @return string
-      */
-     function check_sphinx_running()
-     {
-         if (file_exists($this->admin_options['sphinx_searchd_pid'])){
-             $this->admin_options['sphinx_running'] = 'true';
-             return true;
-         } else {
-             $this->admin_options['sphinx_running'] = 'false';
-             return false;
-         }
-     }
 
-     function get_sphinx_pid()
+     public function getOption($opt)
      {
-         exec("cat {$this->admin_options['sphinx_searchd_pid']}", $res);
-         if (empty($res)){
-             return false;
-         } else {
-             return $res[0];
+         if (isset($this->admin_options[$opt])){
+            return $this->admin_options[$opt];
          }
+         return false;
      }
      
-     function need_reindex($flag)
-     {
-     	if ($flag){
-     		$fp = fopen(SPHINXSEARCH_REINDEX_FILENAME, 'w+');
-     		fwrite($fp, '1');
-     		fclose($fp);
-     	}else{
-     		if (file_exists(SPHINXSEARCH_REINDEX_FILENAME)){
-     			unlink(SPHINXSEARCH_REINDEX_FILENAME);
-     		}
-     	}
-     }
+     
     
 }

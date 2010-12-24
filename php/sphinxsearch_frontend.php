@@ -93,7 +93,7 @@ class SphinxSearch_FrontEnd
 		    $_GET['s'] = stripslashes($_GET['s']); 
 		}
 		
-		$this->search_string = $_GET['s']; 
+		$this->search_string = !empty($_GET['s']) ? $_GET['s'] : '';
 				
 		if (!isset($_GET['search_comments']) && !isset($_GET['search_posts']) && !isset($_GET['search_pages'])){
 			$this->params['search_comments'] = $this->config->admin_options['search_comments']=='false'?'':'true';

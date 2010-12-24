@@ -1,0 +1,58 @@
+<?php echo $this->render('admin/messagebox.phtml'); ?>
+<div class="postbox">
+    <h3 class="hndle">Install or use existing binaries</h3>
+    <div class="inside">
+
+    <form  action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post" id="wizard_form">
+        <input type="hidden" name="detection_process" value="1" />
+        <input type="hidden" name="action" value="detection" />
+        <table class="form-table">
+        <?php if($this->view->detect_searchd):?>            
+            <tr>
+                <th><label>detected system searchd</label></th>
+                <td>
+                    <input type="text" name="detected_searchd"
+                           value="<?php echo $this->view->detect_searchd?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>detected system indexer</label></th>
+                <td>
+                    <input type="text" name="detected_indexer"
+                           value="<?php echo $this->view->detect_indexer?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>use system binaries</label></th>
+                <td><input type="radio" name="detected_install"
+                           value="detect" checked="checked" /></td>
+            </tr>
+            <tr>
+                <th><label>install sphinx</label></th>
+                <td><input type="radio" name="detected_install"
+                           value="install" /></td>
+            </tr>
+
+            
+        <?php else:?>
+            <p>
+            Sphinx is not installed on the system.<br/>
+            Notice that sphinx will be installed at <?php echo $this->view->install_path?>?
+            </p>
+            <tr>
+                <th><label>install sphinx</label></th>
+                <td><input type="radio" name="detected_install"
+                           value="install" checked="checked" /></td>
+            </tr>
+        <?php endif; ?>
+            
+            </table>
+            <p class="submit">
+                <input class="button-primary" type="button" onClick="return wizard_next();"
+                       name="use_detected_sphinx" value="Continue" />
+                <span style="font-size: 24px;">
+            </p>
+
+    </form>
+    </div>
+</div>
