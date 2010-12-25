@@ -466,7 +466,7 @@ class SphinxSearch_FrontEnd
 	function the_author($display_name)
 	{
 		global $post;
-		if (!$post->comment_id){	
+		if (empty($post->comment_id)){
 			return $display_name;
 		}
 		return $post->comment_author;
@@ -482,7 +482,7 @@ class SphinxSearch_FrontEnd
 	{
 		global $post;
 		
-		if ($post->comment_id){
+		if (!empty($post->comment_id)){
 			return $permalink.'#comment-'.$post->comment_id;
 		} else {
 			return $permalink;
@@ -500,7 +500,7 @@ class SphinxSearch_FrontEnd
 	{	
 		global $post;
 		
-		if (!$post->comment_id){
+		if (empty($post->comment_id)){
 			return $permalink;
 		}
 		

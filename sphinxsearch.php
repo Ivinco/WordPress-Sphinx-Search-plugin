@@ -91,8 +91,10 @@ class SphinxSearch{
 	 * @return SphinxSearch
 	 */
 	function SphinxSearch()
-	{		
+	{
+
 		$this->config = new SphinxSearch_Config();
+                $this->sphinxService = new SphinxService($this->config);
 		$this->backend = new SphinxSearch_BackEnd($this->config);		
 		$this->frontend = new SphinxSearch_FrontEnd($this->config);
 		
@@ -257,8 +259,9 @@ class SphinxSearch{
 	 */
 	function wp_insert_post($post_id, $post='')
 	{
-		$this->config->need_reindex(true);
-		$this->config->update_admin_options();
+		$this->sphinxService->needReindex(true);
+                $options['sphinx_need_reindex'] = true;
+		$this->config->update_admin_options($options);
 	}
 	
 	/**
@@ -319,32 +322,8 @@ register_activation_hook(__FILE__,'ss_install');
 */
 function ss_install () 
 {
-	global $wpdb;
-
-	$table_name = $wpdb->prefix . "sph_counter";
-	if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE `".$table_name."`
-				(counter_id INTEGER PRIMARY KEY NOT NULL,
-    			max_doc_id INTEGER NOT NULL
-				);";
-				
-   		 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		 dbDelta($sql);
-   	}
-   	$table_name = $wpdb->prefix . "sph_stats";
-   	if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE `".$table_name."`(
-				`id` int(11) unsigned NOT NULL auto_increment,
-				`keywords` varchar(255) NOT NULL default '',
-				`date_added` datetime NOT NULL default '0000-00-00 00:00:00',
-				`keywords_full` varchar(255) NOT NULL default '',
-				PRIMARY KEY  (`id`),
-				KEY `keywords` (`keywords`),
-				FULLTEXT `ft_keywords` (`keywords`),
-				) ENGINE=MyISAM;";
-				
-   		 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		 dbDelta($sql);
-   	}
+    $config = new SphinxSearch_Config();
+    $sphinxInstall = new SphinxSearch_Install($config);
+    $sphinxInstall->setupSphinxCounterTables();
 }
 

@@ -49,9 +49,9 @@ class SphinxSearch_Install
 	 * Constructor
 	 *
 	 * @param SphinxSearch_Config $config
-	 * @return SphinxSearch_Install
+         * @return void
 	 */
-	function SphinxSearch_Install($config)
+	function  __construct(SphinxSearch_Config $config)
 	{
 		$this->config = $config;
 		
@@ -324,37 +324,10 @@ class SphinxSearch_Install
             return $res;
 	}
 			
-	//////////////////
-	//Create sph_counter
-	//table
-	//////////////////
-					  
-	$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_counter (            
-               counter_id int(11) NOT NULL,        
-               max_doc_id int(11) NOT NULL,        
-               PRIMARY KEY  (counter_id)           
-             );";
-	$res = $wpdb->query($sql);
-	if (false === $res){
-            return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_counter .<br/>"."Command: ".$wpdb->last_query );
-	}
-	//////////////////
-	//Create sph_stats
-	//table
-	//////////////////
-					  
-	$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_stats(                             
-                `id` int(11) unsigned NOT NULL auto_increment,          
-                `keywords` varchar(255) NOT NULL,                       
-                `date_added` datetime NOT NULL,                         
-                `url` varchar(255) NOT NULL,                            
-                PRIMARY KEY  (`id`),
-                KEY `keywords` (`keywords`) 
-              );";
-	$res = $wpdb->query($sql);
-	if (false === $res){
-            return array('err' => "Installtion: Can\'t create table {$table_prefix}sph_stats .<br/>"."Command: ".$wpdb->last_query );
-	}
+	$res = $this->setupSphinxCounterTables();
+        if (is_array($res)){
+            return $res;
+        }
 		
 	//////////////////
 	//run re indexing 
@@ -366,5 +339,42 @@ class SphinxSearch_Install
 	}
 	*/
 	return true;
+     }
+
+     public function setupSphinxCounterTables()
+     {
+         global $table_prefix, $wpdb;
+         //////////////////
+	//Create sph_counter
+	//table
+	//////////////////
+
+	$sql = "CREATE TABLE IF NOT EXISTS {$table_prefix}sph_counter (
+               counter_id int(11) NOT NULL,
+               max_doc_id int(11) NOT NULL,
+               PRIMARY KEY  (counter_id)
+             );";
+	$res = $wpdb->query($sql);
+	if (false === $res){
+            return array('err' => "Can\'t create table {$table_prefix}sph_counter .<br/>"."Command: ".$wpdb->last_query );
+	}
+	//////////////////
+	//Create sph_stats
+	//table
+	//////////////////
+	$sql = "CREATE TABLE IF NOT EXISTS  `".$table_prefix."sph_stats`(
+				`id` int(11) unsigned NOT NULL auto_increment,
+				`keywords` varchar(255) NOT NULL default '',
+				`date_added` datetime NOT NULL default '0000-00-00 00:00:00',
+				`keywords_full` varchar(255) NOT NULL default '',
+				PRIMARY KEY  (`id`),
+				KEY `keywords` (`keywords`),
+				FULLTEXT `ft_keywords` (`keywords`),
+				) ENGINE=MyISAM;";
+	$res = $wpdb->query($sql);
+	if (false === $res){
+            return array('err' => "Can\'t create table {$table_prefix}sph_stats .<br/>"."Command: ".$wpdb->last_query );
+	}
+        return true;
      }
 }

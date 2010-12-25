@@ -50,7 +50,6 @@
 	function ss_latest_searches($limit = 10, $width = 0, $break = '...')
 	{
 		global $defaultObjectSphinxSearch;
-		
 		$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break);
 		echo "<ul>";
 		foreach ($result as $res)
