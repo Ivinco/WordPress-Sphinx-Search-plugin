@@ -2,16 +2,14 @@
 /**
  * LatestSearchesWidget Class
  */
-class LatestSearchesWidget extends WP_Widget
+class TopSearchesWidget extends WP_Widget
 {
     /** constructor */
-    function  LatestSearchesWidget()
+    function  TopSearchesWidget()
     {
-        $widget_ops = array('classname' => 'SphinxLatestSearchesWidget',
-                            'description' => 'Sphinx last search terms' );
-        $this->WP_Widget('SphinxLatestSearchesWidget', 'Sphinx Last Searches', $widget_ops);
-
-        //parent::WP_Widget(false, $name = 'SphinxLatestSearchesWidget');
+        $widget_ops = array('classname' => 'TopSearchesWidget',
+                            'description' => 'Sphinx top search terms' );
+        $this->WP_Widget('TopSearchesWidget', 'Sphinx Top Searches', $widget_ops);
     }
 
     /** @see WP_Widget::widget */
@@ -22,12 +20,12 @@ class LatestSearchesWidget extends WP_Widget
         $limit = !empty($instance['limit']) ? $instance['limit'] : 10;
         $width = !empty($instance['width']) ? $instance['width'] : 0;
         $break = !empty($instance['break']) ? $instance['break'] : '...';
-        echo $before_widget; 
+        echo $before_widget;
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->getLatest($limit, $width, $break);
-        echo $after_widget; 
+        $this->getTop($limit, $width, $break);
+        echo $after_widget;
     }
 
     /** @see WP_Widget::update */
@@ -41,7 +39,7 @@ class LatestSearchesWidget extends WP_Widget
     }
 
     /** @see WP_Widget::form */
-    
+
     function form($instance) {
 
         $title = !empty($instance['title']) ? esc_attr($instance['title']) : '';
@@ -77,11 +75,11 @@ class LatestSearchesWidget extends WP_Widget
 
     }
 
-    function getLatest($limit = 10, $width = 0, $break = '...')
+    function getTop($limit = 10, $width = 0, $break = '...')
     {
         global $defaultObjectSphinxSearch;
-        
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break);
+
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten($limit, $width, $break);
 	echo "<ul>";
             foreach ($result as $res)
             {

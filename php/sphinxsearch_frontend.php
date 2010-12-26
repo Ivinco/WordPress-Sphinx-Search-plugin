@@ -688,7 +688,7 @@ class SphinxSearch_FrontEnd
 		global $wpdb, $table_prefix;
 		$sql_related = '';
 		if (is_search()){
-			$keywords = $this->clear_keywords($_GET['s']);		
+			$keywords = $this->clear_keywords($_GET['s']);
 			if (!empty($keywords)){
 				$sql_related = ' AND ';
 				$sql_related .= " (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE)) ";
@@ -711,7 +711,7 @@ class SphinxSearch_FrontEnd
 						cnt DESC
 					LIMIT 
 						".($limit+30)."" ; 
-			$results = $wpdb->get_results($sql);
+			$results = $wpdb->get_results($sql);                        
 		}
 		if (empty($results)){
 			$sql = "SELECT 

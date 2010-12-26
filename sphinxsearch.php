@@ -58,6 +58,7 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/WizardController.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxService.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/LatestSearches.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/TopSearches.php');
 /**
  * load tags - each tag you can use in your theme template
  * see README
@@ -325,6 +326,7 @@ class SphinxSearch{
     {
         //wp_register_sidebar_widget('LatestSearchesWidget', 'Sphinx Last Searches', array('LatestSearchesWidget', 'widget'));
         register_widget('LatestSearchesWidget');
+        register_widget('TopSearchesWidget');
     }
 }
 
