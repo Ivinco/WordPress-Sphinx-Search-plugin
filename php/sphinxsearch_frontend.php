@@ -733,7 +733,7 @@ class SphinxSearch_FrontEnd
 			$this->top_ten_is_related = true;
 		}
 
-		$results = $this->make_results_clear($results, $limit);
+		$results = $this->make_results_clear($results, $limit, $width, $break);
 		
 		return $results;
 	}
@@ -764,12 +764,12 @@ class SphinxSearch_FrontEnd
 				" ; 
 		$results = $wpdb->get_results($sql);
 		
-		$results = $this->make_results_clear($results, $limit);
+		$results = $this->make_results_clear($results, $limit, $width, $break);
 		
 		return $results;
 	}
 	
-	function make_results_clear($results, $limit){
+	function make_results_clear($results, $limit, $width = 0, $break = '...'){
 	    $counter = 0;
 		$clear_results = array();
 		foreach ($results as $res){

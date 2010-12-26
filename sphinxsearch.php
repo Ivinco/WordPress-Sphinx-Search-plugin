@@ -57,6 +57,7 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_sphinxinstall.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/WizardController.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxService.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/LatestSearches.php');
 /**
  * load tags - each tag you can use in your theme template
  * see README
@@ -132,6 +133,10 @@ class SphinxSearch{
 		add_action('wp_insert_post', array(&$this, 'wp_insert_post'));
 		add_action('comment_post', array(&$this, 'comment_post'));
 		add_action('delete_post', array(&$this, 'delete_post'));
+
+                //widgets
+                add_action( 'widgets_init', array(&$this, 'load_widgets') );
+
 	}
 	
 	/**
@@ -312,6 +317,14 @@ class SphinxSearch{
                 dirname(plugin_basename(__FILE__)).
                 '/templates/jquery-1.4.4.min.js');
         wp_enqueue_script( 'jquery' );
+
+        
+    }
+
+    public function load_widgets()
+    {
+        //wp_register_sidebar_widget('LatestSearchesWidget', 'Sphinx Last Searches', array('LatestSearchesWidget', 'widget'));
+        register_widget('LatestSearchesWidget');
     }
 }
 
