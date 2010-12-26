@@ -369,7 +369,7 @@ class SphinxSearch_Install
 				`keywords_full` varchar(255) NOT NULL default '',
 				PRIMARY KEY  (`id`),
 				KEY `keywords` (`keywords`),
-				FULLTEXT `ft_keywords` (`keywords`),
+				FULLTEXT `ft_keywords` (`keywords`)
 				) ENGINE=MyISAM;";
 	$res = $wpdb->query($sql);
 	if (false === $res){

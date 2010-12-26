@@ -29,3 +29,23 @@
     position: relative;
     width: 99.5%;
 }
+
+a.sm_button {
+    background-position: 5px 50%;
+    background-repeat: no-repeat;
+    border: medium none;
+    display: block;
+    padding: 4px 4px 4px 25px;
+    text-decoration: none;
+}
+
+a.sm_pluginHome {
+    background-image: url("img/icon-arne.gif");
+}
+a.sm_pluginSupport {
+    background-image: url("img/icon-wordpress.gif");
+}
+
+table.form-table {
+    clear: none;
+}

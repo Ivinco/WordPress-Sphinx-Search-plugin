@@ -16,10 +16,21 @@ class WizardController
     {
         $this->view = new SphinxView();
         $this->_config = $config;
+        $this->view->assign('header', 'Sphinx Search :: Wizard');
+    }
+
+    public function startAction()
+    {
+        if (!empty($_POST['start_process'])){
+            $options['wizard_done'] = 'false';
+            $this->_config->update_admin_options($options);
+            return $this->_nextAction('start');
+        }
+        $this->view->render('admin/wizard_layout.phtml');
     }
 
     public function connectionAction()
-    {
+    {        
         if (!empty($_POST['connection_process'])){
             if (empty($_POST['sphinx_host']) ||
                 empty($_POST['sphinx_port']) ||
@@ -29,7 +40,6 @@ class WizardController
                 $this->view->sphinx_port = $_POST['sphinx_port'];
                 $this->view->sphinx_index = $_POST['sphinx_index'];                
                 $this->view->render('admin/wizard_sphinx_connection.phtml');
-                exit;
              } else {
                 $this->_set_sphinx_connect();
                 $this->view->success_message = 'Connection parameters successfully set.';
@@ -41,7 +51,7 @@ class WizardController
             $this->view->sphinx_index = $this->_config->getOption('sphinx_index');
             $this->view->render('admin/wizard_sphinx_connection.phtml');
         }
-        
+        exit;
     }
 
     public function detectionAction()
@@ -67,9 +77,7 @@ class WizardController
             } else if('detect' == $_POST['detected_install']) {
                 if (empty($_POST['detected_searchd']) ||
                     empty($_POST['detected_indexer'])){
-                    $this->view->error_message = 'Path to searchd and indexer can\'t be empty';
-                    $this->view->detect_searchd = $_POST['detected_searchd'];
-                    $this->view->detect_indexer = $_POST['detected_indexer'];
+                    $this->view->error_message = 'Path to searchd or indexer can\'t be empty';
                     $this->view->render('admin/wizard_sphinx_detect.phtml');
                     exit;
                 } else {
@@ -128,9 +136,20 @@ class WizardController
 
     public function configAction()
     {
+        if (!empty($_POST['config_process'])){        
+            return $this->_nextAction('config');
+        }
         $this->view->config_content = $this->_generate_config_file_content();
         $this->view->sphinx_conf = $this->_config->getOption('sphinx_conf');
         $this->view->render('/admin/wizard_sphinx_config.phtml');
+        exit;
+    }
+
+    public function finishAction()
+    {
+        $options['wizard_done'] = 'true';
+        $this->_config->update_admin_options($options);
+        $this->view->render('/admin/wizard_sphinx_finish.phtml');
         exit;
     }
 
@@ -222,6 +241,9 @@ class WizardController
     private function _nextAction($prevAction)
     {
         switch ($prevAction) {
+            case 'start':
+                $this->connectionAction();
+                break;
             case 'connection':
                 $this->detectionAction();
                 break;

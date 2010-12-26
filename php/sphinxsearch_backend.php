@@ -40,26 +40,15 @@ class SphinxSearch_Backend {
       */
 	function print_admin_page() 
 	{
-            require_once (SPHINXSEARCH_PLUGIN_DIR.'/templates/admin/header.phtml');
-            
-            
             if (!current_user_can('manage_options'))  {
                 wp_die( __('You do not have sufficient permissions to access this page.') );
             }            
-            if ( !empty($_REQUEST['run_wizard']) ){
-                $options['wizard_done'] = 'false';
-                $this->config->update_admin_options($options);
-            }
-            if ( !empty($_REQUEST['done_wizard']) ){
-                $options['wizard_done'] = 'true';
-                $this->config->update_admin_options($options);
-            }
             $options = $this->config->get_admin_options();
             $wizard = new WizardController($this->config);
-            if ('false' == $options['wizard_done'] ){
-                $wizard->connectionAction();
+            if (!empty($_POST['start_wizard']) || 'false' == $options['wizard_done']){
+                $wizard->startAction();
                 return;
-            }
+            }            
 
             $sphinxService = new SphinxService($this->config);
             $res = false;
@@ -89,6 +78,7 @@ class SphinxSearch_Backend {
             $devOptions = $this->config->get_admin_options(); //update options
             $sphinxView->assign('devOptions', $devOptions);
             //load admin panel template
+            $sphinxView->assign('header', 'Sphinx Search for Wordpress');
             $sphinxView->render('admin/settings_general.phtml');
 	}
 

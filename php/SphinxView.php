@@ -2,6 +2,7 @@
 class SphinxView
 {
     public $view = null;
+
     public function render($file)
     {
         require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/'.$file);

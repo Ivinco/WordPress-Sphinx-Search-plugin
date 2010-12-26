@@ -1,0 +1,14 @@
+<?php echo $this->render('admin/messagebox.phtml'); ?>
+<div class="postbox">
+    <h3 class="hndle">Sphinx configuration finished</h3>
+    <div class="inside">
+        <p>
+            Configuration wizard is finished.
+        </p>
+        <form  action="options-general.php?page=sphinxsearch.php" method="post"  id="wizard_form">
+            <p class="submit">
+                <input type="submit" value="Finish" class="button-primary" />
+            </p>
+        </form>
+    </div>
+</div>
