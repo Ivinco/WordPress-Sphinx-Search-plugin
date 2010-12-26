@@ -37,7 +37,8 @@ define('SPHINXSEARCH_PLUGIN_DIR', dirname(__FILE__));
 $uploaddir = get_option( 'upload_path' );
 $uploaddir = trim($uploaddir);
 if (empty($uploaddir)){
-    $uploaddir = WP_CONTENT_DIR . '/uploads';
+    $uploads = wp_upload_dir();
+    $uploaddir = $uploads['path'];
 }
 define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
@@ -324,9 +325,12 @@ class SphinxSearch{
 
     public function load_widgets()
     {
-        //wp_register_sidebar_widget('LatestSearchesWidget', 'Sphinx Last Searches', array('LatestSearchesWidget', 'widget'));
-        register_widget('LatestSearchesWidget');
-        register_widget('TopSearchesWidget');
+        global $wp_version;
+        //widgets supported only at version 2.8 or higher
+        if (version_compare($wp_version, '2.8', '>=')) {
+            register_widget('LatestSearchesWidget');
+            register_widget('TopSearchesWidget');
+        }
     }
 }
 
