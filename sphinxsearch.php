@@ -34,12 +34,9 @@ define('SPHINXSEARCH_PLUGIN_DIR', dirname(__FILE__));
  * Sphinx will install in Wordpress default upload directory
  *
  */
-$uploaddir = get_option( 'upload_path' );
-$uploaddir = trim($uploaddir);
-if (empty($uploaddir)){
-    $uploads = wp_upload_dir();
-    $uploaddir = $uploads['path'];
-}
+$uploads = wp_upload_dir();
+$uploaddir = $uploads['basedir'];
+
 define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
 /**
