@@ -65,6 +65,7 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
 
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/LatestSearches.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/TopSearches.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/SearchSidebar.php');
 /**
  * load tags - each tag you can use in your theme template
  * see README
@@ -345,6 +346,7 @@ class SphinxSearch{
         if (version_compare($wp_version, '2.8', '>=')) {
             register_widget('LatestSearchesWidget');
             register_widget('TopSearchesWidget');
+            register_widget('SearchSidebarWidget');
         }
     }
 

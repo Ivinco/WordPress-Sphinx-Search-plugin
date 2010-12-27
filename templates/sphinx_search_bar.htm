@@ -15,11 +15,11 @@ function toggle_sidebar(){
 </script>
 
 <li id="search">
-		<label for="s"><a href="http://www.sphinxsearch.com/" title="Powered By Sphinx Search Engine"><img src="/wp-content/sphinx.png" alt="Powered By Sphinx Search Engine" /></a> <?php _e('Search'); ?></label>
+		<label for="s"><a href="http://www.sphinxsearch.com/" title="Powered By Sphinx Search Engine"><img src="<?php echo plugins_url('img/sphinx.png', __FILE__); ?>" alt="Powered By Sphinx Search Engine" /></a> <?php _e('Search'); ?></label>
 		<form id="searchform" method="get" action="/">
 			<ul>
 				<li>
-				<input type="text" name="s" id="sbar" size="15" value="<?php echo htmlspecialchars($_GET['s']);?>"/> 
+				<input type="text" name="s" id="sbar" size="15" value="<?php echo htmlspecialchars(!empty($_GET['s']) ? $_GET['s']:'');?>"/>
 				<input type="submit" id="submit" value="<?php _e('Search'); ?>" /><br/>
 				<a href="javascript:void(0);" onclick="toggle_sidebar();" style="font-size:10px;">Advanced</a>
 				</li>
