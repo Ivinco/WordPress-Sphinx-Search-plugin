@@ -121,6 +121,7 @@ class SphinxSearch_Install
           if ('' != trim(ini_get('mysql.default_socket'))){
               $sql_sock = 'sql_sock = '.ini_get('mysql.default_socket');
           }
+          $wizard = new WizardController($this->config);
 
      		/**
      		 * We have to rewrite following variables:
@@ -131,6 +132,7 @@ class SphinxSearch_Install
      		 * {searchd_port} to Sphinx search daemon port
      		 * {wp_posts} to Wordpress posts table
      		 * {wp_comments} to Wordpress comments table
+                 * {path_to_php} path to php executable file
      		 * {path_to_wp_config_php} path to wp-config.php - requiered by shebung syntax
      		 */
      	$search = array(
@@ -143,6 +145,7 @@ class SphinxSearch_Install
      		'{wp_term_relationships}' => $wpdb->term_relationships,
      		'{wp_term_taxonomy}' => $wpdb->term_taxonomy,
      		'{wp_terms}' => $wpdb->terms,
+                '{path_to_php}' => $wizard->detectProgram('php'),
                 '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir)))
      		);
 

@@ -36,6 +36,12 @@ define('SPHINXSEARCH_PLUGIN_DIR', dirname(__FILE__));
  */
 $uploads = wp_upload_dir();
 $uploaddir = $uploads['basedir'];
+if (empty($uploaddir) ){
+    $uploaddir = get_option( 'upload_path' );
+    if (empty($uploaddir)){
+        $uploaddir = WP_CONTENT_DIR . '/uploads';
+    }
+}
 
 define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
@@ -52,9 +58,11 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_config.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_frontend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_backend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_sphinxinstall.php');
+
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/WizardController.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxService.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
+
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/LatestSearches.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/TopSearches.php');
 /**
@@ -62,10 +70,11 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/TopSearches.php');
  * see README
  */
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/tags/sphinxsearch_tags.php');
-     	
+
 /**
  * main Sphinx Search object
- */ 
+ */
+
 $defaultObjectSphinxSearch = new SphinxSearch();
 
 class SphinxSearch{
@@ -120,13 +129,6 @@ class SphinxSearch{
 		//action to prepare admin menu
 		add_action('admin_menu', array(&$this, 'options_page'));
                 add_action('admin_init', array(&$this, 'admin_init'));
-
-                //ajax                
-                if (!empty($_POST['action'])){
-                    $wizard = new WizardController($this->config);
-                    add_action('wp_ajax_'.$_POST['action'],
-                            array(&$wizard, $_POST['action'].'Action'));
-                }
 		
 		//frontend actions
 		add_action('wp_insert_post', array(&$this, 'wp_insert_post'));
@@ -192,19 +194,22 @@ class SphinxSearch{
 	/**
 	 * Query Sphinx for search result and parse results return empty query for WP
 	 *
-	 * @param string $query
+	 * @param string $sqlQuery - default sql query to fetch posts
 	 * @return string $query
 	 */
-	function posts_request($query)
-	{	
-		if (!is_search()) return $query;
-		$_GET['s'] = stripslashes($_GET['s']);
-		//Qeuery Sphinx for Search results
-		if ($this->frontend->query() ){
-			$this->frontend->parse_results();
-		}
-		//return empty query
-		return '';
+	function posts_request($sqlQuery)
+	{
+            if (!$this->_sphinxRunning()){
+                return $sqlQuery;
+            }
+            $_GET['s'] = stripslashes($_GET['s']);
+            //Qeuery Sphinx for Search results
+            if ($this->frontend->query() ){
+                $this->frontend->parse_results();
+            }
+            //returning empty string we disabled to run default query
+            //instead of that we add our owen search results 
+            return '';
 	}
 	
 	/**
@@ -215,7 +220,9 @@ class SphinxSearch{
 	 */
 	function posts_results($posts)
 	{			
-		if (!is_search() ) return $posts;
+		if (!$this->_sphinxRunning()){
+                    return $posts;
+                }
 		return  $this->frontend->posts_results();
 	}
 	
@@ -227,7 +234,9 @@ class SphinxSearch{
 	 */
 	function found_posts($found_posts=0)
 	{
-		if (!is_search()) return $found_posts;
+		if (!$this->_sphinxRunning()){
+                        return $found_posts;
+                }
 		return $this->frontend->post_count;
 	}
 	
@@ -239,7 +248,9 @@ class SphinxSearch{
 	 */
 	function the_permalink($permalink = '')
 	{
-		if (!is_search()) return $permalink;		
+		if (!$this->_sphinxRunning()){
+                    return $permalink;
+                }
 		return $this->frontend->the_permalink($permalink);
 	}
 	
@@ -251,7 +262,9 @@ class SphinxSearch{
 	 */
 	function wp_title($title = '')
 	{
-		if (!is_search()) return $title;		
+		if (!$this->_sphinxRunning()){
+                    return $title;
+                }
 		return $this->frontend->wp_title($title);
 	}
 	
@@ -317,7 +330,12 @@ class SphinxSearch{
                 '/templates/jquery-1.4.4.min.js');
         wp_enqueue_script( 'jquery' );
 
-        
+        //ajax wizard actions
+        if (!empty($_POST['action'])){
+            $wizard = new WizardController($this->config);
+            add_action('wp_ajax_'.$_POST['action'],
+            array(&$wizard, $_POST['action'].'Action'));
+         }
     }
 
     public function load_widgets()
@@ -328,6 +346,14 @@ class SphinxSearch{
             register_widget('LatestSearchesWidget');
             register_widget('TopSearchesWidget');
         }
+    }
+
+    private function _sphinxRunning()
+    {
+        if (!is_search() || 'false' == $this->config->getOption('sphinx_running')){
+            return false;
+        }
+        return true;
     }
 }
 

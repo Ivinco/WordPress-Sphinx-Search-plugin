@@ -1,6 +1,8 @@
 <?php 
 if (!file_exists('reindex_config.php')){
-	die("File 'reindex_config.php' is missing.");
+	echo "File 'reindex_config.php' is missing.
+ Example of this file is placed at cron folder of the plugin.\n";
+        exit(0);
 }
 include_once('reindex_config.php');
 
@@ -17,7 +19,7 @@ if (count($argv) != 2 || !in_array($argv[1], array('delta', 'main'))){
 
 if (file_exists(SPHINXSEARCH_REINDEX_FILENAME) || $argv[1] == 'main')
 {
-	$command = PATH_TO_SPHINX_INDEXER." --config ".PATH_TO_SPHINX_CONFIG." ".$argv[1]."_".SPHINX_INDEX_NAME." --rotate ";
+	$command = PATH_TO_SPHINX_INDEXER." --config ".PATH_TO_SPHINX_CONFIG." ".SPHINX_INDEX_NAME.$argv[1]." --rotate ";
 	system($command, $retval);
 	
 	echo "\ndone...\n";	
@@ -28,6 +30,5 @@ if (file_exists(SPHINXSEARCH_REINDEX_FILENAME) || $argv[1] == 'main')
 }
 else {
 	echo "nothing to index...\n";
-	exit(1);
+	exit(0);
 }
-?>

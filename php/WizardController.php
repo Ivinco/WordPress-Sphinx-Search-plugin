@@ -22,6 +22,9 @@ class WizardController
     public function startAction()
     {
         if (!empty($_POST['start_process'])){
+            $sphinxService = new SphinxService($this->_config);
+            $res = $sphinxService->stop();
+
             $options['wizard_done'] = 'false';
             $this->_config->update_admin_options($options);
             return $this->_nextAction('start');
@@ -56,8 +59,8 @@ class WizardController
 
     public function detectionAction()
     {
-        $this->view->detect_searchd = $this->_detect_program('searchd');
-        $this->view->detect_indexer = $this->_detect_program('indexer');
+        $this->view->detect_searchd = $this->detectProgram('searchd');
+        $this->view->detect_indexer = $this->detectProgram('indexer');
 
         if (!empty($_POST['detection_process'])){
             if ('install' == $_POST['detected_install']){                
@@ -147,6 +150,8 @@ class WizardController
 
     public function finishAction()
     {
+        $sphinxService = new SphinxService($this->_config);
+        $res = $sphinxService->start();
         $options['wizard_done'] = 'true';
         $this->_config->update_admin_options($options);
         $this->view->render('/admin/wizard_sphinx_finish.phtml');
@@ -171,7 +176,15 @@ class WizardController
         exit;
     }
 
-
+     public function detectProgram($progname)
+     {
+         $progname = escapeshellcmd($progname);
+         $res = exec("whereis {$progname}");
+         if (!preg_match("#{$progname}:\s?([\w/]+)\s?#", $res, $matches)) {
+            return false;
+         }
+         return $matches[1];
+     }
 
     private function _set_sphinx_connect()
     {
@@ -228,15 +241,7 @@ class WizardController
         return true;
      }
 
-     private function _detect_program($progname)
-     {
-         $progname = escapeshellcmd($progname);
-         $res = exec("whereis {$progname}");
-         if (!preg_match("#{$progname}:\s?([\w/]+)#", $res, $matches)) {
-            return false;
-         }
-         return $matches[1];
-     }
+
 
     private function _nextAction($prevAction)
     {

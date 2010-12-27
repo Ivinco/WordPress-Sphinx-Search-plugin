@@ -20,8 +20,9 @@ class SphinxService
         $command = $this->_config->getOption('sphinx_searchd'). " --config ".
                  $this->_config->getOption('sphinx_conf');
      	exec($command, $output, $retval);
-        if (preg_match("#ERROR:#", implode(" ", $output))){
-            return array('err' => "Can't start searchd, try to start it manually");
+        if ($retval !=0 || preg_match("#ERROR:#i", implode(" ", $output))){
+            return array('err' => "Can't start searchd, try to start it manually.".
+                    '<br/>Command: ' . $command);
         }
      	//echo implode("<br/>", $output);
      	$options['sphinx_running'] = 'true';
@@ -38,11 +39,12 @@ class SphinxService
      	//stop Sphinx search daemon
         $output = '';
      	if ($this->isSphinxRunning()) {
-            $pid = $this->getSphinxPid();
-            $command = "kill -TERM $pid";
+            $command = $this->_config->getOption('sphinx_searchd'). " --config ".
+                 $this->_config->getOption('sphinx_conf') . " --stop";
             exec($command, $output, $retval);
-            if (preg_match("#ERROR:#", implode(" ", $output))){
-                return array('err' => "Can't stop searchd, try to stop it manually");
+            if ($retval != 0 || preg_match("#ERROR:#", implode(" ", $output))){
+                return array('err' => "Can't stop searchd, try to stop it manually. ".
+                    '<br/>Command: ' . $command);
             }
             //echo implode("<br/>", $output);
      	}
@@ -82,18 +84,6 @@ class SphinxService
      	return '';
      }
 
-
-
-     public function getSphinxPid()
-     {
-         exec("cat ".$this->_config->getOption('sphinx_searchd_pid'), $res);
-         if (empty($res)){
-             return false;
-         } else {
-             return $res[0];
-         }
-     }
-
      public function needReindex($flag)
      {
      	if ($flag){
@@ -126,15 +116,16 @@ class SphinxService
             }else {
                 $rotate = '';
             }
-            //re index all indexes with restart searchd
+            //reindex all indexes with restart searchd
             $command = $this->_config->getOption('sphinx_indexer').
                     " --config ".$this->_config->getOption('sphinx_conf'). " ".
                     $this->_config->getOption('sphinx_index')."delta ".
                     $this->_config->getOption('sphinx_index')."main $rotate ";
             exec($command, $output, $retval);
             //echo implode("<br/>", $output);
-            if (preg_match("#ERROR:#", implode(" ", $output))){
-                return  array('err' =>'Indexer: reindexing error, try to run it manually.' .'<br/>Command: ' . $command);
+            if ($retval !=0 || preg_match("#ERROR:#", implode(" ", $output))){
+                return  array('err' =>'Indexer: reindexing error, try to run it manually.' .
+                    '<br/>Command: ' . $command);
             }
 	}
 	$this->needReindex(false);
