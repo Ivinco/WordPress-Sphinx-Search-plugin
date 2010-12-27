@@ -82,7 +82,9 @@ class SphinxSearch_Install
      function get_sphinx_source()
      {	
      	if (!file_exists($this->latest_sphinx_rep_loc.$this->latest_sphinx_filename)){
-     		return array('err' => 'Installation: Sphinx repository '. $this->latest_sphinx_rep_loc . ' do not exist or not available.');
+     		return array('err' => 'Installation: Sphinx repository '. 
+                            $this->latest_sphinx_rep_loc .
+                        ' do not exist or not available.');
      	}else {
      		$sphinx_source = $this->latest_sphinx_rep_loc;
      	}
@@ -229,10 +231,11 @@ class SphinxSearch_Install
             chdir($dir_inst);
             $openarch = "tar xzf ".$dir_inst.'/'.$this->latest_sphinx_filename . " -C $dir_inst";
             exec($openarch, $output, $retval);
-            /*if ($retval == 0)
-                    return array('err' => 'Installation: Archive extracting failed: '. $this->latest_sphinx_filename . ' !<br/>'.
-                    'Command: '.$openarch);
-                    */
+            if ($retval != 0)
+                    return array('err' => 'Installation: Archive extracting failed: '.
+                        $this->latest_sphinx_filename . ' !<br/>'.
+                        'Command: '.$openarch);
+                    
             $dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename);
             chdir($dir_inst.'/'.$dir_rep);
 		
