@@ -247,7 +247,7 @@ class SphinxSearch_Install
             {
                 $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return  array('err' => $msg.'<br/>Command: '.$command);
+                return  array('err' => $msg.'<br/>Command: '.$command." at the dir:".$dir_inst.'/'.$dir_rep);
             }
 
             flush();
