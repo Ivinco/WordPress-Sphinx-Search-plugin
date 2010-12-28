@@ -4,7 +4,7 @@ Donate link: http://ivinco.com/
 Tags: search, sphinx
 !Requires at least: 2.0.2
 !Tested up to: 3.0.3
-!Stable tag: 5.0
+!Stable tag: 4.0
 
 This software replaces Wordpress's built-in search functionality with
 the Sphinx Search Engine, which gives high-performance, relevant
@@ -16,8 +16,7 @@ search results.
 We are open for features requests for plugin and ready to accept community patches.
 
 You can monitor current tasks and further plans on the [WordPress Sphinx Plugin Launchpad project](https://launchpad.net/wp-sphinx-plugin).
-You can also request [features](https://blueprints.launchpad.net/wp-sphinx-plugin) and  report [bugs](https://bugs.launchpad.net/wp-sphinx-plugin)
- there. Also we have setup [maillist](http://groups.google.com/group/WP-Sphinx-plugin) for questions, discussions and announces. 
+You can also request [features](https://blueprints.launchpad.net/wp-sphinx-plugin) and  report [bugs](https://bugs.launchpad.net/wp-sphinx-plugin) there.
 
 Frontend features
 
@@ -59,48 +58,45 @@ Backend features
 
 - Indexer: You can reindex all content manually
 - Search daemon: You can stop/start search daemon
-- Sphinx Search installation wizard: You can automatically install or reinstall Sphinx Search service through web interface
+- Sphinx Search configuration wizard: You can automatically install or reinstall Sphinx Search service through web interface
 
 E-mail:
-WP-Sphinx-plugin@googlegroups.com
+opensource@ivinco.com
 
 Website:
-http://ivinco.com
+http://ivinco.com/
 
 == Installation ==
 
 To use the power of Sphinx for your WordPress blog, follow these steps:
 1. Install the Sphinx Search plugin.
-2. Install Sphinx on your web server.
+2. Install Sphinx on your web server.(optional - you may install Sphinx through web interface of plugin)
 3. Set up cron jobs to re-index your website periodically.
 4. Configure the Sphinx Search plugin.
-5. Customize your WordPress templates to show the Sphinx search field.
+5. Customize your search form on [search results] page by ss_search_bar() tag.
+6. Customize your sidebar with Search widgets (Top/Last search terms and extended search form).
 
 Install the Sphinx Search plugin:
 1. Unpack the plugin archive to wp-content/plugins/sphinxsearch folder of your WordPress installation;
 2. Activate SphinxSearch plugin via WordPress admin area;
-3. Create "sphinx" directory outside of you document root
-4. Chmod the "sphinx" directory to make it writeable for WordPress: e.g. chmod 777 sphinx (to make it writable for all).
+3. Make sure Wordpress upload directory is writeable by webserver;
+4. Open Sphinx Search settings page and follow by Wizard steps to setup sphinx search.
 
 Install Sphinx on your web server:
 If you haven't already installed Sphinx, you can install it
 automatically or manually:
 1. For automatic installation go to 'WP-Admin -> Options -> SphinxSearch' and
-   press "Install Personal Sphinx Search Engine";
+   run configuration Wizard by pressing "Run configuration Wizard";
 2. For manual installation - please visit http://www.sphinxsearch.com/ for more instructions.
 3. After you have installed Sphinx manually change your sphinx.conf:
-   In plugin folder sphinxsearch/rep you can find an example of sphinx.conf;
-   Copy "source" and "index" sections to your sphinx.conf;
-   In sphinx.conf replace our placeholders with their values depending on your system;
-4. Go to "WP-Admin -> Options -> SphinxSearch"
-   Add index configuration options and save the changes;
-5. Run sphinx indexer;
-6. Restart sphinx search daemon.
-7. Chmod the searchd.pid file to make it readable for WordPress: e.g. chmod 644 searchd.pid (to make it readable for all).
+    Go to 'WP-Admin -> Options -> SphinxSearch' and run Wizard again.
+    On second step specify path to installed search and indexer binaries.
+    Follow by Wizard steps to complete configuration.
+4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
    
 Set up cron jobs to re-index your website periodically:
 1. Copy cron/reindex_config_sample.php to cron/reindex_config.php
-2. Open reindex_config.php in editor and change path to Sphinx Indexer, Sphinx conf and index name (optional)
+2. Open reindex_config.php in editor and change path to Sphinx Indexer, Sphinx conf and index prefix (optional)
 3. Use "crontab -e" to add the following lines to your crontab:
 #Delta index.
 #Run cron job every 5 minutes to update delta index:
@@ -115,16 +111,22 @@ Configure the Sphinx Search plugin:
    Go to "WP-Admin -> Options -> SphinxSearch" to do it.
 
 Customize your WordPress templates to show the Sphinx search field:
+Sidebar Widgets:
+Go to "WP-Admin -> Appearance -> Widgets" there are three widgets:
+1. Sphinx Top searches
+2. Sphinx Last searches
+3. Sphinx Search sidebar
+
 Template tags:
 You can use the following tags in your templates:
 1. Search form in sidebar:
   <?php if (function_exists('ss_search_bar')) echo ss_search_bar(true); /*put it in sidebar*/?>
 2. Search form on the top of search results:
   <?php if (function_exists('ss_search_bar')) echo ss_search_bar();/*put it in search page*/?>
-3. Top 10 search results:
-  <?php if (function_exists('ss_top_searches')) ss_top_searches(10); ?>
-4. 10 latest search results:
-  <?php if (function_exists('ss_latest_searches')) ss_latest_searches(10); ?>
+3. Top search results:
+  <?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
+4. Latest search results:
+  <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
 5. To find out if the current post is comment:
   <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
 6. If you want to use tags in post title - please use next function instead of the_title():
@@ -177,7 +179,7 @@ CREATE TABLE wp_sph_counter
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
-Top and last tags:
+Top and last search terms:
 In order to be able to store search statistics the plugin will run 
 the following SQL query during the activation process:
 # in MySQL
@@ -197,6 +199,7 @@ The plugin folder structure:
 ./php - contains php classes and libs;
 ./tags - contains sphinx search tags implementation;
 ./templates - contains html templates, that you can change to suit more to your blog design;
+./widgets - contains sphinx widgets;
 
 How to automatically start Sphinx search daemon at boot:
 In Debian based systems i.e. Ubuntu:

@@ -3,11 +3,11 @@
 Plugin Name: WordPress Sphinx Search Plugin
 Plugin URI: http://www.ivinco.com/software/
 Description: Power of Sphinx Search Engine for Your Blog!
-Version: 1.0
-Author: &copy; Ivinco Inc
+Version: 2.0
+Author: &copy; Ivinco LTD
 Author URI: http://www.ivinco.com/
 
-    Copyright 2008  &copy; Ivinco Inc (email : office@ivinco.com)
+    Copyright 2008  &copy; Ivinco LTD  (email : opensource@ivinco.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

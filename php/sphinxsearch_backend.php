@@ -1,6 +1,6 @@
 <?php
 /*
-	Copyright 2008  &copy; Ivinco Inc  (email : office@ivinco.com)
+    Copyright 2008  &copy; Ivinco LTD  (email : opensource@ivinco.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
