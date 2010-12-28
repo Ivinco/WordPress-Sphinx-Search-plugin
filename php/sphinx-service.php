@@ -34,8 +34,8 @@ class SphinxService
     public function start()
     {
         $this->stop(); //kill daemon if runned
-        $command = $this->_config->getOption('sphinx_searchd'). " --config ".
-                 $this->_config->getOption('sphinx_conf');
+        $command = $this->_config->get_option('sphinx_searchd'). " --config ".
+                 $this->_config->get_option('sphinx_conf');
      	exec($command, $output, $retval);
         if ($retval !=0 || preg_match("#ERROR:#i", implode(" ", $output))){
             return array('err' => "Can't start searchd, try to start it manually.".
@@ -55,9 +55,9 @@ class SphinxService
     {
      	//stop Sphinx search daemon
         $output = '';
-     	if ($this->isSphinxRunning()) {
-            $command = $this->_config->getOption('sphinx_searchd'). " --config ".
-                 $this->_config->getOption('sphinx_conf') . " --stop";
+     	if ($this->is_sphinx_running()) {
+            $command = $this->_config->get_option('sphinx_searchd'). " --config ".
+                 $this->_config->get_option('sphinx_conf') . " --stop";
             exec($command, $output, $retval);
             if ($retval != 0 || preg_match("#ERROR:#", implode(" ", $output))){
                 return array('err' => "Can't stop searchd, try to stop it manually. ".
@@ -76,9 +76,9 @@ class SphinxService
       *
       * @return boolean
       */
-     public function isSphinxRunning()
+     public function is_sphinx_running()
      {
-         if (file_exists($this->_config->getOption('sphinx_searchd_pid'))){
+         if (file_exists($this->_config->get_option('sphinx_searchd_pid'))){
              return true;
          } else {             
              return false;
@@ -90,7 +90,7 @@ class SphinxService
       * @param unknown_type $sphinx_conf
       * @return unknown
       */
-     public function getSearchdPid($sphinx_conf)
+     public function get_searchd_pid($sphinx_conf)
      {
      	$content = file_get_contents($sphinx_conf);
      	//pid_file		= {sphinx_path}/var/log/searchd.pid
@@ -101,7 +101,7 @@ class SphinxService
      	return '';
      }
 
-     public function needReindex($flag)
+     public function need_reindex($flag)
      {
      	if ($flag){
      		$fp = fopen(SPHINXSEARCH_REINDEX_FILENAME, 'w+');
@@ -121,23 +121,23 @@ class SphinxService
 	 */
     function reindex()
     {
-     	if (!file_exists($this->_config->getOption('sphinx_searchd')) ||
-            !file_exists($this->_config->getOption('sphinx_conf')) ||
-            !file_exists($this->_config->getOption('sphinx_indexer'))){
+     	if (!file_exists($this->_config->get_option('sphinx_searchd')) ||
+            !file_exists($this->_config->get_option('sphinx_conf')) ||
+            !file_exists($this->_config->get_option('sphinx_indexer'))){
             return  array('err' =>'Indexer: configuration files not found.');
-	}elseif ('' == $this->_config->getOption('sphinx_index')){
+	}elseif ('' == $this->_config->get_option('sphinx_index')){
             return  array('err' =>'Indexer: Sphinx index prefix is not specified.');
 	}else {
-            if ($this->isSphinxRunning()) {
+            if ($this->is_sphinx_running()) {
                 $rotate = '--rotate ';
             }else {
                 $rotate = '';
             }
             //reindex all indexes with restart searchd
-            $command = $this->_config->getOption('sphinx_indexer').
-                    " --config ".$this->_config->getOption('sphinx_conf'). " ".
-                    $this->_config->getOption('sphinx_index')."delta ".
-                    $this->_config->getOption('sphinx_index')."main $rotate ";
+            $command = $this->_config->get_option('sphinx_indexer').
+                    " --config ".$this->_config->get_option('sphinx_conf'). " ".
+                    $this->_config->get_option('sphinx_index')."delta ".
+                    $this->_config->get_option('sphinx_index')."main $rotate ";
             exec($command, $output, $retval);
             //echo implode("<br/>", $output);
             if ($retval !=0 || preg_match("#ERROR:#", implode(" ", $output))){
@@ -145,7 +145,7 @@ class SphinxService
                     '<br/>Command: ' . $command);
             }
 	}
-	$this->needReindex(false);
+	$this->need_reindex(false);
 	$this->_config->update_admin_options();
 	return true;
      }

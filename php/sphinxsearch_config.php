@@ -109,7 +109,7 @@ class SphinxSearch_Config
    		$this->admin_options = get_option($this->adminOptionsName);
    		if ($this->admin_options['sphinx_installed']){
                     $sphinxService = new SphinxService($this);
-                    if ( $sphinxService->isSphinxRunning() ){
+                    if ( $sphinxService->is_sphinx_running() ){
                         $this->admin_options['sphinx_running'] = 'true';
                     } else {
                         $this->admin_options['sphinx_running'] = 'false';
@@ -138,13 +138,13 @@ class SphinxSearch_Config
      	}
      	if (!empty($this->admin_options['sphinx_conf']) && file_exists($this->admin_options['sphinx_conf'])){
             $sphinxService = new SphinxService($this);
-            $pid = $sphinxService->getSearchdPid($this->admin_options['sphinx_conf']);
+            $pid = $sphinxService->get_searchd_pid($this->admin_options['sphinx_conf']);
             $this->admin_options['sphinx_searchd_pid'] = $pid;
         }
      	update_option($this->adminOptionsName, $this->admin_options);
      }
 
-     public function getOption($opt)
+     public function get_option($opt)
      {
          if (isset($this->admin_options[$opt])){
             return $this->admin_options[$opt];

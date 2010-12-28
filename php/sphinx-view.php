@@ -25,12 +25,7 @@ class SphinxView
     {
         require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/'.$file);
     }
-    public function assignObject($object)
-    {
-        foreach($object as $key => $value){
-            $this->assign($key, $value);
-        }
-    }
+
     public function assign($key, $value)
     {
         $this->view->{$key} = $value;

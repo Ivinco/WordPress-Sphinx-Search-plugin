@@ -41,7 +41,7 @@ class TopSearchesWidget extends WP_Widget
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->getTop($limit, $width, $break);
+        $this->get_top($limit, $width, $break);
         echo $after_widget;
     }
 
@@ -92,7 +92,7 @@ class TopSearchesWidget extends WP_Widget
 
     }
 
-    function getTop($limit = 10, $width = 0, $break = '...')
+    function get_top($limit = 10, $width = 0, $break = '...')
     {
         global $defaultObjectSphinxSearch;
 

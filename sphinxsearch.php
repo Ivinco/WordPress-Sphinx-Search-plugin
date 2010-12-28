@@ -6,6 +6,7 @@ Description: Power of Sphinx Search Engine for Your Blog!
 Version: 2.0
 Author: &copy; Ivinco LTD
 Author URI: http://www.ivinco.com/
+License: A GPL2
 
     Copyright 2008  &copy; Ivinco LTD  (email : opensource@ivinco.com)
 
@@ -59,13 +60,13 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_frontend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_backend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_sphinxinstall.php');
 
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/WizardController.php');
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxService.php');
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/SphinxView.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/wizard-controller.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinx-service.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinx-view.php');
 
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/LatestSearches.php');
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/TopSearches.php');
-include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/SearchSidebar.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/latest-searches.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/top-searches.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/widgets/search-sidebar.php');
 /**
  * load tags - each tag you can use in your theme template
  * see README
@@ -277,7 +278,7 @@ class SphinxSearch{
 	 */
 	function wp_insert_post($post_id, $post='')
 	{
-		$this->sphinxService->needReindex(true);
+		$this->sphinxService->need_reindex(true);
                 $options['sphinx_need_reindex'] = true;
 		$this->config->update_admin_options($options);
 	}
@@ -335,7 +336,7 @@ class SphinxSearch{
         if (!empty($_POST['action'])){
             $wizard = new WizardController($this->config);
             add_action('wp_ajax_'.$_POST['action'],
-            array(&$wizard, $_POST['action'].'Action'));
+            array(&$wizard, $_POST['action'].'_action'));
          }
     }
 
@@ -352,7 +353,7 @@ class SphinxSearch{
 
     private function _sphinxRunning()
     {
-        if (!is_search() || 'false' == $this->config->getOption('sphinx_running')){
+        if (!is_search() || 'false' == $this->config->get_option('sphinx_running')){
             return false;
         }
         return true;
@@ -368,6 +369,6 @@ function ss_install ()
 {
     $config = new SphinxSearch_Config();
     $sphinxInstall = new SphinxSearch_Install($config);
-    $sphinxInstall->setupSphinxCounterTables();
+    $sphinxInstall->setup_sphinx_counter_tables();
 }
 

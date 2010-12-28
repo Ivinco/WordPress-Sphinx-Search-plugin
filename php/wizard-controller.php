@@ -36,14 +36,14 @@ class WizardController
         $this->view->assign('header', 'Sphinx Search :: Wizard');
     }
 
-    public function stopAction()
+    public function stop_action()
     {
         $options['wizard_done'] = 'true';
         $this->_config->update_admin_options($options);
-        return $this->_nextAction('config');
+        return $this->_next_action('config');
     }
 
-    public function startAction()
+    public function start_action()
     {
         if (!empty($_POST['start_process'])){
             //$sphinxService = new SphinxService($this->_config);
@@ -51,16 +51,16 @@ class WizardController
 
             $options['wizard_done'] = 'false';
             $this->_config->update_admin_options($options);
-            return $this->_nextAction('start');
+            return $this->_next_action('start');
         }
         $this->view->render('admin/wizard_layout.phtml');
     }
 
-    public function connectionAction()
+    public function connection_action()
     {
         if (!empty($_POST['skip_wizard_connection'])){
             $this->view->success_message = 'Step was skipped.';
-            return $this->_nextAction('connection');
+            return $this->_next_action('connection');
         }
         if (!empty($_POST['connection_process'])){
             if (empty($_POST['sphinx_host']) ||
@@ -74,23 +74,23 @@ class WizardController
              } else {
                 $this->_set_sphinx_connect();
                 $this->view->success_message = 'Connection parameters successfully set.';
-                return $this->_nextAction('connection');                
+                return $this->_next_action('connection');
              }
         } else {
-            $this->view->sphinx_host = $this->_config->getOption('sphinx_host');
-            $this->view->sphinx_port = $this->_config->getOption('sphinx_port');
-            $this->view->sphinx_index = $this->_config->getOption('sphinx_index');
+            $this->view->sphinx_host = $this->_config->get_option('sphinx_host');
+            $this->view->sphinx_port = $this->_config->get_option('sphinx_port');
+            $this->view->sphinx_index = $this->_config->get_option('sphinx_index');
             $this->view->render('admin/wizard_sphinx_connection.phtml');
         }
         exit;
     }
 
-    public function detectionAction()
+    public function detection_action()
     {
-        $detect_system_searchd = $this->detectProgram('searchd');
-        $detect_system_indexer = $this->detectProgram('indexer');
-        $detect_installed_searchd = $this->_config->getOption('sphinx_searchd');
-        $detect_installed_indexer = $this->_config->getOption('sphinx_indexer');
+        $detect_system_searchd = $this->detect_program('searchd');
+        $detect_system_indexer = $this->detect_program('indexer');
+        $detect_installed_searchd = $this->_config->get_option('sphinx_searchd');
+        $detect_installed_indexer = $this->_config->get_option('sphinx_indexer');
         if (!file_exists($detect_installed_searchd)){
             $detect_installed_searchd = '';
         }
@@ -108,11 +108,11 @@ class WizardController
             if ( empty($detect_installed_searchd) ||
                  empty($detect_installed_indexer) ){
                 $this->view->success_message = 'Sphinx is not installed. All step was skipped.';
-                return $this->_nextAction('config');
+                return $this->_next_action('config');
                 exit;
             } else {
                 $this->view->success_message = 'Step was skipped.';
-                return $this->_nextAction('detection');
+                return $this->_next_action('detection');
             }
         }
         
@@ -126,7 +126,7 @@ class WizardController
 		$res = $sphinxInstall->install();
                 if (true === $res){
                     $this->view->success_message = 'Sphinx successfully installed.';
-                    return $this->_nextAction('install');
+                    return $this->_next_action('install');
                 } else {
                     $this->view->error_message = $res['err'];
                      $this->view->render('admin/wizard_sphinx_detect.phtml');
@@ -141,7 +141,7 @@ class WizardController
                 } else {
                     $this->_set_sphinx_detected($_POST['detected_system_searchd'], $_POST['detected_system_indexer']);
                     $this->view->success_message = 'Sphinx binaries are set.';
-                    return $this->_nextAction('detection');
+                    return $this->_next_action('detection');
                 }
             } else if('detect_installed' == $_POST['detected_install']) {
                 if (empty($_POST['detected_installed_searchd']) ||
@@ -152,7 +152,7 @@ class WizardController
                 } else {
                     $this->_set_sphinx_detected($_POST['detected_installed_searchd'], $_POST['detected_installed_indexer']);
                     $this->view->success_message = 'Sphinx binaries are set.';
-                    return $this->_nextAction('detection');
+                    return $this->_next_action('detection');
                 }
             }
         } 
@@ -160,11 +160,11 @@ class WizardController
         exit;
     }
 
-    public function folderAction()
+    public function folder_action()
     {
         if (!empty($_POST['skip_wizard_folder'])){
             $this->view->success_message = 'Step was skipped.';
-            return $this->_nextAction('folder');
+            return $this->_next_action('folder');
         }
         if (!empty($_POST['folder_process'])){
             $sphinx_install_path = $_POST['sphinx_path'];
@@ -194,7 +194,7 @@ class WizardController
                     mkdir($sphinx_install_path.'/var/log');
                 }
                 $this->view->success_message = 'Path is set';
-                return $this->_nextAction('folder');
+                return $this->_next_action('folder');
             }
 
             $this->view->error_message = $error_message;            
@@ -206,22 +206,22 @@ class WizardController
         exit;
     }
 
-    public function configAction()
+    public function config_action()
     {
         if (!empty($_POST['skip_wizard_config'])){
             $this->view->success_message = 'Step was skipped.';
-            return $this->_nextAction('config');
+            return $this->_next_action('config');
         }
         if (!empty($_POST['config_process'])){        
-            return $this->_nextAction('config');
+            return $this->_next_action('config');
         }
         $this->view->config_content = $this->_generate_config_file_content();
-        $this->view->sphinx_conf = $this->_config->getOption('sphinx_conf');
+        $this->view->sphinx_conf = $this->_config->get_option('sphinx_conf');
         $this->view->render('/admin/wizard_sphinx_config.phtml');
         exit;
     }
 
-    public function finishAction()
+    public function finish_action()
     {
         $sphinxService = new SphinxService($this->_config);
         $res = $sphinxService->start();
@@ -231,11 +231,11 @@ class WizardController
         exit;
     }
 
-    public function indexingAction()
+    public function indexing_action()
     {
         if (!empty($_POST['skip_wizard_indexsation'])){
             $this->view->success_message = 'Step was skipped.';
-            return $this->_nextAction('indexing');
+            return $this->_next_action('indexing');
         }
 
         if (!empty($_POST['process_indexing'])){
@@ -244,7 +244,7 @@ class WizardController
             if (true === $res){
                 $this->view->indexsation_done = true;
                 $this->view->success_message = 'Indexing is done successfuly!';
-                return $this->_nextAction('indexing');
+                return $this->_next_action('indexing');
             } else {
                 $this->view->error_message = $res['err'];
             }
@@ -254,7 +254,7 @@ class WizardController
         exit;
     }
 
-     public function detectProgram($progname)
+     public function detect_program($progname)
      {
          $progname = escapeshellcmd($progname);
          $res = exec("whereis {$progname}");
@@ -321,30 +321,30 @@ class WizardController
 
 
 
-    private function _nextAction($prevAction)
+    private function _next_action($prevAction)
     {
         switch ($prevAction) {
             case 'start':
-                $this->connectionAction();
+                $this->connection_action();
                 break;
             case 'connection':
-                $this->detectionAction();
+                $this->detection_action();
                 break;
             case 'install':
                 case 'folder':
-                $this->indexingAction();
+                $this->indexing_action();
                 break;
             case 'indexing':
-                $this->configAction();
+                $this->config_action();
                 break;
             case 'config':
-                $this->finishAction();
+                $this->finish_action();
                 break;
             case 'detection':
-                $this->folderAction();
+                $this->folder_action();
                 break;
             default:
-                $this->connectionAction();
+                $this->start_action();
                 break;
         }
     }

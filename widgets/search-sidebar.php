@@ -41,7 +41,7 @@ class SearchSidebarWidget extends WP_Widget
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->getSidebar();
+        $this->get_sidebar();
         echo $after_widget;
     }
 
@@ -68,7 +68,7 @@ class SearchSidebarWidget extends WP_Widget
 
     }
 
-    function getSidebar()
+    function get_sidebar()
     {
         global $defaultObjectSphinxSearch;
 

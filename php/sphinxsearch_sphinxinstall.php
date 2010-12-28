@@ -147,7 +147,7 @@ class SphinxSearch_Install
      		'{wp_term_relationships}' => $wpdb->term_relationships,
      		'{wp_term_taxonomy}' => $wpdb->term_taxonomy,
      		'{wp_terms}' => $wpdb->terms,
-                '{path_to_php}' => $wizard->detectProgram('php'),
+                '{path_to_php}' => $wizard->detect_program('php'),
                 '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir)))
      		);
 
@@ -330,7 +330,7 @@ class SphinxSearch_Install
             return $res;
 	}
 			
-	$res = $this->setupSphinxCounterTables();
+	$res = $this->setup_sphinx_counter_tables();
         if (is_array($res)){
             return $res;
         }
@@ -347,7 +347,7 @@ class SphinxSearch_Install
 	return true;
      }
 
-     public function setupSphinxCounterTables()
+     public function setup_sphinx_counter_tables()
      {
          global $table_prefix, $wpdb;
          //////////////////

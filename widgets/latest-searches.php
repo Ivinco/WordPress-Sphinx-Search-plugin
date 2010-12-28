@@ -43,7 +43,7 @@ class LatestSearchesWidget extends WP_Widget
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->getLatest($limit, $width, $break);
+        $this->get_latest($limit, $width, $break);
         echo $after_widget; 
     }
 
@@ -94,7 +94,7 @@ class LatestSearchesWidget extends WP_Widget
 
     }
 
-    function getLatest($limit = 10, $width = 0, $break = '...')
+    function get_latest($limit = 10, $width = 0, $break = '...')
     {
         global $defaultObjectSphinxSearch;
         
