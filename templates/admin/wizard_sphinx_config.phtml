@@ -12,8 +12,13 @@
             <input type="hidden" name="config_process" value="true" />
             <input type="hidden" name="action" value="config" />
             <p class="submit">
+                <input class="button-primary" type="button"
+                       onClick="return wizard_skip('config');" value="Skip step" />
                 <input type="button"  onClick="return wizard_next();"
                        value="Save &amp; Continue" class="button-primary" />
+                 <input class="button-primary" type="button"
+                                       style="float:right"
+                                       onClick="return wizard_cancel();" value="Cancel Wizard" />
             </p>
         </form>
     </div>

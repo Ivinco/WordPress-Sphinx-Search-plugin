@@ -19,11 +19,18 @@ class WizardController
         $this->view->assign('header', 'Sphinx Search :: Wizard');
     }
 
+    public function stopAction()
+    {
+        $options['wizard_done'] = 'true';
+        $this->_config->update_admin_options($options);
+        return $this->_nextAction('config');
+    }
+
     public function startAction()
     {
         if (!empty($_POST['start_process'])){
-            $sphinxService = new SphinxService($this->_config);
-            $res = $sphinxService->stop();
+            //$sphinxService = new SphinxService($this->_config);
+            //$res = $sphinxService->stop();
 
             $options['wizard_done'] = 'false';
             $this->_config->update_admin_options($options);
@@ -33,7 +40,11 @@ class WizardController
     }
 
     public function connectionAction()
-    {        
+    {
+        if (!empty($_POST['skip_wizard_connection'])){
+            $this->view->success_message = 'Step was skipped.';
+            return $this->_nextAction('connection');
+        }
         if (!empty($_POST['connection_process'])){
             if (empty($_POST['sphinx_host']) ||
                 empty($_POST['sphinx_port']) ||
@@ -59,8 +70,35 @@ class WizardController
 
     public function detectionAction()
     {
-        $this->view->detect_searchd = $this->detectProgram('searchd');
-        $this->view->detect_indexer = $this->detectProgram('indexer');
+        $detect_system_searchd = $this->detectProgram('searchd');
+        $detect_system_indexer = $this->detectProgram('indexer');
+        $detect_installed_searchd = $this->_config->getOption('sphinx_searchd');
+        $detect_installed_indexer = $this->_config->getOption('sphinx_indexer');
+        if (!file_exists($detect_installed_searchd)){
+            $detect_installed_searchd = '';
+        }
+        if (!file_exists($detect_installed_indexer)){
+            $detect_installed_indexer = '';
+        }
+
+        $this->view->detect_system_searchd = $detect_system_searchd;
+        $this->view->detect_system_indexer = $detect_system_indexer;
+        $this->view->detect_installed_searchd = $detect_installed_searchd;
+        $this->view->detect_installed_indexer = $detect_installed_indexer;
+        $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
+
+        if (!empty($_POST['skip_wizard_detection'])){
+            if ( empty($detect_installed_searchd) ||
+                 empty($detect_installed_indexer) ){
+                $this->view->success_message = 'Sphinx is not installed. All step was skipped.';
+                return $this->_nextAction('config');
+                exit;
+            } else {
+                $this->view->success_message = 'Step was skipped.';
+                return $this->_nextAction('detection');
+            }
+        }
+        
 
         if (!empty($_POST['detection_process'])){
             if ('install' == $_POST['detected_install']){                
@@ -77,26 +115,40 @@ class WizardController
                      $this->view->render('admin/wizard_sphinx_detect.phtml');
                     exit;
                 }
-            } else if('detect' == $_POST['detected_install']) {
-                if (empty($_POST['detected_searchd']) ||
-                    empty($_POST['detected_indexer'])){
+            } else if('detect_system' == $_POST['detected_install']) {
+                if (empty($_POST['detected_system_searchd']) ||
+                    empty($_POST['detected_system_indexer'])){
                     $this->view->error_message = 'Path to searchd or indexer can\'t be empty';
                     $this->view->render('admin/wizard_sphinx_detect.phtml');
                     exit;
                 } else {
-                    $this->_set_sphinx_detected();
+                    $this->_set_sphinx_detected($_POST['detected_system_searchd'], $_POST['detected_system_indexer']);
+                    $this->view->success_message = 'Sphinx binaries are set.';
+                    return $this->_nextAction('detection');
+                }
+            } else if('detect_installed' == $_POST['detected_install']) {
+                if (empty($_POST['detected_installed_searchd']) ||
+                    empty($_POST['detected_installed_indexer'])){
+                    $this->view->error_message = 'Path to searchd or indexer can\'t be empty';
+                    $this->view->render('admin/wizard_sphinx_detect.phtml');
+                    exit;
+                } else {
+                    $this->_set_sphinx_detected($_POST['detected_installed_searchd'], $_POST['detected_installed_indexer']);
                     $this->view->success_message = 'Sphinx binaries are set.';
                     return $this->_nextAction('detection');
                 }
             }
         } 
-        $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
         $this->view->render('admin/wizard_sphinx_detect.phtml');
         exit;
     }
 
     public function folderAction()
     {
+        if (!empty($_POST['skip_wizard_folder'])){
+            $this->view->success_message = 'Step was skipped.';
+            return $this->_nextAction('folder');
+        }
         if (!empty($_POST['folder_process'])){
             $sphinx_install_path = $_POST['sphinx_path'];
             if (empty($sphinx_install_path)) {
@@ -139,6 +191,10 @@ class WizardController
 
     public function configAction()
     {
+        if (!empty($_POST['skip_wizard_config'])){
+            $this->view->success_message = 'Step was skipped.';
+            return $this->_nextAction('config');
+        }
         if (!empty($_POST['config_process'])){        
             return $this->_nextAction('config');
         }
@@ -160,6 +216,11 @@ class WizardController
 
     public function indexingAction()
     {
+        if (!empty($_POST['skip_wizard_indexsation'])){
+            $this->view->success_message = 'Step was skipped.';
+            return $this->_nextAction('indexing');
+        }
+
         if (!empty($_POST['process_indexing'])){
             $sphinxService = new SphinxService($this->_config);
             $res = $sphinxService->reindex();
@@ -233,10 +294,10 @@ class WizardController
 
     
 
-    private function _set_sphinx_detected()
+    private function _set_sphinx_detected($searchd, $indexer)
     {
-        $options['sphinx_searchd'] = $_POST['detected_searchd'];
-        $options['sphinx_indexer'] = $_POST['detected_indexer'];
+        $options['sphinx_searchd'] = $searchd;
+        $options['sphinx_indexer'] = $indexer;
         $this->_config->update_admin_options($options);
         return true;
      }

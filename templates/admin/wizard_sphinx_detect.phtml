@@ -7,52 +7,82 @@
         <input type="hidden" name="detection_process" value="1" />
         <input type="hidden" name="action" value="detection" />
         <table class="form-table">
-        <?php if($this->view->detect_searchd):?>            
+        <?php if($this->view->detect_system_searchd):?>
             <tr>
                 <th><label>detected system searchd</label></th>
                 <td>
-                    <input type="text" name="detected_searchd"
-                           value="<?php echo $this->view->detect_searchd?>" />
+                    <input type="text" name="detected_system_searchd"
+                           value="<?php echo $this->view->detect_system_searchd?>" />
                 </td>
             </tr>
             <tr>
                 <th><label>detected system indexer</label></th>
                 <td>
-                    <input type="text" name="detected_indexer"
-                           value="<?php echo $this->view->detect_indexer?>" />
+                    <input type="text" name="detected_system_indexer"
+                           value="<?php echo $this->view->detect_system_indexer?>" />
                 </td>
             </tr>
             <tr>
                 <th><label>use system binaries</label></th>
                 <td><input type="radio" name="detected_install"
-                           value="detect" checked="checked" /></td>
-            </tr>
-            <tr>
-                <th><label>install sphinx</label></th>
-                <td><input type="radio" name="detected_install"
-                           value="install" /></td>
-            </tr>
+                           value="detect_system" checked="checked" /></td>
+            </tr>            
+        <?php endif; ?>
 
-            
-        <?php else:?>
-            <p>
-            Sphinx is not installed on the system.<br/>
-            Notice that sphinx will be installed at <?php echo $this->view->install_path?>?
-            </p>
+        <?php if($this->view->detect_installed_searchd &&
+                $this->view->detect_installed_searchd != $this->view->detect_system_searchd):?>
             <tr>
-                <th><label>install sphinx</label></th>
+                <th><label>detected installed searchd</label></th>
+                <td>
+                    <input type="text" name="detected_installed_searchd"
+                           value="<?php echo $this->view->detect_installed_searchd?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>detected installed indexer</label></th>
+                <td>
+                    <input type="text" name="detected_installed_indexer"
+                           value="<?php echo $this->view->detect_installed_indexer?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label>use installed binaries</label></th>
+                <td><input type="radio" name="detected_install"
+                           value="detect_installed" checked="checked" /></td>
+            </tr>
+        <?php endif; ?>
+
+        <?php if (empty($this->view->detect_system_searchd) &&
+                empty($this->view->detect_installed_searchd)):?>
+            <tr>
+                <th><label>* install sphinx</label></th>
                 <td><input type="radio" name="detected_install"
                            value="install" checked="checked" /></td>
+            </tr>
+       <?php else:?>
+            <tr>
+                <th><label>* install sphinx</label></th>
+                <td><input type="radio" name="detected_install"
+                           value="install" /></td>
             </tr>
         <?php endif; ?>
             
             </table>
-            <p class="submit">
-                <input class="button-primary" type="button" onClick="return wizard_next();"
+        <p>
+            <i>* Notice that sphinx will be installed at <?php echo $this->view->install_path?></i>
+        </p>
+        
+        <p class="submit">
+            <input class="button-primary" type="button"
+                onClick="return wizard_skip('detection');" value="Skip step" />
+             <input class="button-primary" type="button" onClick="return wizard_next();"
                        name="use_detected_sphinx" value="Save &amp; Continue" />
-                <span style="font-size: 24px;">
+              <input class="button-primary" type="button"
+                                       style="float:right"
+                                       onClick="return wizard_cancel();" value="Cancel Wizard" />
             </p>
 
     </form>
+        
     </div>
 </div>
