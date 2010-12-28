@@ -4,7 +4,7 @@ Donate link: http://ivinco.com/
 Tags: search, sphinx
 !Requires at least: 2.0.2
 !Tested up to: 3.0.3
-!Stable tag: 4.0
+!Stable tag: r_2-0
 
 This software replaces Wordpress's built-in search functionality with
 the Sphinx Search Engine, which gives high-performance, relevant
@@ -20,26 +20,26 @@ You can also request [features](https://blueprints.launchpad.net/wp-sphinx-plugi
 
 Frontend features
 
-- Search powered by Sphinx Search engine or SphinxSearch inside
-- Very fast search
-- Flexible [search syntax](http://www.sphinxsearch.com/doc.html#extended-syntax)
-- Sort search resutls by Relevance or Freshness
-- Search by posts, by comments and by pages.
-- Exclude posts, comments or pages from search results.
-- Display comments at search results page.
-- Search non-password protected pages only
-- Search only approved comments
-- By default search working in extended mode, but if no one results was found, then it try to search in "Match Any" mode.
-- On search results page title of web page are changed due to entered search keywords
-- Log all search results, except empty results
-- Display Top-n search keywords
-- Display Latest-n search keywords
-- If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
+* Search powered by Sphinx Search engine or SphinxSearch inside
+* Very fast search
+* Flexible [search syntax](http://www.sphinxsearch.com/doc.html#extended-syntax)
+* Sort search resutls by Relevance or Freshness
+* Search by posts, by comments and by pages.
+* Exclude posts, comments or pages from search results.
+* Display comments at search results page.
+* Search non-password protected pages only
+* Search only approved comments
+* By default search working in extended mode, but if no one results was found, then it try to search in "Match Any" mode.
+* On search results page title of web page are changed due to entered search keywords
+* Log all search results, except empty results
+* Display Top-n search keywords
+* Display Latest-n search keywords
+* If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
 
 Backend features
 
-- Disable/Enable search by: comments, posts, pages
-- Keywords wrapper settings:
+* Disable/Enable search by: comments, posts, pages
+* Keywords wrapper settings:
 
   * Add tag Before and After search keyword in body/title
   * Separator of result snippets
@@ -48,23 +48,23 @@ Backend features
   * Prefix before Posts, Comments and Pages title
   * List of phrases to cut from search results
 
-- Sphinx daemon Configuration:
- * Sphinx index prefix
- * Host
- * Port
- * Configuration file
- * Searchd file
- * Indexer file
+* Sphinx daemon Configuration:
+  * Sphinx index prefix
+  * Host
+  * Port
+  * Configuration file
+  * Searchd file
+  * Indexer file
 
-- Indexer: You can reindex all content manually
-- Search daemon: You can stop/start search daemon
-- Sphinx Search configuration wizard: You can automatically install or reinstall Sphinx Search service through web interface
+* Indexer: You can reindex all content manually
+* Search daemon: You can stop/start search daemon
+* Sphinx Search configuration wizard: You can automatically install or reinstall Sphinx Search service through web interface
 
 E-mail:
 opensource@ivinco.com
 
 Website:
-http://ivinco.com/
+[Ivinco](http://ivinco.com/ "Ivinco LTD")
 
 == Installation ==
 
@@ -89,9 +89,9 @@ automatically or manually:
    run configuration Wizard by pressing "Run configuration Wizard";
 2. For manual installation - please visit http://www.sphinxsearch.com/ for more instructions.
 3. After you have installed Sphinx manually change your sphinx.conf:
-    Go to 'WP-Admin -> Options -> SphinxSearch' and run Wizard again.
-    On second step specify path to installed search and indexer binaries.
-    Follow by Wizard steps to complete configuration.
+   * Go to 'WP-Admin -> Options -> SphinxSearch' and run Wizard again.
+   * On second step specify path to installed search and indexer binaries.
+   * Follow by Wizard steps to complete configuration.
 4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
    
 Set up cron jobs to re-index your website periodically:
@@ -108,7 +108,7 @@ Set up cron jobs to re-index your website periodically:
 
 Configure the Sphinx Search plugin:
 1. You can control the majority of options via admin area of WordPress. 
-   Go to "WP-Admin -> Options -> SphinxSearch" to do it.
+Go to "WP-Admin -> Options -> SphinxSearch" to do it.
 
 Customize your WordPress templates to show the Sphinx search field:
 Sidebar Widgets:
@@ -131,6 +131,7 @@ You can use the following tags in your templates:
   <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
 6. If you want to use tags in post title - please use next function instead of the_title():
   <?php sphinx_the_title(); ?>
+
 
 
 == Frequently Asked Questions ==
@@ -206,3 +207,59 @@ In Debian based systems i.e. Ubuntu:
 % update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults
 In Redhat based systems i.e. Fedora:
 % chkconfig --add "/path/to/bin/searchd --config /path/to/etc/sphinx.conf"
+
+== Upgrade Notice ==
+
+= 2.0 =
+New configuration Wizard will help your better understand sphinx configuration and
+setup it properly.
+Enhanced backend interface with more clear layout.
+
+
+== Changelog ==
+
+= 2.0 =
+* Added configuration wizard: You can automatically install or reinstall Sphinx
+Search service through web interface
+* Changed default installation directory - now sphinx installed in default
+Wordpress upload directory
+* Added shebung syntax to sphinx configuration file - it allow to load connection
+parameters automatically and hide it from the public access
+* Changed layout of backend interface
+* Changed error handling. Hided all system output and instead added human readable
+error messages.
+
+= 1.0 =
+Frontend
+* Added Search powered by Sphinx Search engine
+* Added sort search resutls by Relevance or Freshness
+* Added search by posts, by comments and by pages.
+* Added exclude posts, comments or pages from search results.
+* Added display comments at search results page.
+* Added search non-password protected pages only
+* Added search only approved comments
+* Added "Match Any" search ability - if no one results was found, then it try to search in "Match Any" mode.
+* Added support for tag title of web page - it changed due to entered search keywords
+* Added log of all search results, except empty results
+* Added tag to display Top-n search keywords
+* Added tag to display Latest-n search keywords
+* Added relevant keywords support to the Top-n search keywords bar.
+
+Backend
+* Added support to Disable/Enable search by: comments, posts, pages
+* Added support of keywords wrapper settings:
+  * Add tag Before and After search keyword in body/title
+  * Separator of result snippets
+  * Snippet max length
+  * Maximum number of words around keyword in snippet
+  * Prefix before Posts, Comments and Pages title
+  * List of phrases to cut from search results
+* Added configuration for Sphinx index prefix
+* Added configuration for Host
+* Added configuration for Port
+* Added configuration for Configuration file
+* Added configuration for Searchd file
+* Added configuration for Indexer file
+* Added support to reindex all content manually
+* Added support to stop/start search daemon
+* Added support to install Sphinx Search through web interface
