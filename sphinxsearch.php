@@ -140,6 +140,10 @@ class SphinxSearch{
                 //widgets
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
+                //cron job
+                add_action('my_hourly_event', array(&$this->sphinxService, 'reindex_delta'));
+                add_action('my_daily_event', array(&$this->sphinxService, 'reindex_main'));
+
 	}
 	
 	/**
@@ -370,13 +374,15 @@ class SphinxSearch{
     }
 }
 
-register_activation_hook(__FILE__,'ss_install');
+register_activation_hook(__FILE__,'sphinx_plugin_activation');
+
 /**
 * Install table structure
 *
 */
-function ss_install () 
+function sphinx_plugin_activation()
 {
+    //create neccessary tables
     $config = new SphinxSearch_Config();
     $sphinxInstall = new SphinxSearch_Install($config);
     $sphinxInstall->setup_sphinx_counter_tables();

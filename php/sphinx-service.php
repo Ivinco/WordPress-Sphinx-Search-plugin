@@ -119,7 +119,7 @@ class SphinxService
 	 *
 	 * @return bool
 	 */
-    function reindex()
+    function reindex($index_name = '')
     {
      	if (!file_exists($this->_config->get_option('sphinx_searchd')) ||
             !file_exists($this->_config->get_option('sphinx_conf')) ||
@@ -133,11 +133,20 @@ class SphinxService
             }else {
                 $rotate = '';
             }
-            //reindex all indexes with restart searchd
+
             $command = $this->_config->get_option('sphinx_indexer').
-                    " --config ".$this->_config->get_option('sphinx_conf'). " ".
-                    $this->_config->get_option('sphinx_index')."delta ".
+                    " --config ".$this->_config->get_option('sphinx_conf');
+
+            if(empty($index_name)){
+                //reindex all indexes with restart searchd
+                $command .= " ".$this->_config->get_option('sphinx_index')."delta ".
                     $this->_config->get_option('sphinx_index')."main $rotate ";
+            } elseif (!empty ($index_name)) {
+                //reindex only specified index with restart searchd
+                $command .= " ".$this->_config->get_option('sphinx_index').
+                        $index_name . " " . $rotate;
+            }
+                    
             exec($command, $output, $retval);
             //echo implode("<br/>", $output);
             if ($retval !=0 || preg_match("#ERROR:#", implode(" ", $output))){
@@ -149,4 +158,38 @@ class SphinxService
 	$this->_config->update_admin_options();
 	return true;
      }
+
+     public function setup_cronjob()
+     {
+         wp_schedule_event(time(), 'hourly', 'my_hourly_event');
+         wp_schedule_event(time(), 'daily', 'my_daily_event');
+         $options['sphinx_cron_start'] = 'true';
+         $this->_config->update_admin_options($options);
+     }
+
+     public function remove_cronjob()
+     {
+         wp_clear_scheduled_hook('my_hourly_event');
+         wp_clear_scheduled_hook('my_daily_event');
+         $options['sphinx_cron_start'] = 'false';
+         $this->_config->update_admin_options($options);
+     }
+
+    /**
+    * Reindex delta indexes
+    *
+    */
+    public function reindex_delta()
+    {
+        $this->reindex('delta');
+    }
+
+    /**
+    * Reindex main indexes
+    *
+    */
+    public function reindex_main()
+    {
+        $this->reindex('main');
+    }
 }

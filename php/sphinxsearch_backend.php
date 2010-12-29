@@ -64,6 +64,12 @@ class SphinxSearch_Backend {
             }elseif (isset($_POST['update_SphinxSearchSettings'])) {
                 $this->update_options();
 		$success_message = 'Settings updated.';
+            }elseif (isset($_POST['setup_cronjob'])) {
+                $res = $sphinxService->setup_cronjob();
+		$success_message = 'Schedule update of indexes is created.';
+            }elseif (isset($_POST['remove_cronjob'])) {
+                $res = $sphinxService->remove_cronjob();
+		$success_message = 'Schedule update of indexes is removed.';
             }
             $error_message = '';
             if (is_array($res)){

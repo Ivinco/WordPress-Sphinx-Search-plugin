@@ -103,7 +103,9 @@ class SphinxSearch_Config
    			
    			'before_comment' => 'Comment:',
    			'before_page' => 'Page:',
-   			'before_post' => ''
+   			'before_post' => '',
+
+                        'sphinx_cron_start' => 'false'
    			
    			);
    		$this->admin_options = get_option($this->adminOptionsName);
