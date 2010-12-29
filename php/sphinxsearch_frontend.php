@@ -370,6 +370,7 @@ class SphinxSearch_FrontEnd
 				$cID = $post['comment_id'];
 				
 				$posts_data_assoc_arry[$pID]['post_content'] = $comments_content_excerpt[$cID];
+                                $posts_data_assoc_arry[$pID]['post_excerpt'] = $comments_content_excerpt[$cID];
 				
 				$posts_data_assoc_arry[$pID]['post_title'] = strip_tags($posts_titles_excerpt[$pID]);
 				$posts_data_assoc_arry[$pID]['sphinx_post_title'] = $this->config->admin_options['before_comment'].$posts_titles_excerpt[$pID];
@@ -382,6 +383,7 @@ class SphinxSearch_FrontEnd
 				$posts[] = $posts_data_assoc_arry[$pID];		
 			}else {
 				$posts_data_assoc_arry[$pID]['post_content'] = $posts_content_excerpt[$pID];
+                                $posts_data_assoc_arry[$pID]['post_excerpt'] = $posts_content_excerpt[$pID];
 				if ( 'page' == $posts_data_assoc_arry[$pID]['post_type']){
 					$posts_data_assoc_arry[$pID]['post_title'] = strip_tags($posts_titles_excerpt[$pID]);
 					$posts_data_assoc_arry[$pID]['sphinx_post_title'] = $this->config->admin_options['before_page'].$posts_titles_excerpt[$pID];
@@ -389,7 +391,6 @@ class SphinxSearch_FrontEnd
 					$posts_data_assoc_arry[$pID]['post_title'] = strip_tags($posts_titles_excerpt[$pID]);
 					$posts_data_assoc_arry[$pID]['sphinx_post_title'] = $this->config->admin_options['before_post'].$posts_titles_excerpt[$pID];
 				}
-			
 				$posts[] = $posts_data_assoc_arry[$pID];			
 			}
 		}
@@ -595,11 +596,11 @@ class SphinxSearch_FrontEnd
 					);
 					
 		$excerpts = $this->config->sphinx->BuildExcerpts(
-														$post_content,
-														$this->config->admin_options['sphinx_index'].'main',
-														$this->search_string,
-														$opts
-														); 
+                    $post_content,
+                    $this->config->admin_options['sphinx_index'].'main',
+                    $this->search_string,
+                    $opts
+		); 
 		//to do something usefull with error
 		if ( $excerpts === false ){
 			$error = $this->config->sphinx->getLastError();
@@ -609,12 +610,12 @@ class SphinxSearch_FrontEnd
 			return false;
 		}
 
-		$i = 0;
-        foreach ($post_content as $k=>$v){
-        	$post_content[$k] = $excerpts[$i++];
-        }
+            $i = 0;
+            foreach ($post_content as $k=>$v){
+                    $post_content[$k] = $excerpts[$i++];
+            }
         
-        return $post_content;				
+            return $post_content;
 	}
 	
 	/**

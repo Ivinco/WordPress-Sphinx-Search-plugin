@@ -151,8 +151,10 @@ class SphinxSearch{
 	 */
 	function the_time($the_time, $d='')
 	{
-		if (!is_search()) return $the_time;		
-		return $this->frontend->the_time($the_time, $d);
+            if (!$this->_sphinxRunning()){
+                return $the_time;
+            }
+            return $this->frontend->the_time($the_time, $d);
 	}
 	
 	/**
@@ -163,12 +165,14 @@ class SphinxSearch{
 	 */
 	function the_author($display_name)
 	{
-		if (!is_search()) return $display_name;		
-		return $this->frontend->the_author($display_name);
+            if (!$this->_sphinxRunning()){
+		return $display_name;
+            }
+            return $this->frontend->the_author($display_name);
 	}
 	
 	/**
-	 * Correct date time for comment records in search results
+	 * Correct link in search results
 	 *
 	 * @param string $permalink
 	 * @param object $post usually null so we use global post object
@@ -176,8 +180,10 @@ class SphinxSearch{
 	 */
 	function post_link($permalink, $post=null)
 	{
-		if (!is_search()) return $permalink;		
-		return $this->frontend->post_link($permalink, $post);
+            if (!$this->_sphinxRunning()){
+                return $permalink;
+            }
+            return $this->frontend->post_link($permalink, $post);
 	}
 	
 	/**
@@ -188,9 +194,11 @@ class SphinxSearch{
 	 */
 	function the_content($content = '')
 	{
-		if (!is_search()) return $content;
-		$content = $this->frontend->the_content($content);
-		return $content;
+            if (!$this->_sphinxRunning()){
+                return $content;
+            }
+            $content = $this->frontend->the_content($content);
+            return $content;
 	}
 	
 	/**
@@ -213,8 +221,10 @@ class SphinxSearch{
             //instead of that we add our owen search results 
             return '';
 	}
-	
-	/**
+
+
+
+        /**
 	 * Generate new posts based on search results
 	 *
 	 * @param object $posts
