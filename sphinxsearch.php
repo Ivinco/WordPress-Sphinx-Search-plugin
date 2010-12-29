@@ -140,10 +140,6 @@ class SphinxSearch{
                 //widgets
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
-                //cron job
-                add_action('my_hourly_event', array(&$this->sphinxService, 'reindex_delta'));
-                add_action('my_daily_event', array(&$this->sphinxService, 'reindex_main'));
-
 	}
 	
 	/**

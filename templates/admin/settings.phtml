@@ -35,29 +35,6 @@
                 </form>
             </div>
 
-            <div class="postbox">
-                <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
-                <h3 class="hndle">Scheduler settings</h3>
-                <div class="inside">
-                    <fieldset class="options">
-                        <p style="font-weight: bold;">
-                            Schedule update of Sphinx indexes.<br/>
-                            Delta index will update hourly and Main index daily.
-                        </p>
-                    </fieldset>
-                    <p class="submit">
-                        <?php if ($this->view->devOptions['sphinx_cron_start'] == 'false'): ?>
-                        <input type="submit" style="width:300px;" name="setup_cronjob" class="button-primary"
-                               value="Schedule update of indexes" />
-                        <?php else: ?>
-                        <input type="submit" style="width:300px;" name="remove_cronjob" class="button-primary"
-                               value="Remove scheduled update of indexes" />
-                        <?php endif; ?>
-                    </p>
-                </div>
-                </form>
-            </div>
-
             <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
             <div class="postbox">
                 <h3 class="hndle">Search in</h3>

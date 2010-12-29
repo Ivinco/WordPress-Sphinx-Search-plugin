@@ -159,22 +159,6 @@ class SphinxService
 	return true;
      }
 
-     public function setup_cronjob()
-     {
-         wp_schedule_event(time(), 'hourly', 'my_hourly_event');
-         wp_schedule_event(time(), 'daily', 'my_daily_event');
-         $options['sphinx_cron_start'] = 'true';
-         $this->_config->update_admin_options($options);
-     }
-
-     public function remove_cronjob()
-     {
-         wp_clear_scheduled_hook('my_hourly_event');
-         wp_clear_scheduled_hook('my_daily_event');
-         $options['sphinx_cron_start'] = 'false';
-         $this->_config->update_admin_options($options);
-     }
-
     /**
     * Reindex delta indexes
     *
