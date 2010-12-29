@@ -40,10 +40,10 @@ a.sm_button {
 }
 
 a.sm_pluginHome {
-    background-image: url("img/icon-arne.gif");
+    background-image: url("../img/icon-arne.gif");
 }
 a.sm_pluginSupport {
-    background-image: url("img/icon-wordpress.gif");
+    background-image: url("../img/icon-wordpress.gif");
 }
 
 table.form-table {
