@@ -83,7 +83,7 @@ class SphinxSearch_Config
    			'excerpt_limit' => '256',
    			'excerpt_around' => '5',
    			
-   			'sphinx_port' => '3312',
+   			'sphinx_port' => '9312',
    			'sphinx_host' => 'localhost',
    			'sphinx_index' => 'wp_',
 

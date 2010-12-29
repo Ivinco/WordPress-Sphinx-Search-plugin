@@ -1,6 +1,6 @@
 === WordPress Sphinx Search Plugin ===
 Contributors: Ivinco
-Donate link: http://ivinco.com/
+Donate link: http://www.ivinco.com/
 Tags: search, sphinx
 !Requires at least: 2.0.2
 !Tested up to: 3.0.3
@@ -64,13 +64,13 @@ E-mail:
 opensource@ivinco.com
 
 Website:
-[Ivinco](http://ivinco.com/ "Ivinco LTD")
+[Ivinco](http://www.ivinco.com/ "Ivinco LTD")
 
 == Installation ==
 
 To use the power of Sphinx for your WordPress blog, follow these steps:
-1. Install the Sphinx Search plugin.
-2. Install Sphinx on your web server.(optional - you may install Sphinx through web interface of plugin)
+1. Install the Sphinx Search plugin (see below)
+2. Install Sphinx on your web server (optional - you may install Sphinx through web interface of plugin, see below)
 3. Set up cron jobs to re-index your website periodically.
 4. Configure the Sphinx Search plugin.
 5. Customize your search form on [search results] page by ss_search_bar() tag.
@@ -79,17 +79,17 @@ To use the power of Sphinx for your WordPress blog, follow these steps:
 Install the Sphinx Search plugin:
 1. Unpack the plugin archive to wp-content/plugins/sphinxsearch folder of your WordPress installation;
 2. Activate SphinxSearch plugin via WordPress admin area;
-3. Make sure Wordpress upload directory is writeable by webserver;
+3. Make sure Wordpress upload directory is writeable by webserver (by default Wordpress is configured to use wp-content/uploads);
 4. Open Sphinx Search settings page and follow by Wizard steps to setup sphinx search.
 
 Install Sphinx on your web server:
 If you haven't already installed Sphinx, you can install it
 automatically or manually:
-1. For automatic installation go to 'WP-Admin -> Options -> SphinxSearch' and
+1. For automatic installation go to 'Options -> SphinxSearch' and
    run configuration Wizard by pressing "Run configuration Wizard";
 2. For manual installation - please visit http://www.sphinxsearch.com/ for more instructions.
 3. After you have installed Sphinx manually change your sphinx.conf:
-   * Go to 'WP-Admin -> Options -> SphinxSearch' and run Wizard again.
+   * Go to 'Options -> SphinxSearch' and run Wizard again.
    * On second step specify path to installed search and indexer binaries.
    * Follow by Wizard steps to complete configuration.
 4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
@@ -108,27 +108,50 @@ Set up cron jobs to re-index your website periodically:
 
 Configure the Sphinx Search plugin:
 1. You can control the majority of options via admin area of WordPress. 
-Go to "WP-Admin -> Options -> SphinxSearch" to do it.
+Go to "Options -> SphinxSearch" to do it.
 
 Customize your WordPress templates to show the Sphinx search field:
 Sidebar Widgets:
-Go to "WP-Admin -> Appearance -> Widgets" there are three widgets:
+Go to "Appearance -> Widgets" there are three widgets:
 1. Sphinx Top searches
+  * Display Top-n search keywords.
+  * If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
 2. Sphinx Last searches
+  * Display Latest-n search keywords
 3. Sphinx Search sidebar
+  * Display extended search form at sidebar
+  * Allow sort search resutls by Relevance or Freshness
+  * Allow search by posts, by comments and by pages.
+  * Allow exclude posts, comments or pages from search results.
 
 Template tags:
 You can use the following tags in your templates:
 1. Search form in sidebar:
+  * Display extended search form at sidebar
+  * Allow sort search resutls by Relevance or Freshness
+  * Allow search by posts, by comments and by pages.
+  * Allow exclude posts, comments or pages from search results.
   <?php if (function_exists('ss_search_bar')) echo ss_search_bar(true); /*put it in sidebar*/?>
+
 2. Search form on the top of search results:
+  * Display extended search form at search results page
+  * Allow sort search resutls by Relevance or Freshness
+  * Allow search by posts, by comments and by pages.
+  * Allow exclude posts, comments or pages from search results.
   <?php if (function_exists('ss_search_bar')) echo ss_search_bar();/*put it in search page*/?>
+
 3. Top search results:
+  * Display Top-n search keywords.
+  * If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
   <?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
+
 4. Latest search results:
+  * Display Latest-n search keywords
   <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
+
 5. To find out if the current post is comment:
   <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
+
 6. If you want to use tags in post title - please use next function instead of the_title():
   <?php sphinx_the_title(); ?>
 

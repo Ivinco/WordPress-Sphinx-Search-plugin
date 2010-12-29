@@ -175,9 +175,9 @@ class WizardController
                 @mkdir($sphinx_install_path);
             }
             if (!file_exists($sphinx_install_path)){
-                $error_message = 'Path '.$sphinx_install_path.' isn\'t exists!';
+                $error_message = 'Path '.$sphinx_install_path.' does not exist!';
             } else if (!is_writable($sphinx_install_path)){
-                $error_message = 'Path '.$sphinx_install_path.' isn\'t writeable!';
+                $error_message = 'Path '.$sphinx_install_path.' is not writeable!';
             } else {
                 $this->_setup_sphinx_path();
                 $config_file_name = $this->_generate_config_file_name();
@@ -243,7 +243,7 @@ class WizardController
             $res = $sphinxService->reindex();
             if (true === $res){
                 $this->view->indexsation_done = true;
-                $this->view->success_message = 'Indexing is done successfuly!';
+                $this->view->success_message = 'Indexing is done successfully!';
                 return $this->_next_action('indexing');
             } else {
                 $this->view->error_message = $res['err'];

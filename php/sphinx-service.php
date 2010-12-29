@@ -38,7 +38,7 @@ class SphinxService
                  $this->_config->get_option('sphinx_conf');
      	exec($command, $output, $retval);
         if ($retval !=0 || preg_match("#ERROR:#i", implode(" ", $output))){
-            return array('err' => "Can't start searchd, try to start it manually.".
+            return array('err' => "Can not start searchd, try to start it manually.".
                     '<br/>Command: ' . $command);
         }
      	//echo implode("<br/>", $output);
@@ -60,7 +60,7 @@ class SphinxService
                  $this->_config->get_option('sphinx_conf') . " --stop";
             exec($command, $output, $retval);
             if ($retval != 0 || preg_match("#ERROR:#", implode(" ", $output))){
-                return array('err' => "Can't stop searchd, try to stop it manually. ".
+                return array('err' => "Can not stop searchd, try to stop it manually. ".
                     '<br/>Command: ' . $command);
             }
             //echo implode("<br/>", $output);

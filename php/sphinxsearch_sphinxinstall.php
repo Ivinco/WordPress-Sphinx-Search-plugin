@@ -84,7 +84,7 @@ class SphinxSearch_Install
      	if (!file_exists($this->latest_sphinx_rep_loc.$this->latest_sphinx_filename)){
      		return array('err' => 'Installation: Sphinx repository '. 
                             $this->latest_sphinx_rep_loc .
-                        ' do not exist or not available.');
+                        ' does not exist or is not available.');
      	}else {
      		$sphinx_source = $this->latest_sphinx_rep_loc;
      	}
@@ -187,24 +187,24 @@ class SphinxSearch_Install
         $parentInstDir = dirname($dir_inst);
         if (!file_exists($parentInstDir)){
             return array('err' => "Installation: Directory ". $parentInstDir .
-                        " isn't exists, ".
-                        " create the upload directory of you WordPress.");
+                        " does not exist. You need to setup WordPress upload ".
+                        "directory (by default Wordpress is configured to use wp-content/uploads)");
         }
 
         if (!is_writable($parentInstDir)){
             return array('err' => "Installation: Directory ". $parentInstDir .
-                        " isn't writeable, ".
+                        " is not writeable, ".
                         " check the permissions.");
         }
 
         if (!file_exists($dir_inst)){
             if ( !mkdir($dir_inst) ){
-                return array('err' => "Installation: Can't create directory ". $dir_inst .
+                return array('err' => "Installation: Can not create directory ". $dir_inst .
                         " check the permissions.");
             }
         } else {
             if (!is_writable($dir_inst)){
-                return array('err' => "Installation: ". $dir_inst ." isn't writeable, ".
+                return array('err' => "Installation: ". $dir_inst ." is not writeable, ".
                         " check the permissions.");
             }
             //clear previouse installations
@@ -218,7 +218,7 @@ class SphinxSearch_Install
      	
 	$res = copy($sphinx_source.$this->latest_sphinx_filename, $dir_inst.'/'.$this->latest_sphinx_filename);
 	if ($res == false) {
-            return array('err' => "Installation: Can't copy ".
+            return array('err' => "Installation: Can not copy ".
                 $sphinx_source.$this->latest_sphinx_filename." to ".
                 $dir_inst.'/'.$this->latest_sphinx_filename.
                     ", check the file permissions.");
@@ -251,7 +251,7 @@ class SphinxSearch_Install
             exec($command, $output, $retval);
             if (0 != $retval)
             {
-                $msg = 'Installation: Configure error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+                $msg = 'Installation: Configuration error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
                 //echo '<script>alert("'.$msg.'")</script>';
                 return  array('err' => $msg.'<br/>Command: '.$command." at the dir:".$dir_inst.'/'.$dir_rep);
             }
@@ -284,7 +284,7 @@ class SphinxSearch_Install
             flush();
 
             if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
-                $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search deamon ({$dir_inst}/bin/searchd) was not found.";
+                $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search daemon ({$dir_inst}/bin/searchd) was not found.";
                 //echo '<script>alert("'.$msg.'")</script>';
                 return array('err' => $msg);
             }
@@ -297,7 +297,7 @@ class SphinxSearch_Install
 	//copy our config to new installation
 	$res = copy($this->plugin_sphinx_dir.'/rep/sphinx.conf', $dir_inst.'/etc/sphinx.conf');
 	if ($res == false){ 
-	    return array('err' => "Installation: Can't copy ".$this->plugin_sphinx_dir.'/rep/sphinx.conf'." to ".
+	    return array('err' => "Installation: Can not copy ".$this->plugin_sphinx_dir.'/rep/sphinx.conf'." to ".
                 $dir_inst.'/etc/sphinx.conf'.", check the file permissions.");
 	}
 		

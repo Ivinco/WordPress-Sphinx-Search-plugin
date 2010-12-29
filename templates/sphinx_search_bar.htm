@@ -16,7 +16,7 @@ function toggle_sidebar(){
 
 <li id="search">
 		<label for="s"><?php _e('Search'); ?></label>
-		<form id="searchform" method="get" action="/">
+		<form id="searchform" method="get" action="<?php get_site_url(); ?>">
 			<ul>
 				<li>
 				<input type="text" name="s" id="sbar" size="15" value="<?php echo htmlspecialchars(!empty($_GET['s']) ? $_GET['s']:'');?>"/>
