@@ -23,7 +23,7 @@ Frontend features
 * Search powered by Sphinx Search engine or SphinxSearch inside
 * Very fast search
 * Flexible [search syntax](http://www.sphinxsearch.com/doc.html#extended-syntax)
-* Sort search resutls by Relevance or Freshness
+* Sort search results by Relevance or Freshness
 * Search by posts, by comments and by pages.
 * Exclude posts, comments or pages from search results.
 * Display comments at search results page.
@@ -34,7 +34,8 @@ Frontend features
 * Log all search results, except empty results
 * Display Top-n search keywords
 * Display Latest-n search keywords
-* If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
+* If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar
+* Extended search form at the sidebar and on the search results page.
 
 Backend features
 
@@ -94,17 +95,18 @@ automatically or manually:
    * Follow by Wizard steps to complete configuration.
 4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
    
-Set up cron jobs to re-index your website periodically:
-1. Copy cron/reindex_config_sample.php to cron/reindex_config.php
-2. Open reindex_config.php in editor and change path to Sphinx Indexer, Sphinx conf and index prefix (optional)
-3. Use "crontab -e" to add the following lines to your crontab:
-#Delta index.
-#Run cron job every 5 minutes to update delta index:
-*/5 * * * * /usr/bin/php /path/to/wp-content/plugins/sphinxsearch/cron/reindex.php delta
-#main indexing.
-#Run cron job once a day to update main index:
-#Run every day in 0 hours and 5 minutes
-5 0 * * * /usr/bin/php /path/to/wp-content/plugins/sphinxsearch/cron/reindex.php main
+Set up schedule jobs to re-index your website periodically:
+Before setup the schedule you should run Wizard which will create
+special schedule files. The default location of that files is:
+/path/to/wp-content/uploads/sphinx/cron/
+After wizard is finished edit you crontab file.
+Use "crontab -e" command and add the following lines to your crontab:
+#Wordpress Delta index update
+#Following cron job update delta index every 5 minutes:
+*/5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_delta.php
+#Wordpress Main index update
+#Following cron job update main index daily (at 0 hours and 5 minutes):
+5 0 * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_main.php
 
 Configure the Sphinx Search plugin:
 1. You can control the majority of options via admin area of WordPress. 
@@ -237,6 +239,7 @@ In Redhat based systems i.e. Fedora:
 New configuration Wizard will help your better understand sphinx configuration and
 setup it properly.
 Enhanced backend interface with more clear layout.
+Added keywords highlight for content of the_excerpt Wordpress tag
 
 
 == Changelog ==
@@ -259,6 +262,7 @@ error messages.
   search by posts, by comments and by pages,
   exclude posts, comments or pages from search results.
 * Added keywords highlight for content of the_excerpt Wordpress tag
+* Added automatic generation of cron files
 
 = 1.0 =
 Frontend

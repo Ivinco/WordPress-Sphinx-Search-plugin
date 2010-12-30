@@ -79,10 +79,13 @@ class SphinxService
      public function is_sphinx_running()
      {
          if (file_exists($this->_config->get_option('sphinx_searchd_pid'))){
-             return true;
-         } else {             
-             return false;
+             $pid = file_get_contents($this->_config->get_option('sphinx_searchd_pid'));
+             $pid = trim($pid);
+             if ( file_exists("/proc/$pid") ){
+                 return true;
+             }             
          }
+         return false;
      }
      /**
       * Parse sphinx conf and grab path to search pid file
@@ -90,7 +93,7 @@ class SphinxService
       * @param unknown_type $sphinx_conf
       * @return unknown
       */
-     public function get_searchd_pid($sphinx_conf)
+     public function get_searchd_pid_filename($sphinx_conf)
      {
      	$content = file_get_contents($sphinx_conf);
      	//pid_file		= {sphinx_path}/var/log/searchd.pid

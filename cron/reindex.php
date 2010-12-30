@@ -17,6 +17,10 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/*
+ * This update indexes method is deprecated (see readme.txt)
+ */
+
 if (!file_exists('reindex_config.php')){
 	echo "File 'reindex_config.php' is missing.
  Example of this file is placed at cron folder of the plugin.\n";

@@ -193,6 +193,10 @@ class WizardController
                 if (!file_exists($sphinx_install_path.'/var/log')){
                     mkdir($sphinx_install_path.'/var/log');
                 }
+                //setup cronjob files
+                $sphinx_install = new SphinxSearch_Install($this->_config);
+                $sphinx_install->setup_cron_job();
+
                 $this->view->success_message = 'Path is set';
                 return $this->_next_action('folder');
             }

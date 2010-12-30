@@ -140,8 +140,8 @@ class SphinxSearch_Config
      	}
      	if (!empty($this->admin_options['sphinx_conf']) && file_exists($this->admin_options['sphinx_conf'])){
             $sphinxService = new SphinxService($this);
-            $pid = $sphinxService->get_searchd_pid($this->admin_options['sphinx_conf']);
-            $this->admin_options['sphinx_searchd_pid'] = $pid;
+            $pid_file = $sphinxService->get_searchd_pid_filename($this->admin_options['sphinx_conf']);
+            $this->admin_options['sphinx_searchd_pid'] = $pid_file;
         }
      	update_option($this->adminOptionsName, $this->admin_options);
      }

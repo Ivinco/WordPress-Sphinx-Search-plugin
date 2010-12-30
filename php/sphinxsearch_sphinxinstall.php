@@ -208,7 +208,7 @@ class SphinxSearch_Install
                         " check the permissions.");
             }
             //clear previouse installations
-            exec("rm -fr " . $dir_inst.'/*');
+            //exec("rm -fr " . $dir_inst.'/*');
         }
 
 	//////////////////
@@ -334,6 +334,8 @@ class SphinxSearch_Install
         if (is_array($res)){
             return $res;
         }
+
+        $this->setup_cron_job();
 		
 	//////////////////
 	//run re indexing 
@@ -345,6 +347,46 @@ class SphinxSearch_Install
 	}
 	*/
 	return true;
+     }
+
+     public function setup_cron_job()
+     {
+         $search = array(
+                '{path_to_sphinx}' => $this->config->admin_options['sphinx_path'],
+     		'{path_to_indexer}' => $this->config->admin_options['sphinx_indexer'],
+     		'{path_to_config}'   => $this->config->admin_options['sphinx_conf'],
+     		'{index_prefix}' => $this->config->admin_options['sphinx_index'],
+     		'{searchd_port}' => $this->config->admin_options['sphinx_port']
+     	);
+        $delta_template = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.
+                '/rep/cron_reindex_delta.php.tpl');
+        $main_template = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.
+                '/rep/cron_reindex_main.php.tpl');
+     	$delta_rewrited = str_replace(array_keys($search), $search, $delta_template);
+        $main_rewrited = str_replace(array_keys($search), $search, $main_template);
+        $cron_dir = $this->config->admin_options['sphinx_path'].'/cron';
+        if (!file_exists($cron_dir)){            
+            if ( ! mkdir($cron_dir) ){
+                return array('err' => "Installation: Can not create directory ". $cron_dir .
+                        " check the permissions.");
+            }
+        } else {
+            if (!is_writable($cron_dir)){
+                return array('err' => "Installation: ". $cron_dir ." is not writeable, ".
+                        " check the permissions.");
+            }
+        }
+        $delta_filename = $cron_dir.'/cron_reindex_delta.php';
+        $main_filename = $cron_dir.'/cron_reindex_main.php';
+        if ( ! file_put_contents($delta_filename, $delta_rewrited) ){
+            return array('err' => "Installation: Can not write to file ".
+                        $delta_filename ." check the permissions.");
+        }
+        if ( ! file_put_contents($main_filename, $main_rewrited) ){
+            return array('err' => "Installation: Can not write to file ".
+                        $main_filename ." check the permissions.");
+        }
+        return true;
      }
 
      public function setup_sphinx_counter_tables()
