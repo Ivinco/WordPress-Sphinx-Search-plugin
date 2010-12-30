@@ -251,6 +251,14 @@ parameters automatically and hide it from the public access
 * Changed layout of backend interface
 * Changed error handling. Hided all system output and instead added human readable
 error messages.
+* Added widget to display Top-n search keywords.
+  If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
+* Added widget to display Latest-n search keywords
+* Added widget to display extended search form in sidebar
+  It allow sort search resutls by Relevance or Freshness,
+  search by posts, by comments and by pages,
+  exclude posts, comments or pages from search results.
+* Added keywords highlight for content of the_excerpt Wordpress tag
 
 = 1.0 =
 Frontend
