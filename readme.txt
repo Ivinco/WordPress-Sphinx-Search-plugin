@@ -96,7 +96,7 @@ automatically or manually:
 4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
    
 Set up schedule jobs to re-index your website periodically:
-Before setup the schedule you should run Wizard which will create
+Before setup the schedule you should run Wizard to create
 special schedule files. The default location of that files is:
 /path/to/wp-content/uploads/sphinx/cron/
 After wizard is finished edit you crontab file.
@@ -111,6 +111,20 @@ Use "crontab -e" command and add the following lines to your crontab:
 Configure the Sphinx Search plugin:
 1. You can control the majority of options via admin area of WordPress. 
 Go to "Options -> SphinxSearch" to do it.
+
+Customize your search form on [search results] page by ss_search_bar() tag:
+1. Search form on the top of search results:
+  * Display extended search form at search results page
+  * Allow sort search resutls by Relevance or Freshness
+  * Allow search by posts, by comments and by pages.
+  * Allow exclude posts, comments or pages from search results.
+  <?php if (function_exists('ss_search_bar')) echo ss_search_bar();/*put it in search page*/?>
+
+2. To find out if the current post is comment:
+  <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
+
+3. If you want to use tags in post title - please use next function instead of the_title():
+  <?php sphinx_the_title(); ?>
 
 Customize your WordPress templates to show the Sphinx search field:
 Sidebar Widgets:
@@ -135,27 +149,16 @@ You can use the following tags in your templates:
   * Allow exclude posts, comments or pages from search results.
   <?php if (function_exists('ss_search_bar')) echo ss_search_bar(true); /*put it in sidebar*/?>
 
-2. Search form on the top of search results:
-  * Display extended search form at search results page
-  * Allow sort search resutls by Relevance or Freshness
-  * Allow search by posts, by comments and by pages.
-  * Allow exclude posts, comments or pages from search results.
-  <?php if (function_exists('ss_search_bar')) echo ss_search_bar();/*put it in search page*/?>
-
-3. Top search results:
+2. Top search results:
   * Display Top-n search keywords.
   * If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
   <?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
 
-4. Latest search results:
+3. Latest search results:
   * Display Latest-n search keywords
   <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
 
-5. To find out if the current post is comment:
-  <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
 
-6. If you want to use tags in post title - please use next function instead of the_title():
-  <?php sphinx_the_title(); ?>
 
 
 
