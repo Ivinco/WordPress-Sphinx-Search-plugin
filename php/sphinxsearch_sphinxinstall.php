@@ -245,43 +245,36 @@ class SphinxSearch_Install
      	//make & make install
      	//////////////////
 
-	//echo "<pre>";
             //configure
             $command = "./configure --with-mysql --prefix=$dir_inst 2>&1";
             exec($command, $output, $retval);
             if (0 != $retval)
             {
-                $msg = 'Installation: Configuration error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+                $msg = 'Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return  array('err' => $msg.'<br/>Command: '.$command." at the dir:".$dir_inst.'/'.$dir_rep);
+                return  array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
             }
-
-            flush();
 
             //making
             $command = "make 2>&1";
             exec($command, $output, $retval);
             if (0 != $retval)
             {
-                $msg = 'Installation: Make error, please refer to Sphinx documentation about installation requirements, fix the problem and try again.';
+                $msg = 'Installation: Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return  array('err' => $msg.'<br/>Command: '.$command);
+                return  array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
             }
-
-            flush();
 
             //make install
             $command = "make install 2>&1";
             exec($command, $output, $retval);
             if (0 != $retval)
             {
-                $msg = 'Installation: Make install error, try to run it manually or fix a problem and try again!';
+                $msg = 'Installation: Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return array('err' => $msg.'<br/>Command: '.$command);
+                return array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
             }
 
-            //echo "</pre>";
-            flush();
 
             if (!file_exists($dir_inst.'/bin/indexer') || !file_exists($dir_inst.'/bin/searchd')){
                 $msg = "Installation: indexer ({$dir_inst}/bin/indexer) or search daemon ({$dir_inst}/bin/searchd) was not found.";

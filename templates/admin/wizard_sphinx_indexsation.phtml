@@ -7,13 +7,12 @@
                 <input type="hidden" name="process_indexing" value="1" />
                 <input type="hidden" name="action" value="indexing" />
                 <p class="submit">
-                    <input class="button-primary" type="button"
+                    <input class="button-secondary cancel" type="button"
                        onClick="return wizard_skip('indexsation');" value="Skip step" />
                     <input type="button" class="button-primary"
                        value="Run indexing &amp; Continue" onClick="return wizard_next();" />
-                     <input class="button-primary" type="button"
-                                       style="float:right"
-                                       onClick="return wizard_cancel();" value="Cancel Wizard" />
+                     <input class="button-secondary cancel alignright" type="button"
+                            onClick="return wizard_cancel();" value="Cancel Wizard" />
                 </p>
         </form>
     </div>
