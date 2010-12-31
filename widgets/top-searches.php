@@ -33,22 +33,31 @@ class TopSearchesWidget extends WP_Widget
     function widget($args, $instance)
     {
         extract( $args );
-        $title = apply_filters('widget_title', $instance['title']);
         $limit = !empty($instance['limit']) ? $instance['limit'] : 10;
         $width = !empty($instance['width']) ? $instance['width'] : 0;
         $break = !empty($instance['break']) ? $instance['break'] : '...';
+        
+        $top_words_html = $this->get_top($limit, $width, $break);
+        
+        if ( $this->is_related ){
+            $title = apply_filters('widget_title', $instance['title_top']);
+        } else {
+            $title = apply_filters('widget_title', $instance['title_rel']);
+        }
+        
         echo $before_widget;
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->get_top($limit, $width, $break);
+        echo $top_words_html;
         echo $after_widget;
     }
 
     /** @see WP_Widget::update */
     function update($new_instance, $old_instance) {
 	$instance = $old_instance;
-	$instance['title'] = strip_tags($new_instance['title']);
+	$instance['title_rel'] = strip_tags($new_instance['title_top']);
+        $instance['title_top'] = strip_tags($new_instance['title_rel']);
         $instance['limit'] = strip_tags($new_instance['limit']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
@@ -59,16 +68,23 @@ class TopSearchesWidget extends WP_Widget
 
     function form($instance) {
 
-        $title = !empty($instance['title']) ? esc_attr($instance['title']) : '';
+        $title_rel = !empty($instance['title_rel']) ? esc_attr($instance['title_rel']) : '';
+        $title_top = !empty($instance['title_top']) ? esc_attr($instance['title_top']) : '';
         $limit = !empty($instance['limit']) ? esc_attr($instance['limit']) : 10;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         ?>
-            <p><label for="<?php echo $this->get_field_id('title'); ?>">
-            <?php _e('Title:'); ?>
-            <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
-                   name="<?php echo $this->get_field_name('title'); ?>"
-                   type="text" value="<?php echo $title; ?>" />
+            <p><label for="<?php echo $this->get_field_id('title_top'); ?>">
+            <?php _e('Title Top:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('title_top'); ?>"
+                   name="<?php echo $this->get_field_name('title_top'); ?>"
+                   type="text" value="<?php echo $title_top; ?>" />
+            </label></p>
+            <p><label for="<?php echo $this->get_field_id('title_rel'); ?>">
+            <?php _e('Title Related:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('title_rel'); ?>"
+                   name="<?php echo $this->get_field_name('title_rel'); ?>"
+                   type="text" value="<?php echo $title_rel; ?>" />
             </label></p>
             <p><label for="<?php echo $this->get_field_id('limit'); ?>">
             <?php _e('Number of results:'); ?>
@@ -97,12 +113,15 @@ class TopSearchesWidget extends WP_Widget
         global $defaultObjectSphinxSearch;
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten($limit, $width, $break);
-	echo "<ul>";
+        $this->is_related = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten_is_related();
+        $html = '';
+	$html .= "<ul>";
             foreach ($result as $res)
             {
-                echo "<li><a href='/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+                $html .= "<li><a href='/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
             }
-	echo "</ul>";
+	$html .= "</ul>";
+        return $html;
     }
 }
 
