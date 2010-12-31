@@ -234,7 +234,8 @@ class SphinxSearch_Install
             if ($retval != 0)
                     return array('err' => 'Installation: Archive extracting failed: '.
                         $this->latest_sphinx_filename . ' !<br/>'.
-                        'Command: '.$openarch);
+                        'Command: '.$openarch."<br/>".
+                        "try running it with sudo if it doesn't work");
                     
             $dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename);
             chdir($dir_inst.'/'.$dir_rep);
@@ -252,7 +253,9 @@ class SphinxSearch_Install
             {
                 $msg = 'Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return  array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
+                return  array('err' => $msg.'<br/>Command: '.$command.
+                    " at the directory:".$dir_inst.'/'.$dir_rep."<br/>".
+                        "try running it with sudo if it doesn't work");
             }
 
             //making
@@ -262,7 +265,9 @@ class SphinxSearch_Install
             {
                 $msg = 'Installation: Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return  array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
+                return  array('err' => $msg.'<br/>Command: '.$command.
+                    " at the directory:".$dir_inst.'/'.$dir_rep."<br/>".
+                        "try running it with sudo if it doesn't work");
             }
 
             //make install
@@ -272,7 +277,9 @@ class SphinxSearch_Install
             {
                 $msg = 'Installation: Installation: Sphinx installation error, try to run this command manually in Terminal:';
                 //echo '<script>alert("'.$msg.'")</script>';
-                return array('err' => $msg.'<br/>Command: '.$command." at the directory:".$dir_inst.'/'.$dir_rep);
+                return array('err' => $msg.'<br/>Command: '.$command.
+                    " at the directory:".$dir_inst.'/'.$dir_rep."<br/>".
+                        "try running it with sudo if it doesn't work");
             }
 
 
@@ -308,7 +315,7 @@ class SphinxSearch_Install
 		$this->config->update_admin_options($admin_options);			
 	}else {
             return array('err' => 'Installation: Installation completed, but configuration files not found.<br/>
-                See installation directory: '.$dir_inst);
+                Check installation directory: '.$dir_inst);
 	}
 		
 	//////////////////
