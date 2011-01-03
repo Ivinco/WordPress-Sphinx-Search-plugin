@@ -15,7 +15,12 @@ function toggle_sidebar(){
 </script>
 
 <li id="search">
-		<label for="s"><?php _e('Search'); ?></label>
+                <label for="s">
+                    <a href="http://www.ivinco.com/software/wordpress-sphinx-search-plugin/"
+                       title="Powered By Ivinco Sphinx Search plugin">
+                        <img src="<?php echo plugins_url('img/ivinco.gif', __FILE__ );?>" alt="Powered By Ivinco Sphinx Search plugin" />
+                    </a> <?php _e('Search'); ?>
+                </label>
 		<form id="searchform" method="get" action="<?php get_bloginfo('url') ?>">
 			<ul>
 				<li>
