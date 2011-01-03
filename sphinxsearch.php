@@ -350,7 +350,7 @@ class SphinxSearch{
          }
     }
 
-    public function load_widgets()
+    function load_widgets()
     {
         global $wp_version;
         //widgets supported only at version 2.8 or higher
@@ -361,7 +361,11 @@ class SphinxSearch{
         }
     }
 
-    private function _sphinxRunning()
+    /**
+     * @access private
+     * @return boolean
+     */
+    function _sphinxRunning()
     {
         if (!is_search() || 'false' == $this->config->get_option('sphinx_running')){
             return false;

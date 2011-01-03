@@ -19,9 +19,18 @@
 
 class SphinxService
 {
-    private $_config = null;
+    /**
+     * @access private
+     * @var object
+     */
+    var $_config = null;
+
+    function SphinxService(SphinxSearch_Config $config)
+    {
+        $this->__construct($config);
+    }
     
-    public function  __construct(SphinxSearch_Config $config)
+    function  __construct(SphinxSearch_Config $config)
     {
         $this->_config = $config;
     }
@@ -31,7 +40,7 @@ class SphinxService
       *
       * @return string - output of start command
       */
-    public function start()
+    function start()
     {
         $this->stop(); //kill daemon if runned
         $command = $this->_config->get_option('sphinx_searchd'). " --config ".
@@ -51,7 +60,7 @@ class SphinxService
       *
       * @return string - output of stop command
       */
-    public function stop()
+    function stop()
     {
      	//stop Sphinx search daemon
         $output = '';
@@ -76,7 +85,7 @@ class SphinxService
       *
       * @return boolean
       */
-     public function is_sphinx_running()
+     function is_sphinx_running()
      {
          if (file_exists($this->_config->get_option('sphinx_searchd_pid'))){
              $pid = file_get_contents($this->_config->get_option('sphinx_searchd_pid'));
@@ -93,7 +102,7 @@ class SphinxService
       * @param unknown_type $sphinx_conf
       * @return unknown
       */
-     public function get_searchd_pid_filename($sphinx_conf)
+     function get_searchd_pid_filename($sphinx_conf)
      {
      	$content = file_get_contents($sphinx_conf);
      	//pid_file		= {sphinx_path}/var/log/searchd.pid
@@ -104,7 +113,7 @@ class SphinxService
      	return '';
      }
 
-     public function need_reindex($flag)
+     function need_reindex($flag)
      {
      	if ($flag){
      		$fp = fopen(SPHINXSEARCH_REINDEX_FILENAME, 'w+');
@@ -166,7 +175,7 @@ class SphinxService
     * Reindex delta indexes
     *
     */
-    public function reindex_delta()
+    function reindex_delta()
     {
         $this->reindex('delta');
     }
@@ -175,7 +184,7 @@ class SphinxService
     * Reindex main indexes
     *
     */
-    public function reindex_main()
+    function reindex_main()
     {
         $this->reindex('main');
     }

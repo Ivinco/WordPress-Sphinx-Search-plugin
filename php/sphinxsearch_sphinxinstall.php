@@ -44,7 +44,12 @@ class SphinxSearch_Install
 	 * Config object
 	 */
 	var $config = '';
-	
+
+        function  SphinxSearch_Install(SphinxSearch_Config $config)
+	{
+		$this->__construct($config);
+	}
+
 	/**
 	 * Constructor
 	 *
@@ -115,7 +120,7 @@ class SphinxSearch_Install
      	return true;
      }
 
-     public function generate_config_content($template_content)
+     function generate_config_content($template_content)
      {
          global $wpdb, $table_prefix;
 
@@ -349,7 +354,7 @@ class SphinxSearch_Install
 	return true;
      }
 
-     public function setup_cron_job()
+     function setup_cron_job()
      {
          $search = array(
                 '{path_to_sphinx}' => $this->config->admin_options['sphinx_path'],
@@ -389,7 +394,7 @@ class SphinxSearch_Install
         return true;
      }
 
-     public function setup_sphinx_counter_tables()
+     function setup_sphinx_counter_tables()
      {
          global $table_prefix, $wpdb;
          //////////////////

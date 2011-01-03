@@ -25,25 +25,36 @@ class WizardController
      * @var SphinxSearch_Config
      * 
      */
-    private $_config = null;
+    var $_config = null;
 
-    private $view = null;
+    /**
+     * Special object used for template system
+     * @access private
+     * @var SphinxView
+     *
+     */
+    var $view = null;
 
-    public function  __construct(SphinxSearch_Config $config)
+    function  WizardController(SphinxSearch_Config $config)
+    {
+        $this->__construct($config);
+    }
+
+    function  __construct(SphinxSearch_Config $config)
     {
         $this->view = new SphinxView();
         $this->_config = $config;
         $this->view->assign('header', 'Sphinx Search :: Wizard');
     }
 
-    public function stop_action()
+    function stop_action()
     {
         $options['wizard_done'] = 'true';
         $this->_config->update_admin_options($options);
         return $this->_next_action('config');
     }
 
-    public function start_action()
+    function start_action()
     {
         if (!empty($_POST['start_process'])){
             //$sphinxService = new SphinxService($this->_config);
@@ -56,7 +67,7 @@ class WizardController
         $this->view->render('admin/wizard_layout.phtml');
     }
 
-    public function connection_action()
+    function connection_action()
     {
         if (!empty($_POST['skip_wizard_connection'])){
             $this->view->success_message = 'Step was skipped.';
@@ -85,7 +96,7 @@ class WizardController
         exit;
     }
 
-    public function detection_action()
+    function detection_action()
     {
         $detect_system_searchd = $this->detect_program('searchd');
         $detect_system_indexer = $this->detect_program('indexer');
@@ -160,7 +171,7 @@ class WizardController
         exit;
     }
 
-    public function folder_action()
+    function folder_action()
     {
         if (!empty($_POST['skip_wizard_folder'])){
             $this->view->success_message = 'Step was skipped.';
@@ -210,7 +221,7 @@ class WizardController
         exit;
     }
 
-    public function config_action()
+    function config_action()
     {
         if (!empty($_POST['skip_wizard_config'])){
             $this->view->success_message = 'Step was skipped.';
@@ -225,7 +236,7 @@ class WizardController
         exit;
     }
 
-    public function finish_action()
+    function finish_action()
     {
         $sphinxService = new SphinxService($this->_config);
         $res = $sphinxService->start();
@@ -235,7 +246,7 @@ class WizardController
         exit;
     }
 
-    public function indexing_action()
+    function indexing_action()
     {
         if (!empty($_POST['skip_wizard_indexsation'])){
             $this->view->success_message = 'Step was skipped.';
@@ -258,7 +269,7 @@ class WizardController
         exit;
     }
 
-     public function detect_program($progname)
+     function detect_program($progname)
      {
          $progname = escapeshellcmd($progname);
          $res = exec("whereis {$progname}");
@@ -268,7 +279,11 @@ class WizardController
          return $matches[1];
      }
 
-    private function _set_sphinx_connect()
+     /**
+      * @access private
+      * @return void
+      */
+    function _set_sphinx_connect()
     {
         $options['sphinx_host'] = $_POST['sphinx_host'];
         $options['sphinx_port'] = $_POST['sphinx_port'];
@@ -277,7 +292,11 @@ class WizardController
         return true;
     }
 
-    private function _generate_config_file_name()
+    /**
+      * @access private
+      * @return string - config file name
+      */
+    function _generate_config_file_name()
      {
          $options = $this->_config->get_admin_options();
          $filename = $options['sphinx_path'].'/sphinx.conf';
@@ -287,7 +306,11 @@ class WizardController
          return $filename;
      }
 
-     private function _generate_config_file_content()
+     /**
+      * @access private
+      * @return string - config file content
+      */
+     function _generate_config_file_content()
      {
          $config_tempate = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.'/rep/sphinx.conf');
 
@@ -296,36 +319,46 @@ class WizardController
 
          return $content;
      }
-     private function _save_config($filename, $content)
+
+     /**
+      * @access private
+      * @return void
+      */
+     function _save_config($filename, $content)
      {
          file_put_contents($filename, $content);
      }
 
-
-
-
-
-     private function _setup_sphinx_path()
+     /**
+      * @access private
+      * @return void
+      */
+     function _setup_sphinx_path()
      {
          $options['sphinx_path'] = $_POST['sphinx_path'];
          $this->_config->update_admin_options($options);
-         return true;
-
      }
 
     
 
-    private function _set_sphinx_detected($searchd, $indexer)
+     /**
+      * @access private
+      * @return void
+      */
+    function _set_sphinx_detected($searchd, $indexer)
     {
         $options['sphinx_searchd'] = $searchd;
         $options['sphinx_indexer'] = $indexer;
         $this->_config->update_admin_options($options);
-        return true;
      }
 
 
 
-    private function _next_action($prevAction)
+     /**
+      * @access private
+      * @return void
+      */
+    function _next_action($prevAction)
     {
         switch ($prevAction) {
             case 'start':

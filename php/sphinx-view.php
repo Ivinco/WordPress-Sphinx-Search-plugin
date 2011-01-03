@@ -19,19 +19,19 @@
 
 class SphinxView
 {
-    public $view = null;
+    var $view = null;
 
-    public function render($file)
+    function render($file)
     {
         require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/'.$file);
     }
 
-    public function assign($key, $value)
+    function assign($key, $value)
     {
         $this->view->{$key} = $value;
     }
 
-    public function __set($name, $value)
+    function __set($name, $value)
     {
         $this->view->$name = $value;
     }

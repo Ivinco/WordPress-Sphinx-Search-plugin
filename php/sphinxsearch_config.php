@@ -146,7 +146,7 @@ class SphinxSearch_Config
      	update_option($this->adminOptionsName, $this->admin_options);
      }
 
-     public function get_option($opt)
+     function get_option($opt)
      {
          if (isset($this->admin_options[$opt])){
             return $this->admin_options[$opt];
