@@ -61,7 +61,7 @@ class LatestSearchesWidget extends WP_Widget
     
     function form($instance) {
 
-        $title = !empty($instance['title']) ? esc_attr($instance['title']) : '';
+        $title = !empty($instance['title']) ? esc_attr($instance['title']) : 'Last Searches';
         $limit = !empty($instance['limit']) ? esc_attr($instance['limit']) : 10;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
