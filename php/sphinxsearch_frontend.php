@@ -121,7 +121,11 @@ class SphinxSearch_FrontEnd
 	function query()
 	{ 
 		global $wp_query;
-		
+
+                //reset filters
+                $this->config->sphinx->ResetFilters();
+                $this->config->sphinx->ResetGroupBy();
+
 		////////////
 		// set filters
 		////////////		
