@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WordPress Sphinx Search Plugin
-Plugin URI: http://www.ivinco.com/software/
+Plugin URI: http://www.ivinco.com/software/wordpress-sphinx-search-plugin/
 Description: Power of Sphinx Search Engine for Your Blog!
 Version: 2.0
 Author: &copy; Ivinco LTD
