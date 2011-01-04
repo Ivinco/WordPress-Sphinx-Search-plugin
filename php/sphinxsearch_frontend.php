@@ -538,7 +538,10 @@ class SphinxSearch_FrontEnd
 			}
 	
 			$authordata = get_userdata($post->post_author);
-			$author = $authordata->user_nicename;
+                        $author = '';
+                        if (is_object($authordata)){
+                            $author = $authordata->user_nicename;
+                        }
 			$date = explode(" ",date('Y m d H i s', $unixtime));
 			$rewritereplace =
 			array(
