@@ -25,8 +25,8 @@ class TopSearchesWidget extends WP_Widget
     function  TopSearchesWidget()
     {
         $widget_ops = array('classname' => 'TopSearchesWidget',
-                            'description' => 'Sphinx top search terms' );
-        $this->WP_Widget('TopSearchesWidget', 'Sphinx Top Searches', $widget_ops);
+                            'description' => 'Sphinx related/top search terms' );
+        $this->WP_Widget('TopSearchesWidget', 'Sphinx Related/Top Searches', $widget_ops);
     }
 
     /** @see WP_Widget::widget */
@@ -56,8 +56,8 @@ class TopSearchesWidget extends WP_Widget
     /** @see WP_Widget::update */
     function update($new_instance, $old_instance) {
 	$instance = $old_instance;
-	$instance['title_rel'] = strip_tags($new_instance['title_top']);
-        $instance['title_top'] = strip_tags($new_instance['title_rel']);
+	$instance['title_rel'] = strip_tags($new_instance['title_rel']);
+        $instance['title_top'] = strip_tags($new_instance['title_top']);
         $instance['limit'] = strip_tags($new_instance['limit']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
@@ -68,8 +68,8 @@ class TopSearchesWidget extends WP_Widget
 
     function form($instance) {
 
-        $title_rel = !empty($instance['title_rel']) ? esc_attr($instance['title_rel']) : '';
-        $title_top = !empty($instance['title_top']) ? esc_attr($instance['title_top']) : '';
+        $title_rel = !empty($instance['title_rel']) ? esc_attr($instance['title_rel']) : 'Related Searches';
+        $title_top = !empty($instance['title_top']) ? esc_attr($instance['title_top']) : 'Top Searches';
         $limit = !empty($instance['limit']) ? esc_attr($instance['limit']) : 10;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
