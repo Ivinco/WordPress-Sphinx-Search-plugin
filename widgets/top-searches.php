@@ -99,7 +99,7 @@ class TopSearchesWidget extends WP_Widget
                    type="text" value="<?php echo $width; ?>" />
             </label></p>
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
-            <?php _e('Breake long search term by:'); ?>
+            <?php _e('Break long search term by:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('break'); ?>"
                    name="<?php echo $this->get_field_name('break'); ?>"
                    type="text" value="<?php echo $break; ?>" />
