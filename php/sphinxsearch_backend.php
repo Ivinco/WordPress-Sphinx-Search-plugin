@@ -72,6 +72,8 @@ class SphinxSearch_Backend {
             }
 
             $sphinxView = new SphinxView();
+            $sphinxView->assign('index_modify_time', $sphinxService->get_index_modify_time());
+
             $sphinxView->assign('error_message', $error_message);
             $sphinxView->assign('success_message', $success_message);            
 		

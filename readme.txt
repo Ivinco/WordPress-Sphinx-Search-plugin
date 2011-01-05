@@ -65,7 +65,7 @@ E-mail:
 opensource@ivinco.com
 
 Website:
-[Ivinco](http://www.ivinco.com/ "Ivinco LTD")
+[Ivinco](http://www.ivinco.com/ "Ivinco")
 
 == Installation ==
 

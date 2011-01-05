@@ -45,6 +45,9 @@ a.sm_pluginHome {
 a.sm_pluginSupport {
     background-image: url("../img/icon-wordpress.gif");
 }
+a.sm_pluginCommercial {
+    background-image: url("../img/icon-ivinco.gif");
+}
 
 table.form-table {
     clear: none;

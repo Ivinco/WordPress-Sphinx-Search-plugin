@@ -99,18 +99,43 @@ class SphinxService
      /**
       * Parse sphinx conf and grab path to search pid file
       *
-      * @param unknown_type $sphinx_conf
-      * @return unknown
+      * @param string $sphinx_conf filename
+      * @return string
       */
      function get_searchd_pid_filename($sphinx_conf)
      {
      	$content = file_get_contents($sphinx_conf);
-     	//pid_file		= {sphinx_path}/var/log/searchd.pid
      	if (preg_match("#\bpid_file\s+=\s+(.*)\b#", $content, $m))
      	{
      		return $m[1];
      	}
      	return '';
+     }
+
+     /**
+      * Parse sphinx conf and fetch path to main index
+      *
+      * @param string $sphinx_conf filename
+      * @return string
+      */
+     function get_main_index_path($sphinx_conf)
+     {
+     	$content = file_get_contents($sphinx_conf);
+        $sphinx_index_path = '';
+     	if (preg_match("#\bpath\s+=\s+(.*)\b#", $content, $m))
+     	{
+            $sphinx_index_path = $m[1];
+     	}
+     	if (!$sphinx_index_path ||
+            !file_exists($sphinx_index_path) ||
+            !is_readable($sphinx_index_path)){
+            $sphinx_path = $this->_config->get_option('sphinx_path');
+            $sphinx_index_path = $sphinx_path . '/var/data';
+            if (!file_exists($sphinx_index_path) || !is_readable($sphinx_index_path)){
+                return '';
+            }
+        }
+        return $sphinx_index_path;
      }
 
      function need_reindex($flag)
@@ -187,5 +212,23 @@ class SphinxService
     function reindex_main()
     {
         $this->reindex('main');
+    }
+
+    function get_index_modify_time()
+    {
+        $sphinx_conf = $this->_config->get_option('sphinx_conf');
+        $sphinx_index_path = $this->get_main_index_path($sphinx_conf);
+        if (!$sphinx_index_path){
+            return false;
+        }
+
+        $index_name = $this->_config->get_option('sphinx_index').'main.spi';
+        $index_filename = $sphinx_index_path . '/'. $index_name;
+        if (!file_exists($index_filename) || !is_readable($index_filename) ){
+            return false;
+        }
+        
+        $time = filemtime($index_filename);
+        return $time;
     }
 }

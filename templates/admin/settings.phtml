@@ -2,17 +2,30 @@
     <div class="has-sidebar-content" id="post-body-content">
         <div class="meta-box-sortabless">
 
+            <p>
+This plugin is developed by <a href="http://www.ivinco.com">Ivinco</a>.
+If you need commercial support, or if you’d like WordPress Sphinx search plugin
+customized for your needs, we can help.
+Visit <a href="http://www.ivinco.com/software/wordpress-sphinx-search-plugin">plugin website</a>
+for the latest news.
+            </p>
+
             <div class="postbox">
                 <h3 class="hndle">Sphinx service management</h3>
                 <div class="inside">
                     <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
                     <fieldset class="options">
+                         <?php if ($this->view->devOptions['sphinx_running'] == 'true'): ?>
+                            Sphinx Search Server is running.<br/>
+                         <?php else: ?>
+                            <span style="color:red">Sphinx Search Server is NOT running.</span><br/>
+                         <?php endif; ?>
                     </fieldset>
                     <p class="submit">
-                        <?php if ($this->view->devOptions['sphinx_running'] == 'true'): ?>
+                        <?php if ($this->view->devOptions['sphinx_running'] == 'true'): ?>                            
                             <input type="submit" style="width:300px;" name="stop_sphinx" class="button-primary"
                                    value="Stop Sphinx daemon" />
-                        <?php else: ?>
+                        <?php else: ?>                            
                             <input type="submit" style="width:300px;" name="start_sphinx" class="button-primary"
                                    value="Start Sphinx daemon" />
                         <?php endif; ?>
@@ -23,13 +36,16 @@
 
             <div class="postbox">
                 <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
-                <h3 class="hndle">Indexes management</h3>
+                <h3 class="hndle">Index management</h3>
                 <div class="inside">
                     <fieldset class="options">
+                        <?php if($this->view->index_modify_time):?>
+                            <strong>Index built on <?php echo date("F d Y H:i:s.", $this->view->index_modify_time); ?></strong><br/>
+                        <?php endif; ?>
                     </fieldset>
                     <p class="submit">
                         <input type="submit" style="width:300px;" name="reindex_sphinx" class="button-primary"
-                               value="Run indexing manually" />
+                               value="Re-index WordPress index now" />
                     </p>
                 </div>
                 </form>
