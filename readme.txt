@@ -6,60 +6,50 @@ Tags: search, sphinx
 !Tested up to: 3.0.3
 !Stable tag: r_2-0
 
-This software replaces Wordpress's built-in search functionality with
-the Sphinx Search Engine, which gives high-performance, relevant
-search results.
-
+WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites. It is especially useful if your WordPress site becomes very large.
 
 == Description ==
 
-We are open for features requests for plugin and ready to accept community patches.
+WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites. It is especially useful if your WordPress site becomes very large.
 
-You can monitor current tasks and further plans on the [WordPress Sphinx Plugin Launchpad project](https://launchpad.net/wp-sphinx-plugin).
-You can also request [features](https://blueprints.launchpad.net/wp-sphinx-plugin) and  report [bugs](https://bugs.launchpad.net/wp-sphinx-plugin) there.
+Search results are more relevant and you can search in posts, pages and comments using flexible search syntax, quickly sort the results by freshness or relevance. This plugin comes with sidebar widgets to display the most recent searches and top and related search terms.
 
-Frontend features
+This plugin replaces WordPress’s built-in search functionality.
 
-* Search powered by Sphinx Search engine or SphinxSearch inside
-* Very fast search
-* Flexible [search syntax](http://www.sphinxsearch.com/doc.html#extended-syntax)
-* Sort search results by Relevance or Freshness
-* Search by posts, by comments and by pages.
-* Exclude posts, comments or pages from search results.
-* Display comments at search results page.
-* Search non-password protected pages only
-* Search only approved comments
-* By default search working in extended mode, but if no one results was found, then it try to search in "Match Any" mode.
-* On search results page title of web page are changed due to entered search keywords
-* Log all search results, except empty results
-* Display Top-n search keywords
-* Display Latest-n search keywords
-* If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar
-* Extended search form at the sidebar and on the search results page.
+Features
 
-Backend features
+ * Use flexible search syntax (see below)
+ * Sort search results by Relevance or Freshness
+ * Search in posts, pages and comments
+ * Use extended search form to fine tune the results
+ * Use sidebar widget for displaying Related/Top search terms
+ * Use sidebar widget for displaying Latest search terms
+ * Use Settings to style the keyword highlighting and search results
+ * Sphinx configuration Wizard (via Settings)
 
-* Disable/Enable search by: comments, posts, pages
-* Keywords wrapper settings:
+Flexible search syntax
 
-  * Add tag Before and After search keyword in body/title
-  * Separator of result snippets
-  * Snippet max length
-  * Maximum number of words around keyword in snippet
-  * Prefix before Posts, Comments and Pages title
-  * List of phrases to cut from search results
+Sphinx allows you to use the following special operators in searchbox:
 
-* Sphinx daemon Configuration:
-  * Sphinx index prefix
-  * Host
-  * Port
-  * Configuration file
-  * Searchd file
-  * Indexer file
+   1. Operator OR: hello | world
+   2. Operator NOT: hello -world, hello !world
+   3. Field search operator: @title hello @body worldThe following field operators are available:
+      @title – search in title of post or page
+      @body – search in body of post, page or comment
+      @category – search in blog categories
+   4. Phrase search operator: “hello world”
+   5. Proximity search operator: “hello world”~10
 
-* Indexer: You can reindex all content manually
-* Search daemon: You can stop/start search daemon
-* Sphinx Search configuration wizard: You can automatically install or reinstall Sphinx Search service through web interface
+Here’s an example query which uses all these operators:
+
+"hello world" @title "example program"~5 @body python -(php|perl)
+
+Read more on extended search syntax on Sphinx website: http://sphinxsearch.com/doc.html#extended-syntax
+
+Support
+
+This plugin is developed by [Ivinco](http://www.ivinco.com/ "Ivinco"). If you need commercial support, or if you’d like WordPress Sphinx Search Plugin customized for your needs, we can help. Visit [plugin website](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "plugin website") for the latest news.
+See release notes, report bugs and feature wishes on Launchpad: https://bugs.launchpad.net/wp-sphinx-plugin
 
 E-mail:
 opensource@ivinco.com
@@ -69,38 +59,28 @@ Website:
 
 == Installation ==
 
-To use the power of Sphinx for your WordPress blog, follow these steps:
-1. Install the Sphinx Search plugin (see below)
-2. Install Sphinx on your web server (optional - you may install Sphinx through web interface of plugin, see below)
-3. Set up cron jobs to re-index your website periodically.
-4. Configure the Sphinx Search plugin.
-5. Customize your search form on [search results] page by ss_search_bar() tag.
-6. Customize your sidebar with Search widgets (Top/Last search terms and extended search form).
+=== Requirments ===
 
-Install the Sphinx Search plugin:
-1. Unpack the plugin archive to wp-content/plugins/sphinxsearch folder of your WordPress installation;
-2. Activate SphinxSearch plugin via WordPress admin area;
-3. Make sure Wordpress upload directory is writeable by webserver (by default Wordpress is configured to use wp-content/uploads);
-4. Open Sphinx Search settings page and follow by Wizard steps to setup sphinx search.
+    * WordPress 2.0.2 or higher
+    * Ability to install Sphinx if not installed
+    * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
-Install Sphinx on your web server:
-If you haven't already installed Sphinx, you can install it
-automatically or manually:
-1. For automatic installation go to 'Options -> SphinxSearch' and
-   run configuration Wizard by pressing "Run configuration Wizard";
-2. For manual installation - please visit http://www.sphinxsearch.com/ for more instructions.
-3. After you have installed Sphinx manually change your sphinx.conf:
-   * Go to 'Options -> SphinxSearch' and run Wizard again.
-   * On second step specify path to installed search and indexer binaries.
-   * Follow by Wizard steps to complete configuration.
-4. After Wizard finished start sphinx daemon by pressing "Start Sphinx daemon";
-   
-Set up schedule jobs to re-index your website periodically:
-Before setup the schedule you should run Wizard to create
-special schedule files. The default location of that files is:
-/path/to/wp-content/uploads/sphinx/cron/
-After wizard is finished edit you crontab file.
-Use "crontab -e" command and add the following lines to your crontab:
+=== Installation guide ===
+[Online step-by-step installation guide](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Step-by-step installation guide")
+
+==== Install the plugin ====
+
+   1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
+   2. Activate Sphinx Search plugin via WordPress Settings
+   3. Make sure WordPress upload directory is writable by web server (by default WordPress is configured to use wp-content/uploads)
+   4. Open Sphinx Search settings page and follow by Wizard steps to setup Sphinx Search Server and plugin configuration
+   5. After Wizard finished start Sphinx Search by pressing "Start Sphinx daemon"
+
+==== Setup schedule ====
+Setup scheduled jobs to re-index your website data periodically
+To setup periodical re-indexing, you should run Wizard to create special schedule files.
+The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/. When wizard finishes, edit your Crontab file.
+Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:
 #Wordpress Delta index update
 #Following cron job update delta index every 5 minutes:
 */5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_delta.php
@@ -108,63 +88,44 @@ Use "crontab -e" command and add the following lines to your crontab:
 #Following cron job update main index daily (at 0 hours and 5 minutes):
 5 0 * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_main.php
 
-Configure the Sphinx Search plugin:
-1. You can control the majority of options via admin area of WordPress. 
-Go to "Options -> SphinxSearch" to do it.
+==== Setup templates and widgets ====
+Extended search form on search results page
+<?php if (function_exists('ss_search_bar'))
+    echo ss_search_bar();/*put it in search page*/?>
 
-Customize your search form on [search results] page by ss_search_bar() tag:
-1. Search form on the top of search results:
-  * Display extended search form at search results page
-  * Allow sort search resutls by Relevance or Freshness
-  * Allow search by posts, by comments and by pages.
-  * Allow exclude posts, comments or pages from search results.
-  <?php if (function_exists('ss_search_bar')) echo ss_search_bar();/*put it in search page*/?>
+To find out if the current post is comment
+<?php if (function_exists('ss_isComment') )
+    if (ss_isComment()) echo 'It is comment'; else echo '';?>
 
-2. To find out if the current post is comment:
-  <?php if (function_exists('ss_isComment') ) if (ss_isComment()) echo 'It is comment'; else echo '';?>
+Highlight search term in post title
+Use the following function instead of the_title()
+<?php sphinx_the_title(); ?>
 
-3. If you want to use tags in post title - please use next function instead of the_title():
-  <?php sphinx_the_title(); ?>
+Extended search form at the sidebar
+Use “Sphinx Search sidebar” widget or add it as template tag:
+<?php if (function_exists('ss_search_bar'))
+    echo ss_search_bar(true); /*put it in sidebar*/?>
 
-Customize your WordPress templates to show the Sphinx search field:
-Sidebar Widgets:
-Go to "Appearance -> Widgets" there are three widgets:
-1. Sphinx Top searches
-  * Display Top-n search keywords.
-  * If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
-2. Sphinx Last searches
-  * Display Latest-n search keywords
-3. Sphinx Search sidebar
-  * Display extended search form at sidebar
-  * Allow sort search resutls by Relevance or Freshness
-  * Allow search by posts, by comments and by pages.
-  * Allow exclude posts, comments or pages from search results.
+Related/Top searches at the sidebar
+Use “Sphinx Related/Top Searches” widget or add it as template tag:
+<?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
 
-Template tags:
-You can use the following tags in your templates:
-1. Search form in sidebar:
-  * Display extended search form at sidebar
-  * Allow sort search resutls by Relevance or Freshness
-  * Allow search by posts, by comments and by pages.
-  * Allow exclude posts, comments or pages from search results.
-  <?php if (function_exists('ss_search_bar')) echo ss_search_bar(true); /*put it in sidebar*/?>
-
-2. Top search results:
-  * Display Top-n search keywords.
-  * If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
-  <?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
-
-3. Latest search results:
-  * Display Latest-n search keywords
-  <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
-
-
-
+Latest searches at the sidebar
+Use “Sphinx Latest Searches” widget or add it as template tag:
+<?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
 
 
 == Frequently Asked Questions ==
 
-none
+Q: What is Sphinx Search Server?
+A: Sphinx is a full-text search engine which provides fast and relevant full-text search functionality. Read more on Sphinx website http://sphinxsearch.com
+
+Q: How to install Sphinx Search manually?
+A: To manually install Sphinx use the official Sphinx Search documentation.
+
+Q: How to update the search index?
+A: The best option to update search index is to setup cron job task for it. Also you may manually update search indexes through WordPress Sphinx Search administrative interface.
+
 
 == Screenshots ==
 
@@ -172,31 +133,8 @@ none
 
 == Arbitrary section ==
 
+=== Semi live update - "main+delta" scheme ===
 
-Search options:
-Sphinx extended queries syntax allows the following special operators to be used:
-* operator OR:
-hello | world
-* operator NOT:
-hello -world
-hello !world
-* field search operator:
-@title hello @body world
-* phrase search operator:
-"hello world"
-* proximity search operator:
-"hello world"~10
-Here's an example query which uses all these operators:
-"hello world" @title "example program"~5 @body python -(php|perl)
-More information about extended syntax you can find at: http://sphinxsearch.com/doc.html#extended-syntax
-
-The following field operators are available:
-@title - search in post or page title
-@body - search in post, page, comment body
-@category - search search in blog categories
-
-
-Semi live update - "main+delta" scheme:
 To enable semi-live index updates also known as "main+delta" scheme, 
 the plugin will create the following table in your MySQL database:
 # in MySQL
@@ -208,7 +146,7 @@ CREATE TABLE wp_sph_counter
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
-Top and last search terms:
+=== Top and last search terms ===
 In order to be able to store search statistics the plugin will run 
 the following SQL query during the activation process:
 # in MySQL
@@ -223,14 +161,8 @@ CREATE TABLE `wp_sph_stats` (
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
-The plugin folder structure:
-./cron - contains crontab scripts, see crontab instructions below;
-./php - contains php classes and libs;
-./tags - contains sphinx search tags implementation;
-./templates - contains html templates, that you can change to suit more to your blog design;
-./widgets - contains sphinx widgets;
-
-How to automatically start Sphinx search daemon at boot:
+=== Start Sphinx Search at boot ===
+How to automatically start Sphinx Search daemon at boot:
 In Debian based systems i.e. Ubuntu:
 % update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults
 In Redhat based systems i.e. Fedora:
@@ -239,11 +171,10 @@ In Redhat based systems i.e. Fedora:
 == Upgrade Notice ==
 
 = 2.0 =
-New configuration Wizard will help your better understand sphinx configuration and
-setup it properly.
+New configuration Wizard will help your easy setup sphinx configuration.
 Enhanced backend interface with more clear layout.
-Added keywords highlight for content of the_excerpt Wordpress tag
-
+Added keywords highlight of the_excerpt Wordpress tag.
+Fixed plenty of Bugs.
 
 == Changelog ==
 
@@ -252,7 +183,7 @@ Added keywords highlight for content of the_excerpt Wordpress tag
 Search service through web interface
 * Changed default installation directory - now sphinx installed in default
 Wordpress upload directory
-* Added shebung syntax to sphinx configuration file - it allow to load connection
+* Added shebang syntax to sphinx configuration file - it allow to load connection
 parameters automatically and hide it from the public access
 * Changed layout of backend interface
 * Changed error handling. Hided all system output and instead added human readable

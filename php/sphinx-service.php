@@ -227,8 +227,30 @@ class SphinxService
         if (!file_exists($index_filename) || !is_readable($index_filename) ){
             return false;
         }
-        
+
         $time = filemtime($index_filename);
         return $time;
     }
+}
+
+function GetCorrectMTime($filePath)
+{
+
+    $time = filemtime($filePath);
+
+    $isDST = (date('I', $time) == 1);
+    $systemDST = (date('I') == 1);
+
+    $adjustment = 0;
+
+    if($isDST == false && $systemDST == true)
+        $adjustment = 3600;
+
+    else if($isDST == true && $systemDST == false)
+        $adjustment = -3600;
+
+    else
+        $adjustment = 0;
+
+    return ($time + $adjustment);
 }

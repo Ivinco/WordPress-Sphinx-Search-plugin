@@ -39,9 +39,6 @@ for the latest news.
                 <h3 class="hndle">Index management</h3>
                 <div class="inside">
                     <fieldset class="options">
-                        <?php if($this->view->index_modify_time):?>
-                            <strong>Index built on <?php echo date("F d Y H:i:s.", $this->view->index_modify_time); ?></strong><br/>
-                        <?php endif; ?>
                     </fieldset>
                     <p class="submit">
                         <input type="submit" style="width:300px;" name="reindex_sphinx" class="button-primary"

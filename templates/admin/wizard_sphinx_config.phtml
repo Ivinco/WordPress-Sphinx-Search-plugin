@@ -11,11 +11,9 @@
         <form  action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post"  id="wizard_form">
             <input type="hidden" name="config_process" value="true" />
             <input type="hidden" name="action" value="config" />
-            <p class="submit">
-                <input class="button-secondary cancel" type="button"
-                       onClick="return wizard_skip('config');" value="Skip step" />
+            <p class="submit">                
                 <input type="button"  onClick="return wizard_next();"
-                       value="Save &amp; Continue" class="button-primary" />
+                       value="OK" class="button-primary" />
                  <input class="button-secondary cancel alignright" type="button"
                                        onClick="return wizard_cancel();" value="Cancel Wizard" />
             </p>
