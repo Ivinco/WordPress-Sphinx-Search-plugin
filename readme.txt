@@ -59,9 +59,10 @@ Website:
 
 == Installation ==
 
-=== Requirments ===
+=== Requirements ===
 
     * WordPress 2.0.2 or higher
+    * Sphinx Search 0.9.8 or higher
     * Ability to install Sphinx if not installed
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
@@ -73,7 +74,7 @@ Website:
    1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
    2. Activate Sphinx Search plugin via WordPress Settings
    3. Make sure WordPress upload directory is writable by web server (by default WordPress is configured to use wp-content/uploads)
-   4. Open Sphinx Search settings page and follow by Wizard steps to setup Sphinx Search Server and plugin configuration
+   4. Open Sphinx Search settings page and follow Wizard steps to setup Sphinx Search Server and plugin configuration
    5. After Wizard finished start Sphinx Search by pressing "Start Sphinx daemon"
 
 ==== Setup schedule ====
@@ -114,6 +115,10 @@ Latest searches at the sidebar
 Use “Sphinx Latest Searches” widget or add it as template tag:
 <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
 
+==== Upgrade the plugin ====
+
+   1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
+   2. Open Sphinx Search settings page and cancel Wizard to skip configuration
 
 == Frequently Asked Questions ==
 

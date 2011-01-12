@@ -8,7 +8,11 @@ Author: Ivinco
 Author URI: http://www.ivinco.com/
 License: A GPL2
 
-    Copyright 2008  &copy; Ivinco LTD  (email : opensource@ivinco.com)
+    WordPress Sphinx Search Plugin by Ivinco (opensource@ivinco.com), 2011.
+    If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
+
+    Visit plugin website for the latest news:
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

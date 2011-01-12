@@ -1,6 +1,10 @@
 <?php
 /*
-    Copyright 2008  &copy; Ivinco LTD  (email : opensource@ivinco.com)
+    WordPress Sphinx Search Plugin by Ivinco (opensource@ivinco.com), 2011.
+    If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
+
+    Visit plugin website for the latest news:
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +21,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 /**
- * LatestSearchesWidget Class
+ * TopSearchesWidget Class
  */
 class TopSearchesWidget extends WP_Widget
 {
@@ -40,9 +44,9 @@ class TopSearchesWidget extends WP_Widget
         $top_words_html = $this->get_top($limit, $width, $break);
         
         if ( $this->is_related ){
-            $title = apply_filters('widget_title', $instance['title_top']);
-        } else {
             $title = apply_filters('widget_title', $instance['title_rel']);
+        } else {
+            $title = apply_filters('widget_title', $instance['title_top']);
         }
         
         echo $before_widget;
