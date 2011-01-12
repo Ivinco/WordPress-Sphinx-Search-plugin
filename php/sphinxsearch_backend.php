@@ -49,7 +49,9 @@ class SphinxSearch_Backend {
             }            
             $options = $this->config->get_admin_options();
             $wizard = new WizardController($this->config);
-            if (!empty($_POST['start_wizard']) || 'false' == $options['wizard_done']){
+            if (!empty($_POST['start_wizard']) ||
+                    (empty($options['sphinx_conf']) &&
+                        'false' == $options['wizard_done'])){
                 return $wizard->start_action();
             }            
 

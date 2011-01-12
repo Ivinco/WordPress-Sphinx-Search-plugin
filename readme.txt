@@ -118,7 +118,6 @@ Use “Sphinx Latest Searches” widget or add it as template tag:
 ==== Upgrade the plugin ====
 
    1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
-   2. Open Sphinx Search settings page and cancel Wizard to skip configuration
 
 == Frequently Asked Questions ==
 
