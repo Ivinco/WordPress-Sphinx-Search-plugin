@@ -6,7 +6,7 @@ Tags: search, sphinx
 !Tested up to: 3.0.3
 !Stable tag: r_2-0
 
-WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites. It is especially useful if your WordPress site becomes very large.
+WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
 
 == Description ==
 
@@ -59,17 +59,17 @@ Website:
 
 == Installation ==
 
-=== Requirements ===
+= Requirements =
 
     * WordPress 2.0.2 or higher
     * Sphinx Search 0.9.8 or higher
     * Ability to install Sphinx if not installed
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
-=== Installation guide ===
+= Installation guide =
 [Online step-by-step installation guide](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Step-by-step installation guide")
 
-==== Install the plugin ====
+= Install the plugin =
 
    1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
    2. Activate Sphinx Search plugin via WordPress Settings
@@ -77,7 +77,7 @@ Website:
    4. Open Sphinx Search settings page and follow Wizard steps to setup Sphinx Search Server and plugin configuration
    5. After Wizard finished start Sphinx Search by pressing "Start Sphinx daemon"
 
-==== Setup schedule ====
+= Setup schedule =
 Setup scheduled jobs to re-index your website data periodically
 To setup periodical re-indexing, you should run Wizard to create special schedule files.
 The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/. When wizard finishes, edit your Crontab file.
@@ -89,7 +89,7 @@ Use “crontab -e” command in the Linux terminal and add the following lines t
 #Following cron job update main index daily (at 0 hours and 5 minutes):
 5 0 * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_main.php
 
-==== Setup templates and widgets ====
+= Setup templates and widgets =
 Extended search form on search results page
 <?php if (function_exists('ss_search_bar'))
     echo ss_search_bar();/*put it in search page*/?>
@@ -115,7 +115,7 @@ Latest searches at the sidebar
 Use “Sphinx Latest Searches” widget or add it as template tag:
 <?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
 
-==== Upgrade the plugin ====
+= Upgrade the plugin =
 
    1. Unpack the plugin archive to wp-content/plugins folder of your WordPress installation
 
@@ -146,7 +146,7 @@ braked by separator.
 
 == Arbitrary section ==
 
-=== Semi live update - "main+delta" scheme ===
+= Semi live update - "main+delta" scheme =
 
 To enable semi-live index updates also known as "main+delta" scheme, 
 the plugin will create the following table in your MySQL database:
@@ -159,7 +159,7 @@ CREATE TABLE wp_sph_counter
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
-=== Top and last search terms ===
+= Top and last search terms =
 In order to be able to store search statistics the plugin will run 
 the following SQL query during the activation process:
 # in MySQL
@@ -174,7 +174,7 @@ CREATE TABLE `wp_sph_stats` (
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
-=== Start Sphinx Search at boot ===
+= Start Sphinx Search at boot =
 How to automatically start Sphinx Search daemon at boot:
 In Debian based systems i.e. Ubuntu:
 % update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults
