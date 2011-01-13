@@ -133,7 +133,16 @@ A: The best option to update search index is to setup cron job task for it. Also
 
 == Screenshots ==
 
-none
+1. Search in action
+2. Customize your Related/Top search terms widget, set the Top and Related titles,
+set total number of results, set length of search term after which term will be
+braked by separator.
+3. Top search terms display
+4. Related search terms display
+5. Customize your Last search terms widget
+6. Last search terms display
+7. Customize extended search form widget
+8. Extended search form display
 
 == Arbitrary section ==
 
