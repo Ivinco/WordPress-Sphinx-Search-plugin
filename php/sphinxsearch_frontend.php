@@ -426,9 +426,23 @@ class SphinxSearch_FrontEnd
 	 * @return string
 	 */
 	function wp_title($title = '')
-	{		
-		return htmlspecialchars($_GET['s']) . ' ' .  $title;
-	}	
+	{            
+            return htmlspecialchars($_GET['s']) . ' ' .  $title;
+	}
+
+        /**
+	 * Return modified post title
+	 *
+	 * @param string $title
+	 * @return string
+	 */
+        function the_title($title = '')
+	{
+            if (!is_search()) return the_title();
+            
+            global $post;
+            return $post->sphinx_post_title;
+	}
 	
 	
 	/**
@@ -437,12 +451,11 @@ class SphinxSearch_FrontEnd
 	 * @return unknown
 	 */
 	function sphinx_the_title()
-	{
-		if (!is_search()) return the_title();		
-		
-		global $post;
-		$title = $post->sphinx_post_title;
-		return $title;
+	{		
+            if (!is_search()) return the_title();
+
+            global $post;
+            return $post->sphinx_post_title;
 	}
 	
 	/**

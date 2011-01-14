@@ -77,15 +77,15 @@ Website:
    4. Open Sphinx Search settings page and follow Wizard steps to setup Sphinx Search Server and plugin configuration
    5. After Wizard finished start Sphinx Search by pressing "Start Sphinx daemon"
 
-= Setup schedule =
+= Setup scheduled jobs to re-index your website data periodically =
 Setup scheduled jobs to re-index your website data periodically
 To setup periodical re-indexing, you should run Wizard to create special schedule files.
 The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/. When wizard finishes, edit your Crontab file.
 Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:
-#Wordpress Delta index update
+#WordPress Delta index update
 #Following cron job update delta index every 5 minutes:
 */5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_delta.php
-#Wordpress Main index update
+#WordPress Main index update
 #Following cron job update main index daily (at 0 hours and 5 minutes):
 5 0 * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_main.php
 
@@ -97,10 +97,6 @@ Extended search form on search results page
 To find out if the current post is comment
 <?php if (function_exists('ss_isComment') )
     if (ss_isComment()) echo 'It is comment'; else echo '';?>
-
-Highlight search term in post title
-Use the following function instead of the_title()
-<?php sphinx_the_title(); ?>
 
 Extended search form at the sidebar
 Use “Sphinx Search sidebar” widget or add it as template tag:
@@ -134,15 +130,13 @@ A: The best option to update search index is to setup cron job task for it. Also
 == Screenshots ==
 
 1. Search in action
-2. Customize your Related/Top search terms widget, set the Top and Related titles,
-set total number of results, set length of search term after which term will be
-braked by separator.
-3. Top search terms display
-4. Related search terms display
+2. Customize your Related/Top searches widget.
+3. Widget displaying Top search terms
+4. Widget displaying Related search terms
 5. Customize your Last search terms widget
-6. Last search terms display
+6. Widget displaying Last search terms
 7. Customize extended search form widget
-8. Extended search form display
+8. Extended search form
 
 == Arbitrary section ==
 
@@ -184,31 +178,18 @@ In Redhat based systems i.e. Fedora:
 == Upgrade Notice ==
 
 = 2.0 =
-New configuration Wizard will help your easy setup sphinx configuration.
-Enhanced backend interface with more clear layout.
-Added keywords highlight of the_excerpt Wordpress tag.
-Fixed plenty of Bugs.
+This release comes with the revamped UI for the plugin's WordPress wp-admin panel, including new Configuration Wizard to help you install the Sphinx Search Server. Besides we've implemented sidebar widgets for displaying top/related and latest search terms and the extended search form, added search term highlighting for search results, and implemented numerous fixes to make this plugin work better and easier to setup.
 
 == Changelog ==
 
 = 2.0 =
-* Added configuration wizard: You can automatically install or reinstall Sphinx
-Search service through web interface
-* Changed default installation directory - now sphinx installed in default
-Wordpress upload directory
-* Added shebang syntax to sphinx configuration file - it allow to load connection
-parameters automatically and hide it from the public access
-* Changed layout of backend interface
-* Changed error handling. Hided all system output and instead added human readable
-error messages.
-* Added widget to display Top-n search keywords.
-  If entered search keywords has relevant keywords in log, then display top relevant keywords in Top-n bar.
-* Added widget to display Latest-n search keywords
-* Added widget to display extended search form in sidebar
-  It allow sort search resutls by Relevance or Freshness,
-  search by posts, by comments and by pages,
-  exclude posts, comments or pages from search results.
-* Added keywords highlight for content of the_excerpt Wordpress tag
+* Added configuration wizard: you can automatically install or reinstall Sphinx via WordPress wp-admin panel
+* Changed default Sphinx installation directory: now Sphinx is installed to WordPress upload directory
+* Using shebang syntax for Sphinx configuration file - it allows to hide the connection parameters from the public access
+* UI fixes for WordPress wp-admin panel
+* Improved error handling: system output is now hidden and human readable error messages were added
+* Added a new sidebar widgets for displaying top/related and latest search terms and a widget for the extended search form
+* Added search term highlighting for search results (in WordPress' the_excerpt tag)
 * Added automatic generation of cron files
 
 = 1.0 =

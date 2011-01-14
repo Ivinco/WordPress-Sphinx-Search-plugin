@@ -126,11 +126,16 @@ class SphinxSearch{
 		add_filter('post_link', array(&$this, 'post_link'));
 		add_filter('the_permalink', array(&$this, 'the_permalink'));		
 		add_filter('wp_title', array(&$this, 'wp_title'));
+                add_filter('the_title', array(&$this, 'the_title'));
 		add_filter('the_content', array(&$this, 'the_content'));
 		add_filter('the_author', array(&$this, 'the_author'));
 		add_filter('the_time', array(&$this, 'the_time'));
+
+                
 				
 		//bind neccessary actions
+
+                add_action('loop_end',  array(&$this, 'remove_actions_filters'));
 		
 		//action to prepare admin menu
 		add_action('admin_menu', array(&$this, 'options_page'));
@@ -145,6 +150,20 @@ class SphinxSearch{
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
 	}
+
+        function remove_actions_filters()
+        {
+            remove_filter( 'posts_request', array(&$this, 'posts_request') );
+            remove_filter( 'posts_results', array(&$this, 'posts_results') );
+            remove_filter( 'found_posts', array(&$this, 'found_posts') );
+            remove_filter( 'post_link', array(&$this, 'post_link') );
+            remove_filter( 'the_permalink', array(&$this, 'the_permalink') );
+            remove_filter( 'the_title', array(&$this, 'the_title') );
+            remove_filter( 'the_content', array(&$this, 'the_content') );
+            remove_filter( 'the_author', array(&$this, 'the_author') );
+            remove_filter( 'the_time', array(&$this, 'the_time') );
+
+        }
 	
 	/**
 	 * Replace post time to commen time
@@ -283,7 +302,15 @@ class SphinxSearch{
                 }
 		return $this->frontend->wp_title($title);
 	}
-	
+
+        function the_title($title = '')
+	{
+		if (!$this->_sphinxRunning()){
+                    return $title;
+                }
+		return $this->frontend->the_title($title);
+	}
+
 	/**
 	 * Set flag for cron job to remind about update
 	 *

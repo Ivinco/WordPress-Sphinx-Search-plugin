@@ -90,7 +90,7 @@ function ss_top_ten_is_related() {
 	
 function sphinx_the_title() {
     global $defaultObjectSphinxSearch;
-echo $defaultObjectSphinxSearch->frontend->sphinx_the_title();
+    echo $defaultObjectSphinxSearch->frontend->sphinx_the_title();
 }
 	
 function sphinx_get_type_count($type){
