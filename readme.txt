@@ -150,6 +150,7 @@ CREATE TABLE wp_sph_counter
     counter_id INTEGER PRIMARY KEY NOT NULL,
     max_doc_id INTEGER NOT NULL
 );
+
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
@@ -165,14 +166,15 @@ CREATE TABLE `wp_sph_stats` (
 	PRIMARY KEY  (`id`),
 	KEY `keywords` (`keywords`)
 );
+
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
 = Start Sphinx Search at boot =
-How to automatically start Sphinx Search daemon at boot:
-In Debian based systems i.e. Ubuntu:
+# How to automatically start Sphinx Search daemon at boot:
+*   In Debian based systems i.e. Ubuntu:
 % update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults
-In Redhat based systems i.e. Fedora:
+*   In Redhat based systems i.e. Fedora:
 % chkconfig --add "/path/to/bin/searchd --config /path/to/etc/sphinx.conf"
 
 == Upgrade Notice ==
