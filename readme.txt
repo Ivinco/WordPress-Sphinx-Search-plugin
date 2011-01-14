@@ -183,46 +183,44 @@ This release comes with the revamped UI for the plugin's WordPress wp-admin pane
 == Changelog ==
 
 = 2.0 =
-* Added configuration wizard: you can automatically install or reinstall Sphinx via WordPress wp-admin panel
-* Changed default Sphinx installation directory: now Sphinx is installed to WordPress upload directory
-* Using shebang syntax for Sphinx configuration file - it allows to hide the connection parameters from the public access
-* UI fixes for WordPress wp-admin panel
-* Improved error handling: system output is now hidden and human readable error messages were added
-* Added a new sidebar widgets for displaying top/related and latest search terms and a widget for the extended search form
-* Added search term highlighting for search results (in WordPress' the_excerpt tag)
-* Added automatic generation of cron files
+*   Added configuration wizard: you can automatically install or reinstall Sphinx via WordPress wp-admin panel
+*   Changed default Sphinx installation directory: now Sphinx is installed to WordPress upload directory
+*   Using shebang syntax for Sphinx configuration file - it allows to hide the connection parameters from the public access
+*   UI fixes for WordPress wp-admin panel
+*   Improved error handling: system output is now hidden and human readable error messages were added
+*   Added a new sidebar widgets for displaying top/related and latest search terms and a widget for the extended search form
+*   Added search term highlighting for search results (in WordPress' the_excerpt tag)
+*   Added automatic generation of cron files
 
 = 1.0 =
-Frontend
-* Added Search powered by Sphinx Search engine
-* Added sort search resutls by Relevance or Freshness
-* Added search by posts, by comments and by pages.
-* Added exclude posts, comments or pages from search results.
-* Added display comments at search results page.
-* Added search non-password protected pages only
-* Added search only approved comments
-* Added "Match Any" search ability - if no one results was found, then it try to search in "Match Any" mode.
-* Added support for tag title of web page - it changed due to entered search keywords
-* Added log of all search results, except empty results
-* Added tag to display Top-n search keywords
-* Added tag to display Latest-n search keywords
-* Added relevant keywords support to the Top-n search keywords bar.
 
-Backend
-* Added support to Disable/Enable search by: comments, posts, pages
-* Added support of keywords wrapper settings:
-  * Add tag Before and After search keyword in body/title
-  * Separator of result snippets
-  * Snippet max length
-  * Maximum number of words around keyword in snippet
-  * Prefix before Posts, Comments and Pages title
-  * List of phrases to cut from search results
-* Added configuration for Sphinx index prefix
-* Added configuration for Host
-* Added configuration for Port
-* Added configuration for Configuration file
-* Added configuration for Searchd file
-* Added configuration for Indexer file
-* Added support to reindex all content manually
-* Added support to stop/start search daemon
-* Added support to install Sphinx Search through web interface
+*   Added Search powered by Sphinx Search engine
+*   Added sort search resutls by Relevance or Freshness
+*   Added search by posts, by comments and by pages.
+*   Added exclude posts, comments or pages from search results.
+*   Added display comments at search results page.
+*   Added search non-password protected pages only
+*   Added search only approved comments
+*   Added "Match Any" search ability - if no one results was found, then it try to search in "Match Any" mode.
+*   Added support for tag title of web page - it changed due to entered search keywords
+*   Added log of all search results, except empty results
+*   Added tag to display Top-n search keywords
+*   Added tag to display Latest-n search keywords
+*   Added relevant keywords support to the Top-n search keywords bar.
+*   Added support to Disable/Enable search by: comments, posts, pages
+*   Added support of keywords wrapper settings:
+   *   Add tag Before and After search keyword in body/title
+   *   Separator of result snippets
+   *   Snippet max length
+   *   Maximum number of words around keyword in snippet
+   *   Prefix before Posts, Comments and Pages title
+   *   List of phrases to cut from search results
+*   Added configuration for Sphinx index prefix
+*   Added configuration for Host
+*   Added configuration for Port
+*   Added configuration for Configuration file
+*   Added configuration for Searchd file
+*   Added configuration for Indexer file
+*   Added support to reindex all content manually
+*   Added support to stop/start search daemon
+*   Added support to install Sphinx Search through web interface

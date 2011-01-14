@@ -122,19 +122,18 @@ class SphinxSearch{
 		//return number of found posts
 		add_filter('found_posts', array(&$this, 'found_posts'));
 		
-		//content filters 
-		add_filter('post_link', array(&$this, 'post_link'));
-		add_filter('the_permalink', array(&$this, 'the_permalink'));		
+		//content filters 		
 		add_filter('wp_title', array(&$this, 'wp_title'));
-                add_filter('the_title', array(&$this, 'the_title'));
-		add_filter('the_content', array(&$this, 'the_content'));
-		add_filter('the_author', array(&$this, 'the_author'));
-		add_filter('the_time', array(&$this, 'the_time'));
-
-                
 				
 		//bind neccessary actions
+                add_filter('post_link', array(&$this, 'post_link'));
+                add_filter('the_permalink', array(&$this, 'the_permalink'));
+                add_filter('the_title', array(&$this, 'the_title'));
+                add_filter('the_content', array(&$this, 'the_content'));
+                add_filter('the_author', array(&$this, 'the_author'));
+                add_filter('the_time', array(&$this, 'the_time'));
 
+               // add_action('loop_start',  array(&$this, 'add_actions_filters'));
                 add_action('loop_end',  array(&$this, 'remove_actions_filters'));
 		
 		//action to prepare admin menu
@@ -150,6 +149,11 @@ class SphinxSearch{
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
 	}
+
+        function add_actions_filters()
+        {
+            
+        }
 
         function remove_actions_filters()
         {

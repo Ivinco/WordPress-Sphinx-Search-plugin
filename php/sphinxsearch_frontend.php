@@ -438,9 +438,10 @@ class SphinxSearch_FrontEnd
 	 */
         function the_title($title = '')
 	{
-            if (!is_search()) return the_title();
-            
             global $post;
+
+            if (!is_search() || !in_the_loop()) return $title;       
+            
             return $post->sphinx_post_title;
 	}
 	
@@ -452,10 +453,7 @@ class SphinxSearch_FrontEnd
 	 */
 	function sphinx_the_title()
 	{		
-            if (!is_search()) return the_title();
-
-            global $post;
-            return $post->sphinx_post_title;
+            return the_title();
 	}
 	
 	/**

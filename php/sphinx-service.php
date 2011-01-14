@@ -169,23 +169,16 @@ class SphinxService
 	}elseif ('' == $this->_config->get_option('sphinx_index')){
             return  array('err' =>'Indexer: Sphinx index prefix is not specified.');
 	}else {
-            if ($this->is_sphinx_running()) {
-                $rotate = '--rotate ';
-            }else {
-                $rotate = '';
-            }
-
             $command = $this->_config->get_option('sphinx_indexer').
-                    " --config ".$this->_config->get_option('sphinx_conf');
+                    "  --rotate --config ".$this->_config->get_option('sphinx_conf');
 
             if(empty($index_name)){
                 //reindex all indexes with restart searchd
                 $command .= " ".$this->_config->get_option('sphinx_index')."delta ".
-                    $this->_config->get_option('sphinx_index')."main $rotate ";
+                    $this->_config->get_option('sphinx_index')."main ";
             } elseif (!empty ($index_name)) {
                 //reindex only specified index with restart searchd
-                $command .= " ".$this->_config->get_option('sphinx_index').
-                        $index_name . " " . $rotate;
+                $command .= " ".$this->_config->get_option('sphinx_index').$index_name;
             }
                     
             exec($command, $output, $retval);
