@@ -667,7 +667,7 @@ class SphinxSearch_FrontEnd
 			foreach (explode("\n", $this->config->admin_options['strip_tags']) as $tag){
 				$tag = trim($tag);
 				if (empty($tag)) continue;
-				$str = str_replace($tag, '', $str);
+				$str = str_ireplace($tag, '', $str);
 			}
 		}
 		return $str;
