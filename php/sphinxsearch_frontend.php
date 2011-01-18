@@ -667,7 +667,7 @@ class SphinxSearch_FrontEnd
 			foreach (explode("\n", $this->config->admin_options['strip_tags']) as $tag){
 				$tag = trim($tag);
 				if (empty($tag)) continue;
-				$str = str_ireplace($tag, '', $str);
+				$str = str_replace($tag, '', $str);
 			}
 		}
 		return $str;
@@ -706,60 +706,80 @@ class SphinxSearch_FrontEnd
 	 * @param string $break
 	 * @return array
 	 */
-	function sphinx_stats_top_ten($limit = 10, $width = 0, $break = '...')
-	{
-		global $wpdb, $table_prefix;
-		$sql_related = '';
-		if (is_search()){
-			$keywords = $this->clear_keywords($_GET['s']);
-			if (!empty($keywords)){
-				$sql_related = ' AND ';
-				$sql_related .= " (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE)) ";
-			}
-		}
-		$results = array();
-		if (!empty($sql_related)){
-			$sql = "SELECT 
-						keywords_full,
-						keywords,
-						count(1) as cnt
-					FROM 
-						{$table_prefix}sph_stats 
-					WHERE 
-						(date_added >= DATE_SUB(NOW(), INTERVAL 2 Month)) $sql_related 
-						and keywords_full != '".trim($wpdb->escape($_GET['s']))."'
-					GROUP BY 
-						keywords DESC
-					ORDER BY 
-						cnt DESC
-					LIMIT 
-						".($limit+30)."" ; 
-			$results = $wpdb->get_results($sql);                        
-		}
-		if (empty($results)){
-			$sql = "SELECT 
-					keywords,
-					keywords_full,
-					count(1) as cnt
-				FROM 
-					{$table_prefix}sph_stats 
-				WHERE 
-					date_added >= DATE_SUB(NOW(), INTERVAL 1 Month) 
-				GROUP BY 
-					keywords DESC
-				ORDER BY 
-					cnt DESC
-				LIMIT 
-					".($limit+30)."" ;
-			$results = $wpdb->get_results($sql);		
-		} else {
-			$this->top_ten_is_related = true;
-		}
+    function sphinx_stats_top_ten($limit = 10, $width = 0, $break = '...')
+    {
+	$keywords = $_GET['s'];
 
-		$results = $this->make_results_clear($results, $limit, $width, $break);
+        //try to get related results on search page
+        if (is_search() && !empty($keywords)){
+            $results = $this->sphinx_stats_related($keywords, $limit, $width, $break);
+            if (!empty($results)){
+                return $results;
+            }
+        }
+        $results = $this->sphinx_stats_top($limit, $width, $break);
 		
-		return $results;
-	}
+	return $results;
+    }
+
+    function sphinx_stats_top($limit = 10, $width = 0, $break = '...')
+    {
+        global $wpdb, $table_prefix;
+	$sql = "SELECT
+                    keywords,
+                    keywords_full,
+                    count(1) as cnt
+		FROM
+                    {$table_prefix}sph_stats
+		WHERE
+                    date_added >= DATE_SUB(NOW(), INTERVAL 1 Month)
+		GROUP BY
+                    keywords DESC
+		ORDER BY
+                    cnt DESC
+		LIMIT
+		".($limit+30)."" ;
+	$results = $wpdb->get_results($sql);
+	$results = $this->make_results_clear($results, $limit, $width, $break);
+
+	return $results;
+    }
+
+    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...')
+    {
+        global $wpdb, $table_prefix;
+        $sql_related = '';
+        $keywords = $this->clear_keywords($keywords);
+	if (empty($keywords)){
+            return false;
+        }
+
+        $sql_related = ' AND ';
+	$sql_related .= " (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE)) ";
+
+
+	$results = array();
+        $sql = "SELECT
+                    keywords_full,
+                    keywords,
+                    count(1) as cnt
+                FROM
+                    {$table_prefix}sph_stats
+		WHERE
+                    (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month)) $sql_related
+                    and keywords_full != '".trim($wpdb->escape($keywords))."'
+		GROUP BY
+                    keywords DESC
+		ORDER BY
+                    cnt DESC
+		LIMIT
+		".($limit+30)."" ;
+	$results = $wpdb->get_results($sql);
+
+	$results = $this->make_results_clear($results, $limit, $width, $break);
+
+	return $results;
+    }
 	
 	/**
 	 * Return N-latest search keywords

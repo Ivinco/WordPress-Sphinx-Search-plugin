@@ -37,24 +37,55 @@ class TopSearchesWidget extends WP_Widget
     function widget($args, $instance)
     {
         extract( $args );
-        $limit = !empty($instance['limit']) ? $instance['limit'] : 10;
+
+        $title_rel = apply_filters('widget_title', $instance['title_rel']);
+        $title_top = apply_filters('widget_title', $instance['title_top']);
         $width = !empty($instance['width']) ? $instance['width'] : 0;
         $break = !empty($instance['break']) ? $instance['break'] : '...';
-        
-        $top_words_html = $this->get_top($limit, $width, $break);
-        
-        if ( $this->is_related ){
-            $title = apply_filters('widget_title', $instance['title_rel']);
-        } else {
-            $title = apply_filters('widget_title', $instance['title_top']);
+        $front_show = !empty($instance['front_show']) ? $instance['front_show'] : 'show';
+        $posts_show = !empty($instance['front_show']) ? $instance['posts_show'] : 'show_related';
+        $search_show = !empty($instance['front_show']) ? $instance['search_show'] : 'show_related';
+
+        $show_widget = false;
+        //if it is post
+        if (is_search() && $search_show != 'hide'){
+            $limit = !empty($instance['limit']) ? $instance['search_limit'] : 10;
+            if ( $search_show == 'show_related' ){
+                $title = $title_rel;
+                $words_html = $this->get_related($_GET['s'], $limit, $width, $break);
+            }
+            if (empty($words_html) || $search_show == 'show_top') {
+                $title = $title_top;
+                $words_html = $this->get_top($limit, $width, $break);
+            }
+            $show_widget = true;
+        } else if ( is_single() && $posts_show != 'hide'){
+            $limit = !empty($instance['limit']) ? $instance['posts_limit'] : 10;
+            if ( $posts_show == 'show_related' ){
+                $title = $title_rel;
+                $keywords = single_post_title( '', false );
+                $words_html = $this->get_related($keywords, $limit, $width, $break);
+            }
+            if (empty($words_html) || $posts_show == 'show_top') {
+                $title = $title_top;
+                $words_html = $this->get_top($limit, $width, $break);
+            }
+            $show_widget = true;
+        } else if ($front_show != 'hide'){
+            $title = $title_top;
+            $limit = !empty($instance['limit']) ? $instance['front_limit'] : 10;
+            $words_html = $this->get_top($limit, $width, $break);
+            $show_widget = true;
         }
         
-        echo $before_widget;
-        if ( $title ) {
-            echo $before_title . $title . $after_title;
+        if ($show_widget){
+            echo $before_widget;
+            if ( $title ) {
+                echo $before_title . $title . $after_title;
+            }
+            echo $words_html;
+            echo $after_widget;
         }
-        echo $top_words_html;
-        echo $after_widget;
     }
 
     /** @see WP_Widget::update */
@@ -62,7 +93,12 @@ class TopSearchesWidget extends WP_Widget
 	$instance = $old_instance;
 	$instance['title_rel'] = strip_tags($new_instance['title_rel']);
         $instance['title_top'] = strip_tags($new_instance['title_top']);
-        $instance['limit'] = strip_tags($new_instance['limit']);
+        $instance['front_limit'] = strip_tags($new_instance['front_limit']);
+        $instance['front_show'] = strip_tags($new_instance['front_show']);
+        $instance['posts_limit'] = strip_tags($new_instance['posts_limit']);
+        $instance['posts_show'] = strip_tags($new_instance['posts_show']);
+        $instance['search_limit'] = strip_tags($new_instance['search_limit']);
+        $instance['search_show'] = strip_tags($new_instance['search_show']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
         return $instance;
@@ -74,7 +110,12 @@ class TopSearchesWidget extends WP_Widget
 
         $title_rel = !empty($instance['title_rel']) ? esc_attr($instance['title_rel']) : 'Related Searches';
         $title_top = !empty($instance['title_top']) ? esc_attr($instance['title_top']) : 'Top Searches';
-        $limit = !empty($instance['limit']) ? esc_attr($instance['limit']) : 10;
+        $front_show = !empty($instance['front_show']) ? esc_attr($instance['front_show']) : 'show';
+        $front_limit = !empty($instance['front_limit']) ? esc_attr($instance['front_limit']) : 10;
+        $posts_show = !empty($instance['posts_show']) ? esc_attr($instance['posts_show']) : 'show_related';
+        $posts_limit = !empty($instance['posts_limit']) ? esc_attr($instance['posts_limit']) : 10;
+        $search_show = !empty($instance['search_show']) ? esc_attr($instance['search_show']) : 'show_related';
+        $search_limit = !empty($instance['search_limit']) ? esc_attr($instance['search_limit']) : 10;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         ?>
@@ -90,12 +131,69 @@ class TopSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('title_rel'); ?>"
                    type="text" value="<?php echo $title_rel; ?>" />
             </label></p>
-            <p><label for="<?php echo $this->get_field_id('limit'); ?>">
+            <p><label for="<?php echo $this->get_field_id('front_show'); ?>">
+                <?php _e('Show On Front Page:'); ?>
+                <select class="widefat" id="<?php echo $this->get_field_id('front_show'); ?>"
+                        name="<?php echo $this->get_field_name('front_show'); ?>">>
+                    <option value="show" 
+                        <?php echo ($front_show =='show')?'  selected="selected"':''?>
+                    >Show Top Searches</option>
+                    <option value="hide"
+                        <?php echo ($front_show =='hide')?'  selected="selected"':''?>
+                     >Do not show</option>
+                </select>
+             </label></p>
+            <p><label for="<?php echo $this->get_field_id('front_limit'); ?>">
             <?php _e('Number of results:'); ?>
-            <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>"
-                   name="<?php echo $this->get_field_name('limit'); ?>"
-                   type="text" value="<?php echo $limit; ?>" />
+            <input class="widefat" id="<?php echo $this->get_field_id('front_limit'); ?>"
+                   name="<?php echo $this->get_field_name('front_limit'); ?>"
+                   type="text" value="<?php echo $front_limit; ?>" />
             </label></p>
+
+            <p><label for="<?php echo $this->get_field_id('posts_show'); ?>">
+                <?php _e('Show On Post Pages:'); ?>
+                <select class="widefat" id="<?php echo $this->get_field_id('posts_show'); ?>"
+                        name="<?php echo $this->get_field_name('posts_show'); ?>">
+                    <option value="show_related"
+                        <?php echo ($posts_show =='show_related')?'  selected="selected"':''?>
+                    >Show Related Searches</option>
+                    <option value="show_top"
+                        <?php echo ($posts_show =='show_top')?'  selected="selected"':''?>
+                    >Show Top Searches</option>
+                    <option value="hide"
+                        <?php echo ($posts_show =='hide')?'  selected="selected"':''?>
+                     >Do not show</option>
+                </select>
+             </label></p>
+            <p><label for="<?php echo $this->get_field_id('posts_limit'); ?>">
+            <?php _e('Number of results:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('posts_limit'); ?>"
+                   name="<?php echo $this->get_field_name('posts_limit'); ?>"
+                   type="text" value="<?php echo $posts_limit; ?>" />
+            </label></p>
+
+            <p><label for="<?php echo $this->get_field_id('search_show'); ?>">
+                <?php _e('Show On Search Pages:'); ?>
+                <select class="widefat" id="<?php echo $this->get_field_id('search_show'); ?>"
+                        name="<?php echo $this->get_field_name('search_show'); ?>">
+                    <option value="show_related"
+                        <?php echo ($search_show =='show_related')?'  selected="selected"':''?>
+                    >Show Related Searches</option>
+                    <option value="show_top"
+                        <?php echo ($search_show =='show_top')?'  selected="selected"':''?>
+                    >Show Top Searches</option>
+                    <option value="hide"
+                        <?php echo ($search_show =='hide')?'  selected="selected"':''?>
+                     >Do not show</option>
+                </select>
+             </label></p>
+            <p><label for="<?php echo $this->get_field_id('search_limit'); ?>">
+            <?php _e('Number of results:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('search_limit'); ?>"
+                   name="<?php echo $this->get_field_name('search_limit'); ?>"
+                   type="text" value="<?php echo $search_limit; ?>" />
+            </label></p>
+            
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
             <?php _e('Maximum length of search term:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('width'); ?>"
@@ -116,14 +214,32 @@ class TopSearchesWidget extends WP_Widget
     {
         global $defaultObjectSphinxSearch;
 
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten($limit, $width, $break);
-        $this->is_related = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten_is_related();
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
+        if (empty($result)){
+            return false;
+        }
         $html = '';
 	$html .= "<ul>";
-            foreach ($result as $res)
-            {
-                $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
-            }
+        foreach ($result as $res){
+            $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+        }
+	$html .= "</ul>";
+        return $html;
+    }
+
+    function get_related($keywords, $limit = 10, $width = 0, $break = '...')
+    {
+        global $defaultObjectSphinxSearch;
+
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break);
+        if (empty($result)){
+            return false;
+        }
+        $html = '';
+	$html .= "<ul>";
+        foreach ($result as $res){
+            $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+        }
 	$html .= "</ul>";
         return $html;
     }
