@@ -173,13 +173,12 @@ class SphinxSearch_FrontEnd
 		//replace key - buffer to key buffer
 		$this->search_string = $this->unify_keywords($this->search_string);
 		
-		$res = $this->config->sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );			
+		$res = $this->config->sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 		if (empty($res["matches"]) && $this->is_simple_query($this->search_string)){
 			$this->config->sphinx->SetMatchMode ( SPH_MATCH_ANY );
 			$res = $this->config->sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 			$this->used_match_any = true;
 		}
-		
 		//to do something usefull with error
 		if ( $res === false ){
 			$error = $this->config->sphinx->getLastError();
@@ -190,8 +189,9 @@ class SphinxSearch_FrontEnd
 		////////////
 		// try match any and save search string
 		////////////
-		$partial_keyword_match_or_adult_keyword = false;	
-		if ( $this->search_string != $this->clear_censor_keywords($this->search_string) || 
+		$partial_keyword_match_or_adult_keyword = false;
+		if (  ( strtolower($this->search_string) !=
+                        $this->clear_censor_keywords($this->search_string) ) ||
 			$this->used_match_any === true){
 			$partial_keyword_match_or_adult_keyword = true;
 		}
@@ -200,7 +200,7 @@ class SphinxSearch_FrontEnd
 			if (!is_array($res["matches"])){
 				$this->used_match_any = false;
 				$this->config->sphinx->_filters = array();
-				$this->config->sphinx->SetLimits(0, 1);		
+				$this->config->sphinx->SetLimits(0, 1);
 				$res_tmp = $this->config->sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 				//to do something usefull with error
 				if ( $res_tmp === false ){
@@ -690,10 +690,14 @@ class SphinxSearch_FrontEnd
 		$keywords_full = trim($keywords_full);
 		
 		$sql = "INSERT INTO 
-					{$table_prefix}sph_stats 
-						(keywords, keywords_full, date_added)
-					VALUES
-						('".mysql_real_escape_string($keywords)."', '".mysql_real_escape_string($keywords_full)."', NOW())";	
+                            {$table_prefix}sph_stats
+                            (keywords, keywords_full, date_added)
+                        VALUES
+                            ('".mysql_real_escape_string($keywords)."',
+                             '".mysql_real_escape_string($keywords_full)."',
+                            NOW()
+                        )";
+
 		$wpdb->query($sql);
 		return true;
 	}
@@ -748,15 +752,16 @@ class SphinxSearch_FrontEnd
     function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...')
     {
         global $wpdb, $table_prefix;
-        $sql_related = '';
+
         $keywords = $this->clear_keywords($keywords);
 	if (empty($keywords)){
             return false;
         }
 
-        $sql_related = ' AND ';
-	$sql_related .= " (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE)) ";
-
+        $sql_exclude_keyword = '';
+        if (is_search()){
+            $sql_exclude_keyword =  " and keywords_full != '".trim($wpdb->escape($keywords));
+        }
 
 	$results = array();
         $sql = "SELECT
@@ -766,8 +771,9 @@ class SphinxSearch_FrontEnd
                 FROM
                     {$table_prefix}sph_stats
 		WHERE
-                    (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month)) $sql_related
-                    and keywords_full != '".trim($wpdb->escape($keywords))."'
+                    (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month)) AND
+                    (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE))
+                    $sql_exclude_keyword
 		GROUP BY
                     keywords DESC
 		ORDER BY
@@ -804,36 +810,38 @@ class SphinxSearch_FrontEnd
  					m DESC					  					
 				LIMIT
 					".($limit+30)."	
-				" ; 
+				" ;
 		$results = $wpdb->get_results($sql);
-		
+
 		$results = $this->make_results_clear($results, $limit, $width, $break);
 		
 		return $results;
 	}
 	
-	function make_results_clear($results, $limit, $width = 0, $break = '...'){
-	    $counter = 0;
-		$clear_results = array();
-		foreach ($results as $res){
-		    if ($counter == $limit){
-		        break;
-		    }
-		    $keywords = $this->clear_censor_keywords($res->keywords);
-		    if ($keywords == $res->keywords){
-		        $counter++;		
-		    } else {
-		        continue;
-		    }
-			if ($width && mb_strlen($res->keywords) > $width){
-				$res->keywords_cut = mb_substr($res->keywords, 0, $width, "UTF-8") . $break;
-			} else {
-				$res->keywords_cut = $res->keywords;
-			}
-			$clear_results[] = $res;
-		}
-		return $clear_results;
-	}
+    function make_results_clear($results, $limit, $width = 0, $break = '...')
+    {
+        $counter = 0;
+        $clear_results = array();
+        
+        foreach ($results as $res){
+            if ($counter == $limit){
+                break;
+            }
+            $keywords = $this->clear_censor_keywords($res->keywords);
+            if ($keywords == strtolower($res->keywords)){
+                $counter++;
+            } else {
+                continue;
+            }
+            if ($width && mb_strlen($res->keywords) > $width){
+                $res->keywords_cut = mb_substr($res->keywords, 0, $width, "UTF-8") . $break;
+            } else {
+		$res->keywords_cut = $res->keywords;
+            }
+            $clear_results[] = $res;
+        }
+	return $clear_results;
+    }
 	
 	/**
 	 * Is sphinx top ten is related
@@ -955,7 +963,7 @@ class SphinxSearch_FrontEnd
 			$censorWords[$k] = '/'.preg_quote($word).'/';
 		}
 		
-		$temp = preg_replace($censorWords, ' ', $temp);		
+		$temp = preg_replace($censorWords, ' ', $temp);
 		$temp = str_replace('"', ' ', $temp);
 		$temp = preg_replace('/\s+/', ' ', $temp);
 		$temp = trim($temp);

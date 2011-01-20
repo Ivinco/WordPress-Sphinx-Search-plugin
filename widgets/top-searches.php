@@ -42,6 +42,7 @@ class TopSearchesWidget extends WP_Widget
         $title_top = apply_filters('widget_title', $instance['title_top']);
         $width = !empty($instance['width']) ? $instance['width'] : 0;
         $break = !empty($instance['break']) ? $instance['break'] : '...';
+        $custom_terms_top = !empty($instance['custom_terms_top']) ? $instance['custom_terms_top'] : '';
         $front_show = !empty($instance['front_show']) ? $instance['front_show'] : 'show';
         $posts_show = !empty($instance['front_show']) ? $instance['posts_show'] : 'show_related';
         $search_show = !empty($instance['front_show']) ? $instance['search_show'] : 'show_related';
@@ -56,7 +57,7 @@ class TopSearchesWidget extends WP_Widget
             }
             if (empty($words_html) || $search_show == 'show_top') {
                 $title = $title_top;
-                $words_html = $this->get_top($limit, $width, $break);
+                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
             }
             $show_widget = true;
         } else if ( is_single() && $posts_show != 'hide'){
@@ -68,13 +69,13 @@ class TopSearchesWidget extends WP_Widget
             }
             if (empty($words_html) || $posts_show == 'show_top') {
                 $title = $title_top;
-                $words_html = $this->get_top($limit, $width, $break);
+                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
             }
             $show_widget = true;
         } else if ($front_show != 'hide'){
             $title = $title_top;
             $limit = !empty($instance['limit']) ? $instance['front_limit'] : 10;
-            $words_html = $this->get_top($limit, $width, $break);
+            $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
             $show_widget = true;
         }
         
@@ -99,6 +100,7 @@ class TopSearchesWidget extends WP_Widget
         $instance['posts_show'] = strip_tags($new_instance['posts_show']);
         $instance['search_limit'] = strip_tags($new_instance['search_limit']);
         $instance['search_show'] = strip_tags($new_instance['search_show']);
+        $instance['custom_terms_top'] = strip_tags($new_instance['custom_terms_top']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
         return $instance;
@@ -116,6 +118,7 @@ class TopSearchesWidget extends WP_Widget
         $posts_limit = !empty($instance['posts_limit']) ? esc_attr($instance['posts_limit']) : 10;
         $search_show = !empty($instance['search_show']) ? esc_attr($instance['search_show']) : 'show_related';
         $search_limit = !empty($instance['search_limit']) ? esc_attr($instance['search_limit']) : 10;
+        $custom_terms_top = !empty($instance['custom_terms_top']) ? esc_attr($instance['custom_terms_top']) : '';
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         ?>
@@ -193,7 +196,15 @@ class TopSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('search_limit'); ?>"
                    type="text" value="<?php echo $search_limit; ?>" />
             </label></p>
-            
+
+            <p><label for="<?php echo $this->get_field_id('custom_terms_top'); ?>">
+            <?php _e('Custom search term on top of Top results:'); ?>
+            <textarea class="widefat" cols="20" rows="5"
+                   id="<?php echo $this->get_field_id('custom_terms_top'); ?>"
+                   name="<?php echo $this->get_field_name('custom_terms_top'); ?>"
+                   ><?php echo $custom_terms_top; ?></textarea>
+            </label></p>
+
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
             <?php _e('Maximum length of search term:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('width'); ?>"
@@ -210,19 +221,29 @@ class TopSearchesWidget extends WP_Widget
 
     }
 
-    function get_top($limit = 10, $width = 0, $break = '...')
+    function get_top($limit = 10, $width = 0, $break = '...', $custom_top='')
     {
         global $defaultObjectSphinxSearch;
+
+        $custom_top_arry = explode("\n", $custom_top);
+        $limit -= count($custom_top_arry);
+
+	$html = "<ul>";
+        if (!empty($custom_top_arry)){
+            foreach($custom_top_arry as $term){
+                $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($term))."' title='".htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
+            }
+        }
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
         if (empty($result)){
             return false;
         }
-        $html = '';
-	$html .= "<ul>";
+        
         foreach ($result as $res){
             $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
         }
+        
 	$html .= "</ul>";
         return $html;
     }
