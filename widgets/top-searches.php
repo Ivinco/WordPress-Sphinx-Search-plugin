@@ -225,15 +225,22 @@ class TopSearchesWidget extends WP_Widget
     {
         global $defaultObjectSphinxSearch;
 
-        $custom_top_arry = explode("\n", $custom_top);
-        $limit -= count($custom_top_arry);
+        $custom_top = trim($custom_top);
+        $custom_top_arry = explode("\n", $custom_top);        
 
 	$html = "<ul>";
         if (!empty($custom_top_arry)){
-            foreach($custom_top_arry as $term){
+            foreach($custom_top_arry as $ind => $term){
+                $term = trim($term);
+                if (empty($term)){
+                    unset($custom_top_arry[$ind]);
+                    continue;
+                }
                 $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($term))."' title='".htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
             }
         }
+
+        $limit -= count($custom_top_arry);
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
         if (empty($result)){
