@@ -123,24 +123,24 @@ class TopSearchesWidget extends WP_Widget
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         ?>
             <p><label for="<?php echo $this->get_field_id('title_top'); ?>">
-            <?php _e('Title Top:'); ?>
+            <?php _e('Title top:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('title_top'); ?>"
                    name="<?php echo $this->get_field_name('title_top'); ?>"
                    type="text" value="<?php echo $title_top; ?>" />
             </label></p>
             <p><label for="<?php echo $this->get_field_id('title_rel'); ?>">
-            <?php _e('Title Related:'); ?>
+            <?php _e('Title related:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('title_rel'); ?>"
                    name="<?php echo $this->get_field_name('title_rel'); ?>"
                    type="text" value="<?php echo $title_rel; ?>" />
             </label></p>
             <p><label for="<?php echo $this->get_field_id('front_show'); ?>">
-                <?php _e('Show On Front Page:'); ?>
+                <?php _e('Show on front page:'); ?>
                 <select class="widefat" id="<?php echo $this->get_field_id('front_show'); ?>"
                         name="<?php echo $this->get_field_name('front_show'); ?>">>
                     <option value="show" 
                         <?php echo ($front_show =='show')?'  selected="selected"':''?>
-                    >Show Top Searches</option>
+                    >Show top searches</option>
                     <option value="hide"
                         <?php echo ($front_show =='hide')?'  selected="selected"':''?>
                      >Do not show</option>
@@ -154,15 +154,15 @@ class TopSearchesWidget extends WP_Widget
             </label></p>
 
             <p><label for="<?php echo $this->get_field_id('posts_show'); ?>">
-                <?php _e('Show On Post Pages:'); ?>
+                <?php _e('Show on post pages:'); ?>
                 <select class="widefat" id="<?php echo $this->get_field_id('posts_show'); ?>"
                         name="<?php echo $this->get_field_name('posts_show'); ?>">
                     <option value="show_related"
                         <?php echo ($posts_show =='show_related')?'  selected="selected"':''?>
-                    >Show Related Searches</option>
+                    >Show related searches</option>
                     <option value="show_top"
                         <?php echo ($posts_show =='show_top')?'  selected="selected"':''?>
-                    >Show Top Searches</option>
+                    >Show top searches</option>
                     <option value="hide"
                         <?php echo ($posts_show =='hide')?'  selected="selected"':''?>
                      >Do not show</option>
@@ -176,15 +176,15 @@ class TopSearchesWidget extends WP_Widget
             </label></p>
 
             <p><label for="<?php echo $this->get_field_id('search_show'); ?>">
-                <?php _e('Show On Search Pages:'); ?>
+                <?php _e('Show on search pages:'); ?>
                 <select class="widefat" id="<?php echo $this->get_field_id('search_show'); ?>"
                         name="<?php echo $this->get_field_name('search_show'); ?>">
                     <option value="show_related"
                         <?php echo ($search_show =='show_related')?'  selected="selected"':''?>
-                    >Show Related Searches</option>
+                    >Show related searches</option>
                     <option value="show_top"
                         <?php echo ($search_show =='show_top')?'  selected="selected"':''?>
-                    >Show Top Searches</option>
+                    >Show top searches</option>
                     <option value="hide"
                         <?php echo ($search_show =='hide')?'  selected="selected"':''?>
                      >Do not show</option>
@@ -198,7 +198,7 @@ class TopSearchesWidget extends WP_Widget
             </label></p>
 
             <p><label for="<?php echo $this->get_field_id('custom_terms_top'); ?>">
-            <?php _e('Custom search term on top of Top results:'); ?>
+            <?php _e('Custom search terms on top of "Top" searches:'); ?>
             <textarea class="widefat" cols="20" rows="5"
                    id="<?php echo $this->get_field_id('custom_terms_top'); ?>"
                    name="<?php echo $this->get_field_name('custom_terms_top'); ?>"
@@ -231,16 +231,23 @@ class TopSearchesWidget extends WP_Widget
 	$html = "<ul>";
         if (!empty($custom_top_arry)){
             foreach($custom_top_arry as $ind => $term){
+                if ($limit <= 0){
+                    break;
+                }
                 $term = trim($term);
                 if (empty($term)){
                     unset($custom_top_arry[$ind]);
                     continue;
                 }
+                $limit--;
                 $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($term))."' title='".htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
             }
         }
 
-        $limit -= count($custom_top_arry);
+        if ($limit <= 0){
+            $html .= "</ul>";
+            return $html;
+        }
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
         if (empty($result)){

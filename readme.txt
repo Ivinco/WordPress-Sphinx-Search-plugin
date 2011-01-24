@@ -184,6 +184,10 @@ This release comes with the revamped UI for the plugin's WordPress wp-admin pane
 
 == Changelog ==
 
+= 2.1 =
+ * Added more settings to Top/Related widget.
+ * A few bug fixes and minor improvements
+
 = 2.0 =
 *   Added configuration wizard: you can automatically install or reinstall Sphinx via WordPress wp-admin panel
 *   Changed default Sphinx installation directory: now Sphinx is installed to WordPress upload directory
