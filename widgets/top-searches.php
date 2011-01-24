@@ -50,7 +50,7 @@ class TopSearchesWidget extends WP_Widget
         $show_widget = false;
         //if it is post
         if (is_search() && $search_show != 'hide'){
-            $limit = !empty($instance['limit']) ? $instance['search_limit'] : 10;
+            $limit = !empty($instance['search_limit']) ? $instance['search_limit'] : 10;
             if ( $search_show == 'show_related' ){
                 $title = $title_rel;
                 $words_html = $this->get_related($_GET['s'], $limit, $width, $break);
@@ -61,7 +61,7 @@ class TopSearchesWidget extends WP_Widget
             }
             $show_widget = true;
         } else if ( is_single() && $posts_show != 'hide'){
-            $limit = !empty($instance['limit']) ? $instance['posts_limit'] : 10;
+            $limit = !empty($instance['posts_limit']) ? $instance['posts_limit'] : 10;
             if ( $posts_show == 'show_related' ){
                 $title = $title_rel;
                 $keywords = single_post_title( '', false );
@@ -74,7 +74,7 @@ class TopSearchesWidget extends WP_Widget
             $show_widget = true;
         } else if ($front_show != 'hide'){
             $title = $title_top;
-            $limit = !empty($instance['limit']) ? $instance['front_limit'] : 10;
+            $limit = !empty($instance['front_limit']) ? $instance['front_limit'] : 10;
             $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
             $show_widget = true;
         }
