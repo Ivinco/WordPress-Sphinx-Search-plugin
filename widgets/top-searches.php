@@ -198,7 +198,7 @@ class TopSearchesWidget extends WP_Widget
             </label></p>
 
             <p><label for="<?php echo $this->get_field_id('custom_terms_top'); ?>">
-            <?php _e('Custom search terms on top of "Top" searches:'); ?>
+            <?php _e('Add your own terms to always display in Top searches list:'); ?>
             <textarea class="widefat" cols="20" rows="5"
                    id="<?php echo $this->get_field_id('custom_terms_top'); ?>"
                    name="<?php echo $this->get_field_name('custom_terms_top'); ?>"
