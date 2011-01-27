@@ -758,20 +758,24 @@ class SphinxSearch_FrontEnd
             return false;
         }
 
-        $sqlMatch = "";
-
 	$results = array();
         $sql = "SELECT
-                    distinct keywords_full,
-                    keywords
+                    keywords_full,
+                    keywords,
+                    count(1) as cnt
                 FROM
                     {$table_prefix}sph_stats
 		WHERE
                     (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month))
                     AND (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE))
-                    and keywords_full != '".trim($wpdb->escape($keywords))."'		
+                    and keywords_full != '".trim($wpdb->escape($keywords))."'
+                GROUP BY
+                    keywords_full
+                ORDER BY
+                    cnt desc
 		LIMIT
 		 $limit" ;
+                    
 	$results = $wpdb->get_results($sql);
 
 	$results = $this->make_results_clear($results, $limit, $width, $break);
