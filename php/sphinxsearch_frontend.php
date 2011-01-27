@@ -756,7 +756,7 @@ class SphinxSearch_FrontEnd
         $keywords = $this->clear_keywords($keywords);
 	if (empty($keywords)){
             return false;
-        }  
+        }
 
 	$results = array();
         $sql = "SELECT
