@@ -1,5 +1,5 @@
 === WordPress Sphinx Search Plugin ===
-Contributors: Ivinco
+Contributors: Ivinco, Percona
 Donate link: http://www.ivinco.com/
 Tags: search, sphinx
 Requires at least: 2.0.2
@@ -56,7 +56,7 @@ E-mail:
 opensource@ivinco.com
 
 Website:
-[Ivinco](http://www.ivinco.com/ "Ivinco")
+[Ivinco](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Ivinco WordPress Sphinx Search plugin")
 
 == Installation ==
 
