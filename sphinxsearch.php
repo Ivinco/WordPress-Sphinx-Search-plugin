@@ -149,6 +149,10 @@ class SphinxSearch{
                 //widgets
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
+                if ('true' != $this->config->get_option('check_stats_table_column_status')){
+                    $this->upgrade_table_statistics_in_v3();
+                }
+
 	}
 
         function add_actions_filters()
@@ -409,6 +413,20 @@ class SphinxSearch{
             return false;
         }
         return true;
+    }
+
+    function upgrade_table_statistics_in_v3()
+    {
+        global $wpdb, $table_prefix;
+        //check for column status
+        $row_stats = $wpdb->get_results("select * from {$table_prefix}sph_stats limit 1", ARRAY_A);
+        if (!isset($row_stats['status'])){
+            $sql_alter = "alter table {$table_prefix}sph_stats add status tinyint(1) not null default 0";
+            $wpdb->query($sql_alter);
+            $wpdb->query("update {$table_prefix}sph_stats set status = 1");
+        }
+        $options['check_stats_table_column_status'] = 'true';
+        $this->config->update_admin_options($options);
     }
 }
 

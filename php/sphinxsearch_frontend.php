@@ -688,14 +688,21 @@ class SphinxSearch_FrontEnd
 		$keywords = $this->clear_from_tags($keywords_full);
 		$keywords = trim($keywords);
 		$keywords_full = trim($keywords_full);
-		
+
+                $sql = "select status from {$table_prefix}sph_stats
+                where keywords_full = '".$wpdb->escape($keywords_full)."'
+                    limit 1";
+                $status = $wpdb->get_var($sql);
+                $status = intval($status);
+
 		$sql = "INSERT INTO 
                             {$table_prefix}sph_stats
-                            (keywords, keywords_full, date_added)
+                            (keywords, keywords_full, date_added, status)
                         VALUES
                             ('".mysql_real_escape_string($keywords)."',
                              '".mysql_real_escape_string($keywords_full)."',
-                            NOW()
+                            NOW(),
+                            $status
                         )";
 
 		$wpdb->query($sql);
@@ -729,6 +736,9 @@ class SphinxSearch_FrontEnd
     function sphinx_stats_top($limit = 10, $width = 0, $break = '...')
     {
         global $wpdb, $table_prefix;
+        if ('true' == $this->config->get_option('check_stats_table_column_status')){
+            $sqlStatus = " and status = 1 ";
+        }
 	$sql = "SELECT
                     keywords,
                     keywords_full,
@@ -737,6 +747,7 @@ class SphinxSearch_FrontEnd
                     {$table_prefix}sph_stats
 		WHERE
                     date_added >= DATE_SUB(NOW(), INTERVAL 1 Month)
+                    $sqlStatus
 		GROUP BY
                     keywords DESC
 		ORDER BY
@@ -758,6 +769,10 @@ class SphinxSearch_FrontEnd
             return false;
         }
 
+        if ('true' == $this->config->get_option('check_stats_table_column_status')){
+            $sqlStatus = " and status = 1 ";
+        }
+
 	$results = array();
         $sql = "SELECT
                     keywords_full,
@@ -769,12 +784,13 @@ class SphinxSearch_FrontEnd
                     (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month))
                     AND (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE))
                     and keywords_full != '".trim($wpdb->escape($keywords))."'
+                    $sqlStatus
                 GROUP BY
                     keywords_full
                 ORDER BY
                     cnt desc
 		LIMIT
-		 $limit" ;
+		 ".($limit+30)."" ;
                     
 	$results = $wpdb->get_results($sql);
 
@@ -791,28 +807,35 @@ class SphinxSearch_FrontEnd
 	 * @param string $break
 	 * @return array
 	 */
-	function sphinx_stats_latest($limit = 10, $width = 0, $break = '...')
-	{
-		global $wpdb, $table_prefix;
-		$sql = "SELECT 
-					keywords,
-					keywords_full,
-					max(id) m
-				FROM 
-					{$table_prefix}sph_stats 
- 				GROUP BY 
- 					keywords_full DESC
- 				ORDER BY 
- 					m DESC					  					
-				LIMIT
-					".($limit+30)."	
-				" ;
-		$results = $wpdb->get_results($sql);
+    function sphinx_stats_latest($limit = 10, $width = 0, $break = '...')
+    {
+        global $wpdb, $table_prefix;
 
-		$results = $this->make_results_clear($results, $limit, $width, $break);
+        if ('true' == $this->config->get_option('check_stats_table_column_status')){
+            $sqlStatus = " and status = 1 ";
+        }
+
+        $sql = "SELECT
+                    keywords,
+                    keywords_full,
+                    max(id) m
+		FROM 
+                    {$table_prefix}sph_stats
+                where 1
+                    $sqlStatus
+ 		GROUP BY 
+                    keywords_full DESC
+ 		ORDER BY 
+                    m DESC
+		LIMIT
+                    ".($limit+30)."
+				" ;
+	$results = $wpdb->get_results($sql);
+
+	$results = $this->make_results_clear($results, $limit, $width, $break);
 		
-		return $results;
-	}
+	return $results;
+    }
 	
     function make_results_clear($results, $limit, $width = 0, $break = '...')
     {

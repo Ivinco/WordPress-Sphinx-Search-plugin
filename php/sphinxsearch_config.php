@@ -109,7 +109,9 @@ class SphinxSearch_Config
    			'before_page' => 'Page:',
    			'before_post' => '',
 
-                        'sphinx_cron_start' => 'false'
+                        'sphinx_cron_start' => 'false',
+
+                    'check_stats_table_column_status' => 'false'
    			
    			);
    		$this->admin_options = get_option($this->adminOptionsName);

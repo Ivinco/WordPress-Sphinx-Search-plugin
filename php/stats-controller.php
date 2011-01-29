@@ -61,13 +61,6 @@ class StatsController
 
     function index_action()
     {
-         //check for column status
-        $row_stats = $this->_wpdb->get_results("select * from {$this->_table_prefix}sph_stats limit 1", ARRAY_A);
-        if (!isset($row_stats['status'])){
-            $sql_alter = "alter table {$this->_table_prefix}sph_stats add status tinyint(1) not null default 0";
-            $this->_wpdb->query($sql_alter);
-        }
-
         if (!empty($_POST) && (!empty($_POST['doaction']) || !empty($_POST['doaction2']) )){
             $action = !empty($_POST['doaction']) ? $_POST['action'] : $_POST['action2'];
             switch($action){
