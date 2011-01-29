@@ -65,6 +65,7 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_backend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_sphinxinstall.php');
 
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/wizard-controller.php');
+include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/stats-controller.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinx-service.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinx-view.php');
 

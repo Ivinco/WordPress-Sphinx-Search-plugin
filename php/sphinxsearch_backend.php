@@ -53,7 +53,13 @@ class SphinxSearch_Backend {
                     (empty($options['sphinx_conf']) &&
                         'false' == $options['wizard_done'])){
                 return $wizard->start_action();
-            }            
+            }
+
+            $stats = new StatsController($this->config);
+
+            if (!empty($_GET['menu']) && 'stats' == $_GET['menu']){
+                return $stats->index_action();
+            }
 
             $sphinxService = new SphinxService($this->config);
             $res = false;

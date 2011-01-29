@@ -52,3 +52,9 @@ a.sm_pluginCommercial {
 table.form-table {
     clear: none;
 }
+
+h2#post-body-content-tabs{
+    border-bottom: 1px solid #CCCCCC;
+    padding-bottom: 0;
+    margin-top: 1px;
+}
