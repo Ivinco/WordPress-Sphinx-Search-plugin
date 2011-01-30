@@ -43,11 +43,12 @@ class LatestSearchesWidget extends WP_Widget
         $limit = !empty($instance['limit']) ? $instance['limit'] : 10;
         $width = !empty($instance['width']) ? $instance['width'] : 0;
         $break = !empty($instance['break']) ? $instance['break'] : '...';
+        $show_approved = !empty($instance['show_approved']) ? $instance['show_approved'] : false;
         echo $before_widget; 
         if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        $this->get_latest($limit, $width, $break);
+        $this->get_latest($limit, $width, $break, $show_approved);
         echo $after_widget; 
     }
 
@@ -58,6 +59,7 @@ class LatestSearchesWidget extends WP_Widget
         $instance['limit'] = strip_tags($new_instance['limit']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
+        $instance['show_approved'] = strip_tags($new_instance['show_approved']);
         return $instance;
     }
 
@@ -69,7 +71,14 @@ class LatestSearchesWidget extends WP_Widget
         $limit = !empty($instance['limit']) ? esc_attr($instance['limit']) : 10;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
+        $show_approved = !empty($instance['show_approved']) ? esc_attr($instance['show_approved']) : false;
         ?>
+            <p><label for="<?php echo $this->get_field_id('show_approved'); ?>">
+            <?php _e('Show only approved keywords:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('show_approved'); ?>"
+                   name="<?php echo $this->get_field_name('show_approved'); ?>"
+                   type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
+            </label></p>
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
             <?php _e('Title:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
@@ -98,11 +107,11 @@ class LatestSearchesWidget extends WP_Widget
 
     }
 
-    function get_latest($limit = 10, $width = 0, $break = '...')
+    function get_latest($limit = 10, $width = 0, $break = '...', $show_approved=false)
     {
         global $defaultObjectSphinxSearch;
         
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break);
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break, $show_approved);
 	echo "<ul>";
             foreach ($result as $res)
             {

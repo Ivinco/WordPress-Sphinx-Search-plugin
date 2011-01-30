@@ -733,12 +733,16 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
-    function sphinx_stats_top($limit = 10, $width = 0, $break = '...')
+    function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false)
     {
         global $wpdb, $table_prefix;
         if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status = 1 ";
+            $sqlStatus = " and status in (0, 1) ";
+            if ($approved){
+                $sqlStatus = " and status = 1 ";
+            }
         }
+        
 	$sql = "SELECT
                     keywords,
                     keywords_full,
@@ -760,7 +764,7 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
-    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...')
+    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...', $approved=false)
     {
         global $wpdb, $table_prefix;
 
@@ -770,8 +774,13 @@ class SphinxSearch_FrontEnd
         }
 
         if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status = 1 ";
+            $sqlStatus = " and status in (0, 1) ";
+            if ($approved){
+                $sqlStatus = " and status = 1 ";
+            }
         }
+
+        
 
 	$results = array();
         $sql = "SELECT
@@ -807,12 +816,15 @@ class SphinxSearch_FrontEnd
 	 * @param string $break
 	 * @return array
 	 */
-    function sphinx_stats_latest($limit = 10, $width = 0, $break = '...')
+    function sphinx_stats_latest($limit = 10, $width = 0, $break = '...', $approved=false)
     {
         global $wpdb, $table_prefix;
 
         if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status = 1 ";
+            $sqlStatus = " and status in (0, 1) ";
+            if ($approved){
+                $sqlStatus = " and status = 1 ";
+            }
         }
 
         $sql = "SELECT

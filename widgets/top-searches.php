@@ -46,6 +46,7 @@ class TopSearchesWidget extends WP_Widget
         $front_show = !empty($instance['front_show']) ? $instance['front_show'] : 'show';
         $posts_show = !empty($instance['front_show']) ? $instance['posts_show'] : 'show_related';
         $search_show = !empty($instance['front_show']) ? $instance['search_show'] : 'show_related';
+        $show_approved = !empty($instance['show_approved']) ? $instance['show_approved'] : false;
 
         $show_widget = false;
         //if it is post
@@ -53,11 +54,11 @@ class TopSearchesWidget extends WP_Widget
             $limit = !empty($instance['search_limit']) ? $instance['search_limit'] : 10;
             if ( $search_show == 'show_related' ){
                 $title = $title_rel;
-                $words_html = $this->get_related($_GET['s'], $limit, $width, $break);
+                $words_html = $this->get_related($_GET['s'], $limit, $width, $break, $show_approved);
             }
             if (empty($words_html) || $search_show == 'show_top') {
                 $title = $title_top;
-                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
+                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top, $show_approved);
             }
             $show_widget = true;
         } else if ( is_single() && $posts_show != 'hide'){
@@ -65,17 +66,17 @@ class TopSearchesWidget extends WP_Widget
             if ( $posts_show == 'show_related' ){
                 $title = $title_rel;
                 $keywords = single_post_title( '', false );
-                $words_html = $this->get_related($keywords, $limit, $width, $break);
+                $words_html = $this->get_related($keywords, $limit, $width, $break, $show_approved);
             }
             if (empty($words_html) || $posts_show == 'show_top') {
                 $title = $title_top;
-                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
+                $words_html = $this->get_top($limit, $width, $break, $custom_terms_top, $show_approved);
             }
             $show_widget = true;
         } else if ($front_show != 'hide'){
             $title = $title_top;
             $limit = !empty($instance['front_limit']) ? $instance['front_limit'] : 10;
-            $words_html = $this->get_top($limit, $width, $break, $custom_terms_top);
+            $words_html = $this->get_top($limit, $width, $break, $custom_terms_top, $show_approved);
             $show_widget = true;
         }
         
@@ -103,6 +104,7 @@ class TopSearchesWidget extends WP_Widget
         $instance['custom_terms_top'] = strip_tags($new_instance['custom_terms_top']);
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
+        $instance['show_approved'] = strip_tags($new_instance['show_approved']);
         return $instance;
     }
 
@@ -119,9 +121,16 @@ class TopSearchesWidget extends WP_Widget
         $search_show = !empty($instance['search_show']) ? esc_attr($instance['search_show']) : 'show_related';
         $search_limit = !empty($instance['search_limit']) ? esc_attr($instance['search_limit']) : 10;
         $custom_terms_top = !empty($instance['custom_terms_top']) ? esc_attr($instance['custom_terms_top']) : '';
+        $show_approved = !empty($instance['show_approved']) ? esc_attr($instance['show_approved']) : false;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         ?>
+            <p><label for="<?php echo $this->get_field_id('show_approved'); ?>">
+            <?php _e('Show only approved keywords:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('show_approved'); ?>"
+                   name="<?php echo $this->get_field_name('show_approved'); ?>"
+                   type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
+            </label></p>
             <p><label for="<?php echo $this->get_field_id('title_top'); ?>">
             <?php _e('Title top:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('title_top'); ?>"
@@ -221,7 +230,7 @@ class TopSearchesWidget extends WP_Widget
 
     }
 
-    function get_top($limit = 10, $width = 0, $break = '...', $custom_top='')
+    function get_top($limit = 10, $width = 0, $break = '...', $custom_top='',$show_approved)
     {
         global $defaultObjectSphinxSearch;
 
@@ -249,7 +258,7 @@ class TopSearchesWidget extends WP_Widget
             return $html;
         }
 
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break, $show_approved);
         if (empty($result)){
             return false;
         }
@@ -262,11 +271,11 @@ class TopSearchesWidget extends WP_Widget
         return $html;
     }
 
-    function get_related($keywords, $limit = 10, $width = 0, $break = '...')
+    function get_related($keywords, $limit = 10, $width = 0, $break = '...', $show_approved=false)
     {
         global $defaultObjectSphinxSearch;
 
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break);
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break, $show_approved);
         if (empty($result)){
             return false;
         }

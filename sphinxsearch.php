@@ -423,7 +423,6 @@ class SphinxSearch{
         if (!isset($row_stats['status'])){
             $sql_alter = "alter table {$table_prefix}sph_stats add status tinyint(1) not null default 0";
             $wpdb->query($sql_alter);
-            $wpdb->query("update {$table_prefix}sph_stats set status = 1");
         }
         $options['check_stats_table_column_status'] = 'true';
         $this->config->update_admin_options($options);
