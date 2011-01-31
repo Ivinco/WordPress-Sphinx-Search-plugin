@@ -58,3 +58,7 @@ h2#post-body-content-tabs{
     padding-bottom: 0;
     margin-top: 1px;
 }
+
+#comments-form {
+    float: left; width: 100%;
+}
