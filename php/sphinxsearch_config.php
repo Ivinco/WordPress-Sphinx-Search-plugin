@@ -160,6 +160,9 @@ class SphinxSearch_Config
          return false;
      }
      
-     
+     function get_plugin_url()
+     {
+         return 'options-general.php?page=sphinxsearch.php';
+     }
     
 }

@@ -86,6 +86,7 @@ class StatsController
         $this->_build_pagination($page);
         
         $this->view->tab = $tab;
+        $this->view->plugin_url = $this->_config->get_plugin_url();
         $this->view->render('admin/stats/layout.phtml');
     }
 
@@ -130,6 +131,19 @@ class StatsController
 
     function _get_new_keywords($page, $status)
     {
+        switch (strtolower($_REQUEST['sort_by'])) {
+            case 'key':
+                $sort_by = 'keywords';
+                break;
+            case 'date':
+                $sort_by = 'date_added';
+                break;
+            case 'cnt':
+            default:
+                $sort_by = 'cnt';
+                break;
+        }
+        $sort_order = strtolower($_REQUEST['sort_order']) == 'asc' ? 'asc' : 'desc';
         switch ($status) {            
             case 'approved':
                 $istatus = 1;
@@ -144,11 +158,12 @@ class StatsController
         }
         $start = ( $page - 1 ) * $this->_keywords_per_page;
 
-        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full, count(1) as cnt
+        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full, 
+                    max(date_added) as date_added, count(1) as cnt
             from '.$this->_table_prefix.'sph_stats
             where status = '.$istatus.'
             group by keywords
-            order by cnt desc
+            order by '.$sort_by.' '.$sort_order.'
             limit '.$start.', '.$this->_keywords_per_page;
         $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
         $this->view->start = $start;
