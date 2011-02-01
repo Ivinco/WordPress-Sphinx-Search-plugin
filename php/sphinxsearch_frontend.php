@@ -733,14 +733,21 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
-    function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false)
+    function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30)
     {
         global $wpdb, $table_prefix;
+
+        $sqlStatus = '';
         if ('true' == $this->config->get_option('check_stats_table_column_status')){
             $sqlStatus = " and status in (0, 1) ";
             if ($approved){
                 $sqlStatus = " and status = 1 ";
             }
+        }
+
+        $sqlPeriod = '';
+        if ($period_limit){
+            $sqlPeriod = " and date_added > date_sub(NOW(), INTERVAL $period_limit DAY) ";
         }
         
 	$sql = "SELECT
@@ -750,7 +757,8 @@ class SphinxSearch_FrontEnd
 		FROM
                     {$table_prefix}sph_stats
 		WHERE
-                    date_added >= DATE_SUB(NOW(), INTERVAL 1 Month)
+                    1
+                    $sqlPeriod
                     $sqlStatus
 		GROUP BY
                     keywords DESC
