@@ -84,7 +84,8 @@ class StatsController
         $this->_get_new_keywords($page, $tab);
         //run after get keywords list
         $this->_build_pagination($page);
-        
+
+        $this->view->period = !empty($_REQUEST['period']) ? $_REQUEST['period'] : 7;
         $this->view->tab = $tab;
         $this->view->plugin_url = $this->_config->get_plugin_url();
         $this->view->render('admin/stats/layout.phtml');
@@ -131,6 +132,32 @@ class StatsController
 
     function _get_new_keywords($page, $status)
     {
+        switch (strtolower($_REQUEST['period'])) {
+
+            case '14':
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+            case '30':
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+            case '90':
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+            case '180':
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+            case '365':
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+            case '-1':
+                $sqlPeriod = '';
+                break;
+            case '7':
+            default:
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                break;
+        }
+
         switch (strtolower($_REQUEST['sort_by'])) {
             case 'key':
                 $sort_by = 'keywords';
@@ -162,6 +189,7 @@ class StatsController
                     max(date_added) as date_added, count(1) as cnt
             from '.$this->_table_prefix.'sph_stats
             where status = '.$istatus.'
+                '.$sqlPeriod.'
             group by keywords
             order by '.$sort_by.' '.$sort_order.'
             limit '.$start.', '.$this->_keywords_per_page;

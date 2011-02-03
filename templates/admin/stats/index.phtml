@@ -11,6 +11,18 @@
 </select>
 <input type="submit" name="doaction" id="doaction" value="Apply" class="button-secondary apply" />
 
+<select name='period'>
+    <option <?php echo $this->view->period == 7 ? 'selected="selected"': ''?> value='7'>7 days</option>
+    <option <?php echo $this->view->period == 14 ? 'selected="selected"': ''?> value='14'>2 weeks</option>
+    <option <?php echo $this->view->period == 30 ? 'selected="selected"': ''?> value='30'>month</option>
+    <option <?php echo $this->view->period == 90 ? 'selected="selected"': ''?> value='90'>3 months</option>
+    <option <?php echo $this->view->period == 180 ? 'selected="selected"': ''?> value='180'>6 months</option>
+    <option <?php echo $this->view->period == 365 ? 'selected="selected"': ''?> value='365'>year</option>
+    <option <?php echo $this->view->period == -1 ? 'selected="selected"': ''?> value='-1'>Show all dates</option>
+</select>
+
+<input type="submit" id="post-query-submit" value="Filter" class="button-secondary" />
+
 
 </div>
 <br class="clear" />
@@ -102,5 +114,6 @@
 
 <br class="clear" />
 </form>
+
 
 
