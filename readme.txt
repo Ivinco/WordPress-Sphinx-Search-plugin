@@ -185,6 +185,13 @@ This release comes with the revamped UI for the plugin's WordPress wp-admin pane
 
 == Changelog ==
 
+= 3.0 =
+ * Added search terms management tool
+ * Added custom search terms at the top of the Top/Related widget
+ * New option "Show only approved search terms" in Top/Related and Latest widget
+ * New option "Show search terms by period of time for last: days, weeks or months" in Top/Related and Latest widget
+ * Run php in quite mode in sphinx.conf to prevent display of HTTP headers
+
 = 2.1 =
  * Added more settings to Top/Related widget.
  * A few bug fixes and minor improvements
