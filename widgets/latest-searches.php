@@ -73,12 +73,14 @@ class LatestSearchesWidget extends WP_Widget
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         $show_approved = !empty($instance['show_approved']) ? esc_attr($instance['show_approved']) : false;
         ?>
-            <p><label for="<?php echo $this->get_field_id('show_approved'); ?>">
-            <?php _e('Show only approved keywords:'); ?>
-            <input class="widefat" id="<?php echo $this->get_field_id('show_approved'); ?>"
+            <p>
+                <input class="checkbox" id="<?php echo $this->get_field_id('show_approved'); ?>"
                    name="<?php echo $this->get_field_name('show_approved'); ?>"
                    type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
-            </label></p>
+                <label for="<?php echo $this->get_field_id('show_approved'); ?>">
+                    <?php _e('Show only approved keywords:'); ?>
+                </label>
+            </p>
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
             <?php _e('Title:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"

@@ -73,19 +73,24 @@ class StatsController
             }
 
         }
-        
-        if ( isset( $_GET['apage'] ) ){
+
+        if ( isset( $_POST['apage'] ) ){
+            $page = abs( (int) $_POST['apage'] );
+        } else if ( isset( $_GET['apage'] ) ){
             $page = abs( (int) $_GET['apage'] );
         } else {
             $page = 1;
         }
         $tab = !empty($_GET['tab'])? $_GET['tab'] : 'new';
 
-        $this->_get_new_keywords($page, $tab);
+        if ( $tab == 'stats' ) {
+            $this->_get_stat_keywords($page);
+        } else {
+            $this->_get_new_keywords($page, $tab);
+        }
         //run after get keywords list
         $this->_build_pagination($page);
-
-        $this->view->period = !empty($_REQUEST['period']) ? $_REQUEST['period'] : 7;
+        
         $this->view->tab = $tab;
         $this->view->plugin_url = $this->_config->get_plugin_url();
         $this->view->render('admin/stats/layout.phtml');
@@ -115,14 +120,20 @@ class StatsController
         $sql_found_rows = 'SELECT FOUND_ROWS()';
         $total = $this->_wpdb->get_var($sql_found_rows);
 
-        $page_links = paginate_links( array(
+        $pagination = array(
             'base' => add_query_arg( 'apage', '%#%' ),
             'format' => '',
             'prev_text' => __('&laquo;'),
             'next_text' => __('&raquo;'),
             'total' => ceil($total / $this->_keywords_per_page),
             'current' => $page
-        ));        
+        );
+        
+        if (!empty($_REQUEST['sterm'])){
+            $pagination['add_args'] = array('sterm'=>urlencode(stripslashes($_REQUEST['sterm'])));
+        }
+
+        $page_links = paginate_links( $pagination );
         
         $this->view->page_links = $page_links;
         $this->view->page = $page;        
@@ -131,6 +142,42 @@ class StatsController
     }
 
     function _get_new_keywords($page, $status)
+    {
+        $sterm_value = !empty($_REQUEST['sterm']) ? $_REQUEST['sterm'] : '';
+
+        $sqlMatch = '';
+        if (!empty($sterm_value)){
+            $sqlMatch = " AND (MATCH(keywords) AGAINST
+                ('".$this->_wpdb->escape($sterm_value)."'))";
+        }
+
+        switch ($status) {            
+            case 'approved':
+                $istatus = 1;
+                break;
+            case 'ban':
+                $istatus = 2;
+                break;
+            case 'new':
+            default:
+                $istatus = 0;
+                break;
+        }
+        $start = ( $page - 1 ) * $this->_keywords_per_page;
+
+        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full, 
+                    max(date_added) as date_added, count(1) as cnt
+            from '.$this->_table_prefix.'sph_stats
+            where status = '.$istatus.'
+                '.$sqlMatch.'
+            group by keywords
+            limit '.$start.', '.$this->_keywords_per_page;
+        $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
+        $this->view->start = $start;
+        $this->view->sterm = stripslashes($_REQUEST['sterm']);
+    }
+
+    function _get_stat_keywords($page)
     {
         $period_param = !empty($_REQUEST['period']) ? intval($_REQUEST['period']) : 7;
         switch (strtolower($period_param)) {
@@ -174,30 +221,18 @@ class StatsController
                 $sort_by = 'cnt';
                 break;
         }
-        
-        switch ($status) {            
-            case 'approved':
-                $istatus = 1;
-                break;
-            case 'ban':
-                $istatus = 2;
-                break;
-            case 'new':
-            default:
-                $istatus = 0;
-                break;
-        }
         $start = ( $page - 1 ) * $this->_keywords_per_page;
 
-        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full, 
+        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full,
                     max(date_added) as date_added, count(1) as cnt
             from '.$this->_table_prefix.'sph_stats
-            where status = '.$istatus.'
+            where 1
                 '.$sqlPeriod.'
             group by keywords
             order by '.$sort_by.' '.$sort_order.'
             limit '.$start.', '.$this->_keywords_per_page;
         $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
         $this->view->start = $start;
+        $this->view->period = $period_param;
     }
 }

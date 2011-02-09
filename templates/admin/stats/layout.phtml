@@ -20,15 +20,25 @@
                 <li class='moderated'><a href='?page=sphinxsearch.php&menu=stats&tab=ban'>Banned</a> |</li>
             <?php endif; ?>
             <?php if($this->view->tab == 'approved'):?>
-                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=approved' class="current">Approved</a> </li>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=approved' class="current">Approved</a> |</li>
             <?php else:?>
-                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=approved'>Approved</a> </li>
-            <?php endif; ?>        
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=approved'>Approved</a> |</li>
+            <?php endif; ?>
+
+            <?php if($this->view->tab == 'stats'):?>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=stats' class="current">Statistics</a> </li>
+            <?php else:?>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=stats&tab=stats'>Statistics</a> </li>
+            <?php endif; ?>
         </ul>
 
 
     <?php
-    echo $this->render('admin/stats/index.phtml');
+    if($this->view->tab == 'stats'){
+        echo $this->render('admin/stats/stats.phtml');
+    } else {
+        echo $this->render('admin/stats/index.phtml');
+    }
     ?>
     </div>
 </div>

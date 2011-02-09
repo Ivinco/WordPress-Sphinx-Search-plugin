@@ -47,7 +47,7 @@ class TopSearchesWidget extends WP_Widget
         $posts_show = !empty($instance['front_show']) ? $instance['posts_show'] : 'show_related';
         $search_show = !empty($instance['front_show']) ? $instance['search_show'] : 'show_related';
         $show_approved = !empty($instance['show_approved']) ? $instance['show_approved'] : false;
-        $period_limit = !empty($instance['period_limit']) ? intval($instance['period_limit']) : 30;
+        $period_limit = !empty($instance['period_limit']) ? intval($instance['period_limit']) : '';
 
         $show_widget = false;
         //if it is post
@@ -126,14 +126,16 @@ class TopSearchesWidget extends WP_Widget
         $show_approved = !empty($instance['show_approved']) ? esc_attr($instance['show_approved']) : false;
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
-        $period_limit = !empty($instance['period_limit']) ? intval($instance['period_limit']) : 30;
+        $period_limit = !empty($instance['period_limit']) ? intval($instance['period_limit']) : '';
         ?>
-            <p><label for="<?php echo $this->get_field_id('show_approved'); ?>">
-            <?php _e('Show only approved keywords:'); ?>
-            <input class="widefat" id="<?php echo $this->get_field_id('show_approved'); ?>"
+            <p>
+                <input class="checkbox" id="<?php echo $this->get_field_id('show_approved'); ?>"
                    name="<?php echo $this->get_field_name('show_approved'); ?>"
                    type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
-            </label></p>
+                 <label for="<?php echo $this->get_field_id('show_approved'); ?>">
+                    <?php _e('Show only approved keywords'); ?>
+                 </label>
+            </p>
             <p><label for="<?php echo $this->get_field_id('period_limit'); ?>">
             <?php _e('Show top Searches for last:'); ?>
             <select class="widefat" id="<?php echo $this->get_field_id('period_limit'); ?>"
@@ -156,6 +158,9 @@ class TopSearchesWidget extends WP_Widget
                     <option value="365"
                         <?php echo ($period_limit == 365)?'  selected="selected"':''?>
                      >One year</option>
+                    <option value=""
+                        <?php echo ($period_limit == '')?'  selected="selected"':''?>
+                     >Show all dates</option>
                 </select>        
             </label></p>
             <p><label for="<?php echo $this->get_field_id('title_top'); ?>">
