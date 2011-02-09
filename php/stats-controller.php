@@ -132,33 +132,37 @@ class StatsController
 
     function _get_new_keywords($page, $status)
     {
-        switch (strtolower($_REQUEST['period'])) {
+        $period_param = !empty($_REQUEST['period']) ? intval($_REQUEST['period']) : 7;
+        switch (strtolower($period_param)) {
 
             case '14':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
             case '30':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
             case '90':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
             case '180':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
             case '365':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
             case '-1':
                 $sqlPeriod = '';
                 break;
             case '7':
             default:
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$_REQUEST['period']} day) ";
+                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
                 break;
         }
 
-        switch (strtolower($_REQUEST['sort_by'])) {
+        $sort_order = strtolower($_REQUEST['sort_order']) == 'asc' ? 'asc' : 'desc';
+
+        $sort_by_param = !empty($_REQUEST['sort_by']) ? $_REQUEST['sort_by'] : 'cnt';
+        switch (strtolower($sort_by_param)) {
             case 'key':
                 $sort_by = 'keywords';
                 break;
@@ -170,7 +174,7 @@ class StatsController
                 $sort_by = 'cnt';
                 break;
         }
-        $sort_order = strtolower($_REQUEST['sort_order']) == 'asc' ? 'asc' : 'desc';
+        
         switch ($status) {            
             case 'approved':
                 $istatus = 1;
