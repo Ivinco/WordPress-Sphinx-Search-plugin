@@ -775,43 +775,41 @@ class SphinxSearch_FrontEnd
     function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...', $approved=false)
     {
         global $wpdb, $table_prefix;
+        
+        //reset filters
+        $this->config->sphinx->ResetFilters();
+        $this->config->sphinx->ResetGroupBy();
+        $keywords = $this->unify_keywords($keywords);
 
-        $keywords = $this->clear_keywords($keywords);
-	if (empty($keywords)){
+        $this->config->sphinx->SetLimits(0, $limit + 30);
+        if ($approved){
+            $status = array(1);
+        } else {
+            $status = array(1,0);
+        }
+        $this->config->sphinx->SetFilter('status', $status);
+
+        $res = $this->config->sphinx->Query($keywords,
+                $this->config->get_option('sphinx_index').'stats');
+        if (empty($res['matches']) || !is_array($res['matches'])){
             return false;
         }
+        $ids = array_keys($res['matches']);
 
-        if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status in (0, 1) ";
-            if ($approved){
-                $sqlStatus = " and status = 1 ";
-            }
-        }
-
-        
-
-	$results = array();
         $sql = "SELECT
-                    keywords_full,
-                    keywords,
-                    count(1) as cnt
+                    distinct keywords,
+                    keywords_full
                 FROM
                     {$table_prefix}sph_stats
 		WHERE
-                    (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month))
-                    AND (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE))
-                    and keywords_full != '".trim($wpdb->escape($keywords))."'
-                    $sqlStatus
-                GROUP BY
-                    keywords_full
-                ORDER BY
-                    cnt desc
-		LIMIT
+                    id in (".  implode(",", $ids).")                    
+                ORDER BY FIELD(id, ".  implode(",", $ids).")
+		LIMIT 
 		 ".($limit+30)."" ;
-                    
+
 	$results = $wpdb->get_results($sql);
 
-	$results = $this->make_results_clear($results, $limit, $width, $break);
+        $results = $this->make_results_clear($results, $limit, $width, $break);
 
 	return $results;
     }
@@ -836,20 +834,17 @@ class SphinxSearch_FrontEnd
         }
 
         $sql = "SELECT
+                    distinct keywords_full,
                     keywords,
-                    keywords_full,
-                    max(id) m
+                    date_added as m
 		FROM 
                     {$table_prefix}sph_stats
                 where 1
                     $sqlStatus
- 		GROUP BY 
-                    keywords_full DESC
  		ORDER BY 
-                    m DESC
+                    date_added DESC                
 		LIMIT
-                    ".($limit+30)."
-				" ;
+                    ".($limit+300)."" ;
 	$results = $wpdb->get_results($sql);
 
 	$results = $this->make_results_clear($results, $limit, $width, $break);
