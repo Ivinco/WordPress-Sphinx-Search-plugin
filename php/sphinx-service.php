@@ -166,7 +166,7 @@ class SphinxService
             !file_exists($this->_config->get_option('sphinx_conf')) ||
             !file_exists($this->_config->get_option('sphinx_indexer'))){
             return  array('err' =>'Indexer: configuration files not found.');
-	}elseif ('' == $this->_config->get_option('sphinx_index')){
+	}elseif ('' == $this->_config->get_option('sphinx_index')){            
             return  array('err' =>'Indexer: Sphinx index prefix is not specified.');
 	}else {
             $command = $this->_config->get_option('sphinx_indexer').
@@ -182,7 +182,7 @@ class SphinxService
                 //reindex only specified index with restart searchd
                 $command .= " ".$this->_config->get_option('sphinx_index').$index_name;
             }
-                    
+            
             exec($command, $output, $retval);
             //echo implode("<br/>", $output);
             if ($retval !=0 || preg_match("#ERROR:#", implode(" ", $output))){

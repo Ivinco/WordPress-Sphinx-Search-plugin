@@ -36,6 +36,8 @@ class SphinxSearch_Backend {
 	function SphinxSearch_Backend($config)
 	{
 		$this->config = $config;
+
+                $this->sphinxView = new SphinxView();
 	}
 	
       /**
@@ -83,27 +85,27 @@ class SphinxSearch_Backend {
                 $error_message = $res['err'];
             }
 
-            $sphinxView = new SphinxView();
-            $sphinxView->assign('index_modify_time', $sphinxService->get_index_modify_time());
+            
+            $this->sphinxView->assign('index_modify_time', $sphinxService->get_index_modify_time());
 
-            $sphinxView->assign('error_message', $error_message);
-            $sphinxView->assign('success_message', $success_message);            
+            $this->sphinxView->assign('error_message', $error_message);
+            $this->sphinxView->assign('success_message', $success_message);
 		
             $devOptions = $this->config->get_admin_options(); //update options
-            $sphinxView->assign('devOptions', $devOptions);
+            $this->sphinxView->assign('devOptions', $devOptions);
             //load admin panel template
-            $sphinxView->assign('header', 'Sphinx Search for Wordpress');
+            $this->sphinxView->assign('header', 'Sphinx Search for Wordpress');
 
             if ('true' != $devOptions['check_stats_table_column_status']) {
                 global $table_prefix;
-                $sphinxView->assign('error_message',  "{$table_prefix}sph_stats table required an update.<br>
+                $this->sphinxView->assign('error_message',  "{$table_prefix}sph_stats table required an update.<br>
                 Please run the following command in MySQL client to update the table: <br>
                 alter table {$table_prefix}sph_stats add `status` tinyint(1) NOT NULL DEFAULT '0';
                 <br><br>
                 This update will allow to use Sphinx Search for Top/Related and Latest search terms widgets!");
             }
 
-            $sphinxView->render('admin/settings_general.phtml');
+            $this->sphinxView->render('admin/settings_general.phtml');
 	}
 
      /**
@@ -128,14 +130,18 @@ class SphinxSearch_Backend {
                 //use sphinx for stats in widgest or not
                 if (!empty($_POST['stats_with_sphinx']) && 'true' == $_POST['stats_with_sphinx']){
                     $wizard = new WizardController($this->config);
-                    $config_file_name = $wizard->_generate_config_file_name();
+                    $config_file_name = $this->config->get_option('sphinx_conf');
                     $config_file_content = $wizard->_generate_config_file_content();
                     $wizard->_save_config($config_file_name, $config_file_content);
                     
                     $sphinxService = new SphinxService($this->config);
-                    $sphinxService->reindex('stats');
-
-                    $devOptions['stats_with_sphinx'] = 'true';
+                    $ret = $sphinxService->reindex('stats');
+                    
+                    if (!empty($ret['err'])){
+                        $this->sphinxView->assign('error_message', $ret['err']);
+                    } else {
+                        $devOptions['stats_with_sphinx'] = 'true';
+                    }
                 } else {
                     $devOptions['stats_with_sphinx'] = 'false';
                 }
