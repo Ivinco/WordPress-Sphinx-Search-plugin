@@ -81,7 +81,8 @@ Website:
 = Setup scheduled jobs to re-index your website data periodically =
 Setup scheduled jobs to re-index your website data periodically
 To setup periodical re-indexing, you should run Wizard to create special schedule files.
-The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/. When wizard finishes, edit your Crontab file.
+The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/.
+When wizard finishes, edit your Crontab file.
 Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:
 #WordPress Delta index update
 #Following cron job update delta index every 5 minutes:
@@ -89,6 +90,9 @@ Use “crontab -e” command in the Linux terminal and add the following lines t
 #WordPress Main index update
 #Following cron job update main index daily (at 0 hours and 5 minutes):
 5 0 * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_main.php
+#WordPress Stats index update
+#Following cron job update stats index every 5 minutes
+*/5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_stats.php
 
 = Setup templates and widgets =
 Extended search form on search results page

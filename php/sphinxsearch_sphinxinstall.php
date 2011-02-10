@@ -371,8 +371,11 @@ class SphinxSearch_Install
                 '/rep/cron_reindex_delta.php.tpl');
         $main_template = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.
                 '/rep/cron_reindex_main.php.tpl');
+        $stats_template = file_get_contents(SPHINXSEARCH_PLUGIN_DIR.
+                '/rep/cron_reindex_stats.php.tpl');
      	$delta_rewrited = str_replace(array_keys($search), $search, $delta_template);
         $main_rewrited = str_replace(array_keys($search), $search, $main_template);
+        $stats_rewrited = str_replace(array_keys($search), $search, $stats_template);
         $cron_dir = $this->config->admin_options['sphinx_path'].'/cron';
         if (!file_exists($cron_dir)){            
             if ( ! mkdir($cron_dir) ){
@@ -387,6 +390,7 @@ class SphinxSearch_Install
         }
         $delta_filename = $cron_dir.'/cron_reindex_delta.php';
         $main_filename = $cron_dir.'/cron_reindex_main.php';
+        $stats_filename = $cron_dir.'/cron_reindex_stats.php';
         if ( ! file_put_contents($delta_filename, $delta_rewrited) ){
             return array('err' => "Installation: Can not write to file ".
                         $delta_filename ." check the permissions.");
@@ -394,6 +398,10 @@ class SphinxSearch_Install
         if ( ! file_put_contents($main_filename, $main_rewrited) ){
             return array('err' => "Installation: Can not write to file ".
                         $main_filename ." check the permissions.");
+        }
+        if ( ! file_put_contents($stats_filename, $stats_rewrited) ){
+            return array('err' => "Installation: Can not write to file ".
+                        $stats_filename ." check the permissions.");
         }
         return true;
      }
