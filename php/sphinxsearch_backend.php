@@ -144,7 +144,11 @@ class SphinxSearch_Backend {
                     } else {
                         $devOptions['stats_with_sphinx'] = 'true';
                     }
-                } else if ($devOptions['stats_with_sphinx'] != 'false')  {
+                } 
+                
+                if (!empty($_POST['stats_with_sphinx']) &&
+                        $devOptions['stats_with_sphinx'] != 'false' &&
+                        'false' == $_POST['stats_with_sphinx'])  {
                     $devOptions['stats_with_sphinx'] = 'false';
                 }
 
