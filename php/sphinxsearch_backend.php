@@ -128,7 +128,9 @@ class SphinxSearch_Backend {
 		}
                 
                 //use sphinx for stats in widgest or not
-                if (!empty($_POST['stats_with_sphinx']) && 'true' == $_POST['stats_with_sphinx']){
+                if (!empty($_POST['stats_with_sphinx']) && 
+                        $devOptions['stats_with_sphinx'] != 'true' &&
+                        'true' == $_POST['stats_with_sphinx']){
                     $wizard = new WizardController($this->config);
                     $config_file_name = $this->config->get_option('sphinx_conf');
                     $config_file_content = $wizard->_generate_config_file_content();
