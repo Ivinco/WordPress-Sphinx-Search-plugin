@@ -803,7 +803,7 @@ class SphinxSearch_FrontEnd
 
         if ($period_limit) {
             $minTime = strtotime("-{$period_limit} days");
-            $sphinx->SetFilterRange('unix_date_added', $minTime, time());
+            $sphinx->SetFilterRange('date_added', $minTime, time());
         }
         
         $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "@count desc" );
