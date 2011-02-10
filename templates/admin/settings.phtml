@@ -55,6 +55,7 @@
                             <tr valign="top" >
                                 <th><label for="stats_with_sphinx">Use Sphinx for statistics in widgets</label></th>
                                 <td>
+                                    <input type="hidden" name="stats_with_sphinx" value="false" />
                                 <input type="checkbox" id="stats_with_sphinx" name="stats_with_sphinx" value="true"
                                     <?php echo ($this->view->devOptions['stats_with_sphinx'] == "true")? 'checked="checked"': '' ?>
                                 />

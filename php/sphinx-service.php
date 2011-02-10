@@ -190,8 +190,6 @@ class SphinxService
                     '<br/>Command: ' . $command);
             }
 	}
-	$this->need_reindex(false);
-	$this->_config->update_admin_options();
 	return true;
      }
 

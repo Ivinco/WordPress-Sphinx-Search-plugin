@@ -50,6 +50,7 @@ class SphinxSearch_Backend {
                 wp_die( __('You do not have sufficient permissions to access this page.') );
             }            
             $options = $this->config->get_admin_options();
+
             $wizard = new WizardController($this->config);
             if (!empty($_POST['start_wizard']) ||
                     (empty($options['sphinx_conf']) &&
@@ -148,7 +149,7 @@ class SphinxSearch_Backend {
                 
                 if (!empty($_POST['stats_with_sphinx']) &&
                         $devOptions['stats_with_sphinx'] != 'false' &&
-                        'false' == $_POST['stats_with_sphinx'])  {
+                        $_POST['stats_with_sphinx'] == 'false')  {
                     $devOptions['stats_with_sphinx'] = 'false';
                 }
 
@@ -194,7 +195,8 @@ class SphinxSearch_Backend {
 		//sphinx_installed - signal of installed sphinx rep or not
 		if (file_exists($devOptions['sphinx_searchd']) &&
 			file_exists($devOptions['sphinx_conf']) &&
-			file_exists($devOptions['sphinx_indexer'])){
+			file_exists($devOptions['sphinx_indexer']) &&
+                        'false' == $devOptions['sphinx_installed']){
 			$devOptions['sphinx_installed'] = 'true';
 			if (dirname($devOptions['sphinx_searchd']) == dirname($devOptions['sphinx_conf'])){
 				$devOptions['sphinx_path'] = dirname($devOptions['sphinx_searchd']);
