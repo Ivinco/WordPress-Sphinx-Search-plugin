@@ -127,6 +127,11 @@ class SphinxSearch_Backend {
                 
                 //use sphinx for stats in widgest or not
                 if (!empty($_POST['stats_with_sphinx']) && 'true' == $_POST['stats_with_sphinx']){
+                    $wizard = new WizardController($this->config);
+                    $config_file_name = $wizard->_generate_config_file_name();
+                    $config_file_content = $wizard->_generate_config_file_content();
+                    $wizard->_save_config($config_file_name, $config_file_content);
+                    
                     $devOptions['stats_with_sphinx'] = 'true';
                 } else {
                     $devOptions['stats_with_sphinx'] = 'false';

@@ -164,9 +164,11 @@ CREATE TABLE `wp_sph_stats` (
 	`keywords` varchar(255) NOT NULL default '',
 	`date_added` datetime NOT NULL default '0000-00-00 00:00:00',
 	`keywords_full` varchar(255) NOT NULL default '',
+        `status` tinyint(1) NOT NULL DEFAULT '0',
 	PRIMARY KEY  (`id`),
+        FULLTEXT `ft_keywords` (`keywords`),
 	KEY `keywords` (`keywords`)
-);
+) ENGINE=MyISAM;
 
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
