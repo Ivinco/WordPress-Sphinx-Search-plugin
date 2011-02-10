@@ -132,6 +132,9 @@ class SphinxSearch_Backend {
                     $config_file_content = $wizard->_generate_config_file_content();
                     $wizard->_save_config($config_file_name, $config_file_content);
                     
+                    $sphinxService = new SphinxService($this->config);
+                    $sphinxService->reindex('stats');
+
                     $devOptions['stats_with_sphinx'] = 'true';
                 } else {
                     $devOptions['stats_with_sphinx'] = 'false';
