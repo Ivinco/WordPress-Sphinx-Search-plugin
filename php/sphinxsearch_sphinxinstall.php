@@ -424,6 +424,7 @@ class SphinxSearch_Install
 				`keywords` varchar(255) NOT NULL default '',
 				`date_added` datetime NOT NULL default '0000-00-00 00:00:00',
 				`keywords_full` varchar(255) NOT NULL default '',
+                                `status` tinyint(1) NOT NULL DEFAULT '0',
 				PRIMARY KEY  (`id`),
 				KEY `keywords` (`keywords`),
 				FULLTEXT `ft_keywords` (`keywords`)

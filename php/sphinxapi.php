@@ -1,7 +1,7 @@
 <?php
 
 //
-// $Id: sphinxapi.php 1103 2008-01-24 18:42:57Z shodan $
+// $Id: sphinxapi.php 2055 2009-11-06 23:09:58Z shodan $
 //
 
 //
@@ -21,11 +21,18 @@
 define ( "SEARCHD_COMMAND_SEARCH",	0 );
 define ( "SEARCHD_COMMAND_EXCERPT",	1 );
 define ( "SEARCHD_COMMAND_UPDATE",	2 );
+define ( "SEARCHD_COMMAND_KEYWORDS",3 );
+define ( "SEARCHD_COMMAND_PERSIST",	4 );
+define ( "SEARCHD_COMMAND_STATUS",	5 );
+define ( "SEARCHD_COMMAND_QUERY",	6 );
 
 /// current client-side command implementation versions
-define ( "VER_COMMAND_SEARCH",		0x112 );
+define ( "VER_COMMAND_SEARCH",		0x116 );
 define ( "VER_COMMAND_EXCERPT",		0x100 );
-define ( "VER_COMMAND_UPDATE",		0x101 );
+define ( "VER_COMMAND_UPDATE",		0x102 );
+define ( "VER_COMMAND_KEYWORDS",	0x100 );
+define ( "VER_COMMAND_STATUS",		0x100 );
+define ( "VER_COMMAND_QUERY",		0x100 );
 
 /// known searchd status codes
 define ( "SEARCHD_OK",				0 );
@@ -47,6 +54,9 @@ define ( "SPH_RANK_PROXIMITY_BM25",	0 );	///< default mode, phrase proximity maj
 define ( "SPH_RANK_BM25",			1 );	///< statistical mode, BM25 ranking only (faster but worse quality)
 define ( "SPH_RANK_NONE",			2 );	///< no ranking, all matches get a weight of 1
 define ( "SPH_RANK_WORDCOUNT",		3 );	///< simple word-count weighting, rank is a weighted sum of per-field keyword occurence counts
+define ( "SPH_RANK_PROXIMITY",		4 );
+define ( "SPH_RANK_MATCHANY",		5 );
+define ( "SPH_RANK_FIELDMASK",		6 );
 
 /// known sort modes
 define ( "SPH_SORT_RELEVANCE",		0 );
@@ -67,6 +77,7 @@ define ( "SPH_ATTR_TIMESTAMP",		2 );
 define ( "SPH_ATTR_ORDINAL",		3 );
 define ( "SPH_ATTR_BOOL",			4 );
 define ( "SPH_ATTR_FLOAT",			5 );
+define ( "SPH_ATTR_BIGINT",			6 );
 define ( "SPH_ATTR_MULTI",			0x40000000 );
 
 /// known grouping functions
@@ -77,77 +88,289 @@ define ( "SPH_GROUPBY_YEAR",		3 );
 define ( "SPH_GROUPBY_ATTR",		4 );
 define ( "SPH_GROUPBY_ATTRPAIR",	5 );
 
+// important properties of PHP's integers:
+//  - always signed (one bit short of PHP_INT_SIZE)
+//  - conversion from string to int is saturated
+//  - float is double
+//  - div converts arguments to floats
+//  - mod converts arguments to ints
 
-/// portably pack numeric to 64 unsigned bits, network order
-function sphPack64 ( $v )
+// the packing code below works as follows:
+//  - when we got an int, just pack it
+//    if performance is a problem, this is the branch users should aim for
+//
+//  - otherwise, we got a number in string form
+//    this might be due to different reasons, but we assume that this is
+//    because it didn't fit into PHP int
+//
+//  - factor the string into high and low ints for packing
+//    - if we have bcmath, then it is used
+//    - if we don't, we have to do it manually (this is the fun part)
+//
+//    - x64 branch does factoring using ints
+//    - x32 (ab)uses floats, since we can't fit unsigned 32-bit number into an int
+//
+// unpacking routines are pretty much the same.
+//  - return ints if we can
+//  - otherwise format number into a string
+
+/// pack 64-bit signed
+function sphPackI64 ( $v )
 {
 	assert ( is_numeric($v) );
-
-	// x64 route
+	
+	// x64
 	if ( PHP_INT_SIZE>=8 )
 	{
-		$i = (int)$v;
-		return pack ( "NN", $i>>32, $i&((1<<32)-1) );
+		$v = (int)$v;
+		return pack ( "NN", $v>>32, $v&0xFFFFFFFF );
 	}
 
-	// x32 route, bcmath
-	$x = "4294967296";
+	// x32, int
+	if ( is_int($v) )
+		return pack ( "NN", $v < 0 ? -1 : 0, $v );
+
+	// x32, bcmath	
 	if ( function_exists("bcmul") )
 	{
-		$h = bcdiv ( $v, $x, 0 );
-		$l = bcmod ( $v, $x );
+		if ( bccomp ( $v, 0 ) == -1 )
+			$v = bcadd ( "18446744073709551616", $v );
+		$h = bcdiv ( $v, "4294967296", 0 );
+		$l = bcmod ( $v, "4294967296" );
 		return pack ( "NN", (float)$h, (float)$l ); // conversion to float is intentional; int would lose 31st bit
 	}
 
-	// x32 route, 15 or less decimal digits
-	// we can use float, because its actually double and has 52 precision bits
-	if ( strlen($v)<=15 )
+	// x32, no-bcmath
+	$p = max(0, strlen($v) - 13);
+	$lo = abs((float)substr($v, $p));
+	$hi = abs((float)substr($v, 0, $p));
+
+	$m = $lo + $hi*1316134912.0; // (10 ^ 13) % (1 << 32) = 1316134912
+	$q = floor($m/4294967296.0);
+	$l = $m - ($q*4294967296.0);
+	$h = $hi*2328.0 + $q; // (10 ^ 13) / (1 << 32) = 2328
+
+	if ( $v<0 )
 	{
-		$f = (float)$v;
-		$h = (int)($f/$x);
-		$l = (int)($f-$x*$h);
+		if ( $l==0 )
+			$h = 4294967296.0 - $h;
+		else
+		{
+			$h = 4294967295.0 - $h;
+			$l = 4294967296.0 - $l;
+		}
+	}
+	return pack ( "NN", $h, $l );
+}
+
+/// pack 64-bit unsigned
+function sphPackU64 ( $v )
+{
+	assert ( is_numeric($v) );
+	
+	// x64
+	if ( PHP_INT_SIZE>=8 )
+	{
+		assert ( $v>=0 );
+		
+		// x64, int
+		if ( is_int($v) )
+			return pack ( "NN", $v>>32, $v&0xFFFFFFFF );
+						  
+		// x64, bcmath
+		if ( function_exists("bcmul") )
+		{
+			$h = bcdiv ( $v, 4294967296, 0 );
+			$l = bcmod ( $v, 4294967296 );
+			return pack ( "NN", $h, $l );
+		}
+		
+		// x64, no-bcmath
+		$p = max ( 0, strlen($v) - 13 );
+		$lo = (int)substr ( $v, $p );
+		$hi = (int)substr ( $v, 0, $p );
+	
+		$m = $lo + $hi*1316134912;
+		$l = $m % 4294967296;
+		$h = $hi*2328 + (int)($m/4294967296);
+
 		return pack ( "NN", $h, $l );
 	}
 
-	// x32 route, 16 or more decimal digits
-	// well, let me know if you *really* need this
-	die ( "INTERNAL ERROR: packing more than 15-digit numeric on 32-bit PHP is not implemented yet (contact support)" );
+	// x32, int
+	if ( is_int($v) )
+		return pack ( "NN", 0, $v );
+	
+	// x32, bcmath
+	if ( function_exists("bcmul") )
+	{
+		$h = bcdiv ( $v, "4294967296", 0 );
+		$l = bcmod ( $v, "4294967296" );
+		return pack ( "NN", (float)$h, (float)$l ); // conversion to float is intentional; int would lose 31st bit
+	}
+
+	// x32, no-bcmath
+	$p = max(0, strlen($v) - 13);
+	$lo = (float)substr($v, $p);
+	$hi = (float)substr($v, 0, $p);
+	
+	$m = $lo + $hi*1316134912.0;
+	$q = floor($m / 4294967296.0);
+	$l = $m - ($q * 4294967296.0);
+	$h = $hi*2328.0 + $q;
+
+	return pack ( "NN", $h, $l );
+}
+
+// unpack 64-bit unsigned
+function sphUnpackU64 ( $v )
+{
+	list ( $hi, $lo ) = array_values ( unpack ( "N*N*", $v ) );
+
+	if ( PHP_INT_SIZE>=8 )
+	{
+		if ( $hi<0 ) $hi += (1<<32); // because php 5.2.2 to 5.2.5 is totally fucked up again
+		if ( $lo<0 ) $lo += (1<<32);
+
+		// x64, int
+		if ( $hi<=2147483647 )
+			return ($hi<<32) + $lo;
+
+		// x64, bcmath
+		if ( function_exists("bcmul") )
+			return bcadd ( $lo, bcmul ( $hi, "4294967296" ) );
+
+		// x64, no-bcmath
+		$C = 100000;
+		$h = ((int)($hi / $C) << 32) + (int)($lo / $C);
+		$l = (($hi % $C) << 32) + ($lo % $C);
+		if ( $l>$C )
+		{
+			$h += (int)($l / $C);
+			$l  = $l % $C;
+		}
+
+		if ( $h==0 )
+			return $l;
+		return sprintf ( "%d%05d", $h, $l );
+	}
+
+	// x32, int
+	if ( $hi==0 )
+	{
+		if ( $lo>0 )
+			return $lo;
+		return sprintf ( "%u", $lo );
+	}
+
+	$hi = sprintf ( "%u", $hi );
+	$lo = sprintf ( "%u", $lo );
+
+	// x32, bcmath
+	if ( function_exists("bcmul") )
+		return bcadd ( $lo, bcmul ( $hi, "4294967296" ) );
+	
+	// x32, no-bcmath
+	$hi = (float)$hi;
+	$lo = (float)$lo;
+	
+	$q = floor($hi/10000000.0);
+	$r = $hi - $q*10000000.0;
+	$m = $lo + $r*4967296.0;
+	$mq = floor($m/10000000.0);
+	$l = $m - $mq*10000000.0;
+	$h = $q*4294967296.0 + $r*429.0 + $mq;
+
+	$h = sprintf ( "%.0f", $h );
+	$l = sprintf ( "%07.0f", $l );
+	if ( $h=="0" )
+		return sprintf( "%.0f", (float)$l );
+	return $h . $l;
+}
+
+// unpack 64-bit signed
+function sphUnpackI64 ( $v )
+{
+	list ( $hi, $lo ) = array_values ( unpack ( "N*N*", $v ) );
+
+	// x64
+	if ( PHP_INT_SIZE>=8 )
+	{
+		if ( $hi<0 ) $hi += (1<<32); // because php 5.2.2 to 5.2.5 is totally fucked up again
+		if ( $lo<0 ) $lo += (1<<32);
+
+		return ($hi<<32) + $lo;
+	}
+
+	// x32, int
+	if ( $hi==0 )
+	{
+		if ( $lo>0 )
+			return $lo;
+		return sprintf ( "%u", $lo );
+	}
+	// x32, int
+	elseif ( $hi==-1 )
+	{
+		if ( $lo<0 )
+			return $lo;
+		return sprintf ( "%.0f", $lo - 4294967296.0 );
+	}
+	
+	$neg = "";
+	$c = 0;
+	if ( $hi<0 )
+	{
+		$hi = ~$hi;
+		$lo = ~$lo;
+		$c = 1;
+		$neg = "-";
+	}	
+
+	$hi = sprintf ( "%u", $hi );
+	$lo = sprintf ( "%u", $lo );
+
+	// x32, bcmath
+	if ( function_exists("bcmul") )
+		return $neg . bcadd ( bcadd ( $lo, bcmul ( $hi, "4294967296" ) ), $c );
+
+	// x32, no-bcmath
+	$hi = (float)$hi;
+	$lo = (float)$lo;
+	
+	$q = floor($hi/10000000.0);
+	$r = $hi - $q*10000000.0;
+	$m = $lo + $r*4967296.0;
+	$mq = floor($m/10000000.0);
+	$l = $m - $mq*10000000.0 + $c;
+	$h = $q*4294967296.0 + $r*429.0 + $mq;
+	if ( $l==10000000 )
+	{
+		$l = 0;
+		$h += 1;
+	}
+
+	$h = sprintf ( "%.0f", $h );
+	$l = sprintf ( "%07.0f", $l );
+	if ( $h=="0" )
+		return $neg . sprintf( "%.0f", (float)$l );
+	return $neg . $h . $l;
 }
 
 
-/// portably unpack 64 unsigned bits, network order to numeric
-function sphUnpack64 ( $v )
+function sphFixUint ( $value )
 {
-	list($h,$l) = array_values ( unpack ( "N*N*", $v ) );
-
-	// x64 route
 	if ( PHP_INT_SIZE>=8 )
 	{
-		if ( $h<0 ) $h += (1<<32); // because php 5.2.2 to 5.2.5 is totally fucked up again
-		if ( $l<0 ) $l += (1<<32);
-		return ($h<<32) + $l;
+		// x64 route, workaround broken unpack() in 5.2.2+
+		if ( $value<0 ) $value += (1<<32);
+		return $value;
 	}
-
-	// x32 route
-	$h = sprintf ( "%u", $h );
-	$l = sprintf ( "%u", $l );
-	$x = "4294967296";
-
-	// bcmath
-	if ( function_exists("bcmul") )
-		return bcadd ( $l, bcmul ( $x, $h ) );
-
-	// no bcmath, 15 or less decimal digits
-	// we can use float, because its actually double and has 52 precision bits
-	if ( $h<1048576 )
+	else
 	{
-		$f = ((float)$h)*$x + (float)$l;
-		return sprintf ( "%.0f", $f ); // builtin conversion is only about 39-40 bits precise!
+		// x32 route, workaround php signed/unsigned braindamage
+		return sprintf ( "%u", $value );
 	}
-
-	// x32 route, 16 or more decimal digits
-	// well, let me know if you *really* need this
-	die ( "INTERNAL ERROR: unpacking more than 15-digit numeric on 32-bit PHP is not implemented yet (contact support)" );
 }
 
 
@@ -155,7 +378,7 @@ function sphUnpack64 ( $v )
 class SphinxClient
 {
 	var $_host;			///< searchd host (default is "localhost")
-	var $_port;			///< searchd port (default is 3312)
+	var $_port;			///< searchd port (default is 9312)
 	var $_offset;		///< how many records to seek from result-set start (default is 0)
 	var $_limit;		///< how many records to return from result-set starting at offset (default is 20)
 	var $_mode;			///< query matching mode (default is SPH_MATCH_ALL)
@@ -178,13 +401,17 @@ class SphinxClient
 	var $_ranker;		///< ranking mode (default is SPH_RANK_PROXIMITY_BM25)
 	var $_maxquerytime;	///< max query time, milliseconds (default is 0, do not limit)
 	var $_fieldweights;	///< per-field-name weights
+	var $_overrides;	///< per-query attribute values overrides
+	var $_select;		///< select-list (attributes or expressions, with optional aliases)
 
 	var $_error;		///< last error message
 	var $_warning;		///< last warning message
+	var $_connerror;		///< connection error vs remote error flag
 
 	var $_reqs;			///< requests array for multi-query
 	var $_mbenc;		///< stored mbstring encoding
 	var $_arrayresult;	///< whether $result["matches"] should be a hash or an array
+	var $_timeout;		///< connect timeout
 
 	/////////////////////////////////////////////////////////////////////////////
 	// common stuff
@@ -195,7 +422,9 @@ class SphinxClient
 	{
 		// per-client-object settings
 		$this->_host		= "localhost";
-		$this->_port		= 3312;
+		$this->_port		= 9312;
+		$this->_path		= false;
+		$this->_socket		= false;
 
 		// per-query settings
 		$this->_offset		= 0;
@@ -220,12 +449,23 @@ class SphinxClient
 		$this->_ranker		= SPH_RANK_PROXIMITY_BM25;
 		$this->_maxquerytime= 0;
 		$this->_fieldweights= array();
+		$this->_overrides 	= array();
+		$this->_select		= "*";
 
 		$this->_error		= ""; // per-reply fields (for single-query case)
 		$this->_warning		= "";
+		$this->_connerror	= false;
+
 		$this->_reqs		= array ();	// requests storage (for multi-query case)
 		$this->_mbenc		= "";
 		$this->_arrayresult	= false;
+		$this->_timeout		= 0;
+	}
+
+	function __destruct()
+	{
+		if ( $this->_socket !== false )
+			fclose ( $this->_socket );
 	}
 
 	/// get last error message (string)
@@ -240,13 +480,51 @@ class SphinxClient
 		return $this->_warning;
 	}
 
+	/// get last error flag (to tell network connection errors from searchd errors or broken responses)
+	function IsConnectError()
+	{
+		return $this->_connerror;
+	}
+
 	/// set searchd host name (string) and port (integer)
-	function SetServer ( $host, $port )
+	function SetServer ( $host, $port = 0 )
 	{
 		assert ( is_string($host) );
+		if ( $host[0] == '/')
+		{
+			$this->_path = 'unix://' . $host;
+			return;
+		}
+		if ( substr ( $host, 0, 7 )=="unix://" )
+		{
+			$this->_path = $host;
+			return;
+		}
+				
 		assert ( is_int($port) );
 		$this->_host = $host;
 		$this->_port = $port;
+		$this->_path = '';
+
+	}
+
+	/// set server connection timeout (0 to remove)
+	function SetConnectTimeout ( $timeout )
+	{
+		assert ( is_numeric($timeout) );
+		$this->_timeout = $timeout;
+	}
+
+
+	function _Send ( $handle, $data, $length )
+	{
+		if ( feof($handle) || fwrite ( $handle, $data, $length ) !== $length )
+		{
+			$this->_error = 'connection unexpectedly closed (timed out?)';
+			$this->_connerror = true;
+			return false;
+		}
+		return true;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -272,9 +550,58 @@ class SphinxClient
 	/// connect to searchd server
 	function _Connect ()
 	{
-		if (!( $fp = @fsockopen ( $this->_host, $this->_port ) ) )
+		if ( $this->_socket!==false )
 		{
-			$this->_error = "connection to {$this->_host}:{$this->_port} failed";
+			// we are in persistent connection mode, so we have a socket
+			// however, need to check whether it's still alive
+			if ( !@feof ( $this->_socket ) )
+				return $this->_socket;
+
+			// force reopen
+			$this->_socket = false;
+		}
+
+		$errno = 0;
+		$errstr = "";
+		$this->_connerror = false;
+
+		if ( $this->_path )
+		{
+			$host = $this->_path;
+			$port = 0;
+		}
+		else
+		{
+			$host = $this->_host;
+			$port = $this->_port;
+		}
+
+		if ( $this->_timeout<=0 )
+			$fp = @fsockopen ( $host, $port, $errno, $errstr );
+		else
+			$fp = @fsockopen ( $host, $port, $errno, $errstr, $this->_timeout );
+		
+		if ( !$fp )
+		{
+			if ( $this->_path )
+				$location = $this->_path;
+			else
+				$location = "{$this->_host}:{$this->_port}";
+			
+			$errstr = trim ( $errstr );
+			$this->_error = "connection to $location failed (errno=$errno, msg=$errstr)";
+			$this->_connerror = true;
+			return false;
+		}
+
+		// send my version
+		// this is a subtle part. we must do it before (!) reading back from searchd.
+		// because otherwise under some conditions (reported on FreeBSD for instance)
+		// TCP stack could throttle write-write-read pattern because of Nagle.
+		if ( !$this->_Send ( $fp, pack ( "N", 1 ), 4 ) )
+		{
+			fclose ( $fp );
+			$this->_error = "failed to send client protocol version";
 			return false;
 		}
 
@@ -288,8 +615,6 @@ class SphinxClient
 			return false;
 		}
 
-		// all ok, send my version
-		fwrite ( $fp, pack ( "N", 1 ) );
 		return $fp;
 	}
 
@@ -314,7 +639,8 @@ class SphinxClient
 				}
 			}
 		}
-		fclose ( $fp );
+		if ( $this->_socket === false )
+			fclose ( $fp );
 
 		// check response
 		$read = strlen ( $response );
@@ -397,6 +723,7 @@ class SphinxClient
 			|| $mode==SPH_MATCH_PHRASE
 			|| $mode==SPH_MATCH_BOOLEAN
 			|| $mode==SPH_MATCH_EXTENDED
+			|| $mode==SPH_MATCH_FULLSCAN
 			|| $mode==SPH_MATCH_EXTENDED2 );
 		$this->_mode = $mode;
 	}
@@ -407,7 +734,8 @@ class SphinxClient
 		assert ( $ranker==SPH_RANK_PROXIMITY_BM25
 			|| $ranker==SPH_RANK_BM25
 			|| $ranker==SPH_RANK_NONE
-			|| $ranker==SPH_RANK_WORDCOUNT );
+			|| $ranker==SPH_RANK_WORDCOUNT
+			|| $ranker==SPH_RANK_PROXIMITY );
 		$this->_ranker = $ranker;
 	}
 
@@ -496,8 +824,8 @@ class SphinxClient
 	function SetFilterRange ( $attribute, $min, $max, $exclude=false )
 	{
 		assert ( is_string($attribute) );
-		assert ( is_int($min) );
-		assert ( is_int($max) );
+		assert ( is_numeric($min) );
+		assert ( is_numeric($max) );
 		assert ( $min<=$max );
 
 		$this->_filters[] = array ( "type"=>SPH_FILTER_RANGE, "attr"=>$attribute, "exclude"=>$exclude, "min"=>$min, "max"=>$max );
@@ -569,6 +897,25 @@ class SphinxClient
 		$this->_arrayresult = $arrayresult;
 	}
 
+	/// set attribute values override
+	/// there can be only one override per attribute
+	/// $values must be a hash that maps document IDs to attribute values
+	function SetOverride ( $attrname, $attrtype, $values )
+	{
+		assert ( is_string ( $attrname ) );
+		assert ( in_array ( $attrtype, array ( SPH_ATTR_INTEGER, SPH_ATTR_TIMESTAMP, SPH_ATTR_BOOL, SPH_ATTR_FLOAT, SPH_ATTR_BIGINT ) ) );
+		assert ( is_array ( $values ) );
+
+		$this->_overrides[$attrname] = array ( "attr"=>$attrname, "type"=>$attrtype, "values"=>$values );
+	}
+
+	/// set select-list (attributes or expressions), SQL-like syntax
+	function SetSelect ( $select )
+	{
+		assert ( is_string ( $select ) );
+		$this->_select = $select;
+	}
+
 	//////////////////////////////////////////////////////////////////////////////
 
 	/// clear all filters (for multi-queries)
@@ -587,16 +934,23 @@ class SphinxClient
 		$this->_groupdistinct= "";
 	}
 
+	/// clear all attribute value overrides (for multi-queries)
+	function ResetOverrides ()
+    {
+    	$this->_overrides = array ();
+    }
+
 	//////////////////////////////////////////////////////////////////////////////
 
 	/// connect to searchd server, run given search query through given indexes,
 	/// and return the search results
-	function Query ( $query, $index="*" )
+	function Query ( $query, $index="*", $comment="" )
 	{
 		assert ( empty($this->_reqs) );
 
-		$this->AddQuery ( $query, $index );
+		$this->AddQuery ( $query, $index, $comment );
 		$results = $this->RunQueries ();
+		$this->_reqs = array (); // just in case it failed too early
 
 		if ( !is_array($results) )
 			return false; // probably network error; error message should be already filled
@@ -619,7 +973,7 @@ class SphinxClient
 
 	/// add query to multi-query batch
 	/// returns index into results array from RunQueries() call
-	function AddQuery ( $query, $index="*" )
+	function AddQuery ( $query, $index="*", $comment="" )
 	{
 		// mbstring workaround
 		$this->_MBPush ();
@@ -633,7 +987,7 @@ class SphinxClient
 			$req .= pack ( "N", (int)$weight );
 		$req .= pack ( "N", strlen($index) ) . $index; // indexes
 		$req .= pack ( "N", 1 ); // id64 range marker
-		$req .= sphPack64 ( $this->_min_id ) . sphPack64 ( $this->_max_id ); // id64 range
+		$req .= sphPackU64 ( $this->_min_id ) . sphPackU64 ( $this->_max_id ); // id64 range
 
 		// filters
 		$req .= pack ( "N", count($this->_filters) );
@@ -646,11 +1000,11 @@ class SphinxClient
 				case SPH_FILTER_VALUES:
 					$req .= pack ( "N", count($filter["values"]) );
 					foreach ( $filter["values"] as $value )
-						$req .= pack ( "N", floatval($value) ); // this uberhack is to workaround 32bit signed int limit on x32 platforms
+						$req .= sphPackI64 ( $value );
 					break;
 
 				case SPH_FILTER_RANGE:
-					$req .= pack ( "NN", $filter["min"], $filter["max"] );
+					$req .= sphPackI64 ( $filter["min"] ) . sphPackI64 ( $filter["max"] );
 					break;
 
 				case SPH_FILTER_FLOATRANGE:
@@ -696,6 +1050,33 @@ class SphinxClient
 		foreach ( $this->_fieldweights as $field=>$weight )
 			$req .= pack ( "N", strlen($field) ) . $field . pack ( "N", $weight );
 
+		// comment
+		$req .= pack ( "N", strlen($comment) ) . $comment;
+
+		// attribute overrides
+		$req .= pack ( "N", count($this->_overrides) );
+		foreach ( $this->_overrides as $key => $entry )
+		{
+			$req .= pack ( "N", strlen($entry["attr"]) ) . $entry["attr"];
+			$req .= pack ( "NN", $entry["type"], count($entry["values"]) );
+			foreach ( $entry["values"] as $id=>$val )
+			{
+				assert ( is_numeric($id) );
+				assert ( is_numeric($val) );
+
+				$req .= sphPackU64 ( $id );
+				switch ( $entry["type"] )
+				{
+					case SPH_ATTR_FLOAT:	$req .= $this->_PackFloat ( $val ); break;
+					case SPH_ATTR_BIGINT:	$req .= sphPackI64 ( $val ); break;
+					default:				$req .= pack ( "N", $val ); break;
+				}
+			}
+		}
+
+		// select-list
+		$req .= pack ( "N", strlen($this->_select) ) . $this->_select;
+
 		// mbstring workaround
 		$this->_MBPop ();
 
@@ -722,28 +1103,29 @@ class SphinxClient
 			return false;
 		}
 
-		////////////////////////////
 		// send query, get response
-		////////////////////////////
-
 		$nreqs = count($this->_reqs);
 		$req = join ( "", $this->_reqs );
 		$len = 4+strlen($req);
 		$req = pack ( "nnNN", SEARCHD_COMMAND_SEARCH, VER_COMMAND_SEARCH, $len, $nreqs ) . $req; // add header
 
-		fwrite ( $fp, $req, $len+8 );
-		if (!( $response = $this->_GetResponse ( $fp, VER_COMMAND_SEARCH ) ))
+		if ( !( $this->_Send ( $fp, $req, $len+8 ) ) ||
+			 !( $response = $this->_GetResponse ( $fp, VER_COMMAND_SEARCH ) ) )
 		{
 			$this->_MBPop ();
 			return false;
 		}
 
+		// query sent ok; we can reset reqs now
 		$this->_reqs = array ();
 
-		//////////////////
-		// parse response
-		//////////////////
+		// parse and return response
+		return $this->_ParseSearchResponse ( $response, $nreqs );
+	}
 
+	/// parse and return search query (or queries) response
+	function _ParseSearchResponse ( $response, $nreqs )
+	{
 		$p = 0; // current position
 		$max = strlen($response); // max position for checks, to protect against broken responses
 
@@ -810,14 +1192,15 @@ class SphinxClient
 				// parse document id and weight
 				if ( $id64 )
 				{
-					$doc = sphUnpack64 ( substr ( $response, $p, 8 ) ); $p += 8;
+					$doc = sphUnpackU64 ( substr ( $response, $p, 8 ) ); $p += 8;
 					list(,$weight) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
-				} else
+				}
+				else
 				{
 					list ( $doc, $weight ) = array_values ( unpack ( "N*N*",
 						substr ( $response, $p, 8 ) ) );
 					$p += 8;
-					$doc = sprintf ( "%u", $doc ); // workaround for php signed/unsigned braindamage
+					$doc = sphFixUint($doc);
 				}
 				$weight = sprintf ( "%u", $weight );
 
@@ -831,6 +1214,13 @@ class SphinxClient
 				$attrvals = array ();
 				foreach ( $attrs as $attr=>$type )
 				{
+					// handle 64bit ints
+					if ( $type==SPH_ATTR_BIGINT )
+					{
+						$attrvals[$attr] = sphUnpackI64 ( substr ( $response, $p, 8 ) ); $p += 8;
+						continue;
+					}
+
 					// handle floats
 					if ( $type==SPH_ATTR_FLOAT )
 					{
@@ -849,11 +1239,11 @@ class SphinxClient
 						while ( $nvalues-->0 && $p<$max )
 						{
 							list(,$val) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
-							$attrvals[$attr][] = sprintf ( "%u", $val );
+							$attrvals[$attr][] = sphFixUint($val);
 						}
 					} else
 					{
-						$attrvals[$attr] = sprintf ( "%u", $val );
+						$attrvals[$attr] = sphFixUint($val);
 					}
 				}
 
@@ -956,8 +1346,8 @@ class SphinxClient
 
 		$len = strlen($req);
 		$req = pack ( "nnN", SEARCHD_COMMAND_EXCERPT, VER_COMMAND_EXCERPT, $len ) . $req; // add header
-		$wrote = fwrite ( $fp, $req, $len+8 );
-		if (!( $response = $this->_GetResponse ( $fp, VER_COMMAND_EXCERPT ) ))
+		if ( !( $this->_Send ( $fp, $req, $len+8 ) ) ||
+			 !( $response = $this->_GetResponse ( $fp, VER_COMMAND_EXCERPT ) ) )
 		{
 			$this->_MBPop ();
 			return false;
@@ -989,16 +1379,110 @@ class SphinxClient
 		return $res;
 	}
 
+
+	/////////////////////////////////////////////////////////////////////////////
+	// keyword generation
+	/////////////////////////////////////////////////////////////////////////////
+
+	/// connect to searchd server, and generate keyword list for a given query
+	/// returns false on failure,
+	/// an array of words on success
+	function BuildKeywords ( $query, $index, $hits )
+	{
+		assert ( is_string($query) );
+		assert ( is_string($index) );
+		assert ( is_bool($hits) );
+
+		$this->_MBPush ();
+
+		if (!( $fp = $this->_Connect() ))
+		{
+			$this->_MBPop();
+			return false;
+		}
+
+		/////////////////
+		// build request
+		/////////////////
+
+		// v.1.0 req
+		$req  = pack ( "N", strlen($query) ) . $query; // req query
+		$req .= pack ( "N", strlen($index) ) . $index; // req index
+		$req .= pack ( "N", (int)$hits );
+
+		////////////////////////////
+		// send query, get response
+		////////////////////////////
+
+		$len = strlen($req);
+		$req = pack ( "nnN", SEARCHD_COMMAND_KEYWORDS, VER_COMMAND_KEYWORDS, $len ) . $req; // add header
+		if ( !( $this->_Send ( $fp, $req, $len+8 ) ) ||
+			 !( $response = $this->_GetResponse ( $fp, VER_COMMAND_KEYWORDS ) ) )
+		{
+			$this->_MBPop ();
+			return false;
+		}
+
+		//////////////////
+		// parse response
+		//////////////////
+
+		$pos = 0;
+		$res = array ();
+		$rlen = strlen($response);
+		list(,$nwords) = unpack ( "N*", substr ( $response, $pos, 4 ) );
+		$pos += 4;
+		for ( $i=0; $i<$nwords; $i++ )
+		{
+			list(,$len) = unpack ( "N*", substr ( $response, $pos, 4 ) );	$pos += 4;
+			$tokenized = $len ? substr ( $response, $pos, $len ) : "";
+			$pos += $len;
+
+			list(,$len) = unpack ( "N*", substr ( $response, $pos, 4 ) );	$pos += 4;
+			$normalized = $len ? substr ( $response, $pos, $len ) : "";
+			$pos += $len;
+
+			$res[] = array ( "tokenized"=>$tokenized, "normalized"=>$normalized );
+
+			if ( $hits )
+			{
+				list($ndocs,$nhits) = array_values ( unpack ( "N*N*", substr ( $response, $pos, 8 ) ) );
+				$pos += 8;
+				$res [$i]["docs"] = $ndocs;
+				$res [$i]["hits"] = $nhits;
+			}
+
+			if ( $pos > $rlen )
+			{
+				$this->_error = "incomplete reply";
+				$this->_MBPop ();
+				return false;
+			}
+		}
+
+		$this->_MBPop ();
+		return $res;
+	}
+
+	function EscapeString ( $string )
+	{
+		$from = array ( '\\', '(',')','|','-','!','@','~','"','&', '/', '^', '$', '=' );
+		$to   = array ( '\\\\', '\(','\)','\|','\-','\!','\@','\~','\"', '\&', '\/', '\^', '\$', '\=' );
+
+		return str_replace ( $from, $to, $string );
+	}
+
 	/////////////////////////////////////////////////////////////////////////////
 	// attribute updates
 	/////////////////////////////////////////////////////////////////////////////
 
-	/// update given attribute values on given documents in given indexes
+	/// batch update given attributes in given rows in given indexes
 	/// returns amount of updated documents (0 or more) on success, or -1 on failure
-	function UpdateAttributes ( $index, $attrs, $values )
+	function UpdateAttributes ( $index, $attrs, $values, $mva=false )
 	{
 		// verify everything
 		assert ( is_string($index) );
+		assert ( is_bool($mva) );
 
 		assert ( is_array($attrs) );
 		foreach ( $attrs as $attr )
@@ -1011,7 +1495,15 @@ class SphinxClient
 			assert ( is_array($entry) );
 			assert ( count($entry)==count($attrs) );
 			foreach ( $entry as $v )
-				assert ( is_int($v) );
+			{
+				if ( $mva )
+				{
+					assert ( is_array($v) );
+					foreach ( $v as $vv )
+						assert ( is_int($vv) );
+				} else
+					assert ( is_int($v) );
+			}
 		}
 
 		// build request
@@ -1019,45 +1511,116 @@ class SphinxClient
 
 		$req .= pack ( "N", count($attrs) );
 		foreach ( $attrs as $attr )
+		{
 			$req .= pack ( "N", strlen($attr) ) . $attr;
+			$req .= pack ( "N", $mva ? 1 : 0 );
+		}
 
 		$req .= pack ( "N", count($values) );
 		foreach ( $values as $id=>$entry )
 		{
-			$req .= sphPack64 ( $id );
+			$req .= sphPackU64 ( $id );
 			foreach ( $entry as $v )
-				$req .= pack ( "N", $v );
+			{
+				$req .= pack ( "N", $mva ? count($v) : $v );
+				if ( $mva )
+					foreach ( $v as $vv )
+						$req .= pack ( "N", $vv );
+			}
 		}
-
-		// mbstring workaround
-		$this->_MBPush ();
 
 		// connect, send query, get response
 		if (!( $fp = $this->_Connect() ))
-		{
-			$this->_MBPop ();
 			return -1;
-		}
 
 		$len = strlen($req);
 		$req = pack ( "nnN", SEARCHD_COMMAND_UPDATE, VER_COMMAND_UPDATE, $len ) . $req; // add header
-		fwrite ( $fp, $req, $len+8 );
+		if ( !$this->_Send ( $fp, $req, $len+8 ) )
+			return -1;
 
 		if (!( $response = $this->_GetResponse ( $fp, VER_COMMAND_UPDATE ) ))
-		{
-			$this->_MBPop ();
 			return -1;
-		}
 
 		// parse response
 		list(,$updated) = unpack ( "N*", substr ( $response, 0, 4 ) );
-		$this->_MBPop ();
 		return $updated;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// persistent connections
+	/////////////////////////////////////////////////////////////////////////////
+
+	function Open()
+	{
+		if ( $this->_socket !== false )
+		{
+			$this->_error = 'already connected';
+			return false;
+		}
+		if ( !$fp = $this->_Connect() )
+			return false;
+
+		// command, command version = 0, body length = 4, body = 1
+		$req = pack ( "nnNN", SEARCHD_COMMAND_PERSIST, 0, 4, 1 );
+		if ( !$this->_Send ( $fp, $req, 12 ) )
+			return false;
+
+		$this->_socket = $fp;
+		return true;
+	}
+
+	function Close()
+	{
+		if ( $this->_socket === false )
+		{
+			$this->_error = 'not connected';
+			return false;
+		}
+
+		fclose ( $this->_socket );
+		$this->_socket = false;
+		
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// status
+	//////////////////////////////////////////////////////////////////////////
+
+	function Status ()
+	{
+		$this->_MBPush ();
+		if (!( $fp = $this->_Connect() ))
+		{
+			$this->_MBPop();
+			return false;
+		}
+
+		$req = pack ( "nnNN", SEARCHD_COMMAND_STATUS, VER_COMMAND_STATUS, 4, 1 ); // len=4, body=1
+		if ( !( $this->_Send ( $fp, $req, 12 ) ) ||
+			 !( $response = $this->_GetResponse ( $fp, VER_COMMAND_STATUS ) ) )
+		{
+			$this->_MBPop ();
+			return false;
+		}
+
+		$res = substr ( $response, 4 ); // just ignore length, error handling, etc
+		$p = 0;
+		list ( $rows, $cols ) = array_values ( unpack ( "N*N*", substr ( $response, $p, 8 ) ) ); $p += 8;
+
+		$res = array();
+		for ( $i=0; $i<$rows; $i++ )
+			for ( $j=0; $j<$cols; $j++ )
+		{
+			list(,$len) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
+			$res[$i][] = substr ( $response, $p, $len ); $p += $len;
+		}
+
+		$this->_MBPop ();
+		return $res;
 	}
 }
 
 //
-// $Id: sphinxapi.php 1103 2008-01-24 18:42:57Z shodan $
+// $Id: sphinxapi.php 2055 2009-11-06 23:09:58Z shodan $
 //
-
-?>

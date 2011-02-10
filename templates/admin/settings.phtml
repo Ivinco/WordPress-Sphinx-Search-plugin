@@ -45,6 +45,32 @@
             </div>
 
             <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
+           <?php if ('true' == $this->view->devOptions['check_stats_table_column_status']):?>
+            <div class="postbox">
+                <h3 class="hndle">Statistics management</h3>
+                <div class="inside">
+                    <fieldset class="options">
+                        <table class="form-table" border="0">
+                            <tbody>
+                            <tr valign="top" >
+                                <th><label for="stats_with_sphinx">Use Sphinx for statistics in widgets</label></th>
+                                <td>
+                                <input type="checkbox" id="stats_with_sphinx" name="stats_with_sphinx" value="true"
+                                    <?php echo ($this->view->devOptions['stats_with_sphinx'] == "true")? 'checked="checked"': '' ?>
+                                />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </fieldset>
+                    <p class="submit">
+                        <input type="submit" name="update_SphinxSearchSettings" class="button-primary"
+                               value="<?php _e('Update Settings', 'SphinxSearch') ?>" />
+                    </p>
+                </div>
+            </div>
+            <?php endif;?>
+                
             <div class="postbox">
                 <h3 class="hndle">Search in</h3>
                 <div class="inside">

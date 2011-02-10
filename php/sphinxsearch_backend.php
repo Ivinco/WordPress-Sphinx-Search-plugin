@@ -93,6 +93,16 @@ class SphinxSearch_Backend {
             $sphinxView->assign('devOptions', $devOptions);
             //load admin panel template
             $sphinxView->assign('header', 'Sphinx Search for Wordpress');
+
+            if ('true' != $devOptions['check_stats_table_column_status']) {
+                global $table_prefix;
+                $sphinxView->assign('error_message',  "{$table_prefix}sph_stats table required an update.<br>
+                Please run the following command in MySQL client to update the table: <br>
+                alter table {$table_prefix}sph_stats add `status` tinyint(1) NOT NULL DEFAULT '0';
+                <br><br>
+                This update will allow to use Sphinx Search for Top/Related and Latest search terms widgets!");
+            }
+
             $sphinxView->render('admin/settings_general.phtml');
 	}
 
@@ -114,6 +124,13 @@ class SphinxSearch_Backend {
 			if (!empty($_POST[$option])) $devOptions[$option] = 'true';
 			else $devOptions[$option] = 'false';
 		}
+                
+                //use sphinx for stats in widgest or not
+                if (!empty($_POST['stats_with_sphinx']) && 'true' == $_POST['stats_with_sphinx']){
+                    $devOptions['stats_with_sphinx'] = 'true';
+                } else {
+                    $devOptions['stats_with_sphinx'] = 'false';
+                }
 
 		/**
 		 * sphinx_conf - path to sphinx conf file
@@ -127,8 +144,8 @@ class SphinxSearch_Backend {
 		 */
 		foreach(array('sphinx_conf', 'sphinx_indexer', 'sphinx_searchd', 'sphinx_path',
 					  'sphinx_index', 'strip_tags', 'censor_words') as $option){
-							if (isset($_POST[$option])) $devOptions[$option] = trim($_POST[$option]);
-					  }
+                    if (isset($_POST[$option])) $devOptions[$option] = trim($_POST[$option]);
+		}
 
 		/**
 		 * excerpt_before_match - tag before search keyword in content part

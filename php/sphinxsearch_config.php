@@ -58,11 +58,16 @@ class SphinxSearch_Config
 		
 		
 		//initialize sphinx object and set neccessary parameters
-		$this->sphinx = new SphinxClient ();
-		$this->sphinx->SetServer ( $this->admin_options['sphinx_host'], intval($this->admin_options['sphinx_port']) );
-		$this->sphinx->SetWeights ( array ( 1, 1 ) );
-		$this->sphinx->SetMatchMode ( SPH_MATCH_EXTENDED2 );
+                $this->init_sphinx();
 	}
+
+        function init_sphinx()
+        {
+            $this->sphinx = new SphinxClient ();
+            $this->sphinx->SetServer ( $this->admin_options['sphinx_host'], intval($this->admin_options['sphinx_port']) );
+            $this->sphinx->SetMatchMode ( SPH_MATCH_EXTENDED2 );
+            return $this->sphinx;
+        }
 	
 	/**
     * Load and return array of options 
@@ -111,7 +116,9 @@ class SphinxSearch_Config
 
                         'sphinx_cron_start' => 'false',
 
-                    'check_stats_table_column_status' => 'false'
+                        'stats_with_sphinx' => 'false',
+
+                        'check_stats_table_column_status' => 'false'
    			
    			);
    		$this->admin_options = get_option($this->adminOptionsName);

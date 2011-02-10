@@ -174,8 +174,10 @@ class SphinxService
 
             if(empty($index_name)){
                 //reindex all indexes with restart searchd
-                $command .= " ".$this->_config->get_option('sphinx_index')."delta ".
-                    $this->_config->get_option('sphinx_index')."main ";
+                $command .= " ".
+                    $this->_config->get_option('sphinx_index')."delta ".
+                    $this->_config->get_option('sphinx_index')."main ".
+                    $this->_config->get_option('sphinx_index')."stats ";
             } elseif (!empty ($index_name)) {
                 //reindex only specified index with restart searchd
                 $command .= " ".$this->_config->get_option('sphinx_index').$index_name;
