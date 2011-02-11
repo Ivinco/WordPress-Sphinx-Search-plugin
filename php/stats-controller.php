@@ -68,6 +68,7 @@ class StatsController
                     $this->_approveKeywords($_POST['keywords']);
                     break;
                 case 'ban':
+                    print_r($_POST['keywords']);
                     $this->_banKeywords($_POST['keywords']);
                     break;
             }
@@ -99,6 +100,7 @@ class StatsController
     function _approveKeywords($keywords)
     {
         foreach($keywords as $keyword){
+            $keyword = urldecode($keyword);
             $sql = "update ".$this->_table_prefix."sph_stats set status = 1
             where keywords_full = '".$this->_wpdb->escape($keyword)."'";
             $this->_wpdb->query($sql);
@@ -109,6 +111,7 @@ class StatsController
     function _banKeywords($keywords)
     {
         foreach($keywords as $keyword){
+            $keyword = urldecode($keyword);
             $sql = "update ".$this->_table_prefix."sph_stats set status = 2
             where keywords_full = '".$this->_wpdb->escape($keyword)."'";
             $this->_wpdb->query($sql);
@@ -174,7 +177,7 @@ class StatsController
             limit '.$start.', '.$this->_keywords_per_page;
         $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
         $this->view->start = $start;
-        $this->view->sterm = stripslashes($_REQUEST['sterm']);
+        $this->view->sterm = !empty($_REQUEST['sterm']) ? stripslashes($_REQUEST['sterm']) : '';
     }
 
     function _get_stat_keywords($page)
