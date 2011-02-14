@@ -55,7 +55,7 @@ class TopSearchesWidget extends WP_Widget
             $limit = !empty($instance['search_limit']) ? $instance['search_limit'] : 10;
             if ( $search_show == 'show_related' ){
                 $title = $title_rel;
-                $words_html = $this->get_related($_GET['s'], $limit, $width, $break, $show_approved);
+                $words_html = $this->get_related($_GET['s'], $limit, $width, $break);
             }
             if (empty($words_html) || $search_show == 'show_top') {
                 $title = $title_top;
@@ -67,7 +67,7 @@ class TopSearchesWidget extends WP_Widget
             if ( $posts_show == 'show_related' ){
                 $title = $title_rel;
                 $keywords = single_post_title( '', false );
-                $words_html = $this->get_related($keywords, $limit, $width, $break, $show_approved);
+                $words_html = $this->get_related($keywords, $limit, $width, $break);
             }
             if (empty($words_html) || $posts_show == 'show_top') {
                 $title = $title_top;
@@ -303,11 +303,11 @@ class TopSearchesWidget extends WP_Widget
         return $html;
     }
 
-    function get_related($keywords, $limit = 10, $width = 0, $break = '...', $show_approved=false)
+    function get_related($keywords, $limit = 10, $width = 0, $break = '...')
     {
         global $defaultObjectSphinxSearch;
 
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break, $show_approved);
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break);
         if (empty($result)){
             return false;
         }

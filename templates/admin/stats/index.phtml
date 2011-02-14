@@ -47,14 +47,18 @@
     </tfoot>
 
     <tbody id="the-list" class="list:tags">
-    <?php foreach($this->view->keywords as $keyword):?>
-            <tr id="tag-1" class="alternate">
-                <th scope="row" class="check-column"><input type="checkbox" value="<?php echo urlencode($keyword->keywords_full)?>" name="keywords[]"/></th>
-                <td class="name column-name"><?php echo $keyword->keywords?></td>
-                <td class="name column-name"><?php echo $keyword->date_added?></td>
-                <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
-            </tr>
-        <?php endforeach; ?>
+    <?php
+        if (!empty($this->view->keywords)):
+            foreach($this->view->keywords as $keyword):?>
+                <tr id="tag-1" class="alternate">
+                    <th scope="row" class="check-column"><input type="checkbox" value="<?php echo urlencode($keyword->keywords_full)?>" name="keywords[]"/></th>
+                    <td class="name column-name"><?php echo $keyword->keywords?></td>
+                    <td class="name column-name"><?php echo $keyword->date_added?></td>
+                    <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
+                </tr>
+            <?php endforeach;
+        endif;
+       ?>
     </tbody>
 </table>
 

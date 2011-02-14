@@ -48,7 +48,7 @@ class WizardController
     {
         $this->view = new SphinxView();
         $this->_config = $config;
-        $this->view->assign('header', 'Sphinx Search :: Wizard');
+        $this->view->assign('header', 'Sphinx Search :: Wizard');        
     }
 
     function stop_action()

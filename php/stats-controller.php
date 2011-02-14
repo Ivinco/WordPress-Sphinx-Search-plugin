@@ -39,19 +39,23 @@ class StatsController
      */
     var $view = null;
 
+    var $_sphinx = null;
+    var $_results = array();
+
     var $_wpdb = null;
     var $_table_prefix = null;
     var $_keywords_per_page = 50;
 
     function  StatsController(SphinxSearch_Config $config)
     {
-        $this->__construct($config);
+        $this->__construct($config);        
     }
 
     function  __construct(SphinxSearch_Config $config)
     {
         global $wpdb, $table_prefix;
 
+        $this->_sphinx = $config->init_sphinx();
         $this->_wpdb = $wpdb;
         $this->_table_prefix = $table_prefix;
         $this->view = new SphinxView();
@@ -85,12 +89,21 @@ class StatsController
         $tab = !empty($_GET['tab'])? $_GET['tab'] : 'new';
 
         if ( $tab == 'stats' ) {
-            $this->_get_stat_keywords($page);
+            $keywords = $this->_get_stat_keywords($page);
         } else {
-            $this->_get_new_keywords($page, $tab);
+            $keywords = $this->_get_new_keywords($page, $tab);
         }
         //run after get keywords list
-        $this->_build_pagination($page);
+        $page_links = $this->_build_pagination($page);
+
+        $this->view->keywords = $keywords;
+        $this->view->start = ( $page - 1 ) * $this->_keywords_per_page;
+        $this->view->sterm = !empty($_REQUEST['sterm']) ? stripslashes($_REQUEST['sterm']) : '';
+
+        $this->view->page_links = $page_links;
+        $this->view->page = $page;
+        $this->view->total = !empty($this->_results['total_found'])?$this->_results['total_found']:0;
+        $this->view->keywords_per_page = $this->_keywords_per_page;
         
         $this->view->tab = $tab;
         $this->view->plugin_url = $this->_config->get_plugin_url();
@@ -99,13 +112,31 @@ class StatsController
 
     function _approveKeywords($keywords)
     {
+        $sphinx = $this->_config->init_sphinx();
         foreach($keywords as $keyword){
             $keyword = urldecode($keyword);
             $sql = "update ".$this->_table_prefix."sph_stats set status = 1
             where keywords_full = '".$this->_wpdb->escape($keyword)."'";
             $this->_wpdb->query($sql);
-        }
 
+            $sphinx->SetLimits(0, 1000000);
+            $sphinx->SetFilter('status', array(1), true);
+            $sphinx->SetFilter('keywords_crc', array(crc32($keyword)));
+            $res = $sphinx->Query("", $this->_config->get_option('sphinx_index').'stats');
+            if (empty($res['matches'])){
+                continue;
+            }
+            $idx = array();
+            foreach($res['matches'] as $index => $m){
+                $idx[$index] = array(1);
+            }
+            $sphinx->UpdateAttributes(
+                $this->_config->get_option('sphinx_index').'stats',
+                array('status'),
+                $idx
+           );
+            $sphinx->ResetFilters();
+        }
     }
 
     function _banKeywords($keywords)
@@ -120,8 +151,13 @@ class StatsController
 
     function _build_pagination($page)
     {
-        $sql_found_rows = 'SELECT FOUND_ROWS()';
-        $total = $this->_wpdb->get_var($sql_found_rows);
+        if (empty($this->_results)){
+            return;
+        }
+        //$sql_found_rows = 'SELECT FOUND_ROWS()';
+        //$total = $this->_wpdb->get_var($sql_found_rows);
+
+        $total = $this->_results['total_found'];
 
         $pagination = array(
             'base' => add_query_arg( 'apage', '%#%' ),
@@ -138,46 +174,53 @@ class StatsController
 
         $page_links = paginate_links( $pagination );
         
-        $this->view->page_links = $page_links;
-        $this->view->page = $page;        
-        $this->view->total = $total;
-        $this->view->keywords_per_page = $this->_keywords_per_page;
+        return $page_links;
     }
 
     function _get_new_keywords($page, $status)
     {
         $sterm_value = !empty($_REQUEST['sterm']) ? $_REQUEST['sterm'] : '';
 
-        $sqlMatch = '';
-        if (!empty($sterm_value)){
-            $sqlMatch = " AND (MATCH(keywords) AGAINST
-                ('".$this->_wpdb->escape($sterm_value)."'))";
-        }
-
         switch ($status) {            
             case 'approved':
-                $istatus = 1;
+                $status_filter = array(1);
                 break;
             case 'ban':
-                $istatus = 2;
+                $status_filter = array(2);
                 break;
             case 'new':
             default:
-                $istatus = 0;
+                $status_filter = array(0);
                 break;
         }
         $start = ( $page - 1 ) * $this->_keywords_per_page;
 
-        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full, 
-                    max(date_added) as date_added, count(1) as cnt
+        $this->_sphinx->SetFilter('status', $status_filter);
+        $this->_sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "date_added desc" );
+        $this->_sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');
+        $this->_sphinx->SetLimits($start, $this->_keywords_per_page);
+
+        $res = $this->_sphinx->Query($sterm_value,
+                $this->_config->get_option('sphinx_index').'stats');
+
+        if (empty($res['matches'])){
+            return array();
+        }
+        $this->_results = $res;
+        $ids = array_keys($res['matches']);
+
+        $sql = 'select id, keywords, keywords_full, 
+                    date_added
             from '.$this->_table_prefix.'sph_stats
-            where status = '.$istatus.'
-                '.$sqlMatch.'
-            group by keywords
-            limit '.$start.', '.$this->_keywords_per_page;
-        $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
-        $this->view->start = $start;
-        $this->view->sterm = !empty($_REQUEST['sterm']) ? stripslashes($_REQUEST['sterm']) : '';
+            where id in ('.  implode(',', $ids).')
+            order by FIELD(id, '.  implode(',', $ids).')';
+
+        $keywords = $this->_wpdb->get_results($sql, OBJECT_K);
+        
+        foreach($res['matches'] as $index => $match){
+            $keywords[$index]->cnt = $match['attrs']['@count'];
+        }
+        return $keywords;
     }
 
     function _get_stat_keywords($page)
@@ -234,8 +277,12 @@ class StatsController
             group by keywords
             order by '.$sort_by.' '.$sort_order.'
             limit '.$start.', '.$this->_keywords_per_page;
-        $this->view->keywords = $this->_wpdb->get_results($sql, OBJECT);
+        $keywords = $this->_wpdb->get_results($sql, OBJECT);
+
+        $this->view->keywords = $keywords;
         $this->view->start = $start;
         $this->view->period = $period_param;
+
+        return $keywords;
     }
 }

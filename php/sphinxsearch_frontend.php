@@ -737,57 +737,8 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
+
     function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30)
-    {
-        if ('true' == $this->config->get_option('stats_with_sphinx') &&
-            $this->sphinx_is_up()  ){
-            $res = $this->sphinx_stats_top_sphinx($limit, $width, $break, $approved, $period_limit);
-        } else {
-            $res = $this->sphinx_stats_top_fulltext($limit, $width, $break, $approved, $period_limit);
-        }
-        return $res;
-    }
-
-    function sphinx_stats_top_fulltext($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30)
-    {
-        global $wpdb, $table_prefix;
-
-        $sqlStatus = '';
-        if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status in (0, 1) ";
-            if ($approved){
-                $sqlStatus = " and status = 1 ";
-            }
-        }
-
-        $sqlPeriod = '';
-        if ($period_limit){
-            $sqlPeriod = " and date_added > date_sub(NOW(), INTERVAL $period_limit DAY) ";
-        }
-        
-	$sql = "SELECT
-                    keywords,
-                    keywords_full,
-                    count(1) as cnt
-		FROM
-                    {$table_prefix}sph_stats
-		WHERE
-                    1
-                    $sqlPeriod
-                    $sqlStatus
-		GROUP BY
-                    keywords DESC
-		ORDER BY
-                    cnt DESC
-		LIMIT
-		".($limit+30)."" ;
-	$results = $wpdb->get_results($sql);
-	$results = $this->make_results_clear($results, $limit, $width, $break);
-
-	return $results;
-    }
-
-    function sphinx_stats_top_sphinx($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30)
     {
         global $wpdb, $table_prefix;
 
@@ -836,61 +787,7 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
-    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...', $approved = false)
-    {
-        if ('true' == $this->config->get_option('stats_with_sphinx') &&
-            $this->sphinx_is_up() ){
-            $res = $this->sphinx_stats_related_sphinx($keywords, $limit, $width, $break, $approved);
-        } else {
-            $res = $this->sphinx_stats_related_fulltext($keywords, $limit, $width, $break, $approved);
-        }
-        return $res;
-    }
-
-    function sphinx_stats_related_fulltext($keywords, $limit = 10, $width = 0, $break = '...', $approved = false)
-    {
-        global $wpdb, $table_prefix;
-
-        $keywords = $this->clear_keywords($keywords);
-	if (empty($keywords)){
-            return false;
-        }
-
-        if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status in (0, 1) ";
-            if ($approved){
-                $sqlStatus = " and status = 1 ";
-            }
-        }
-
-
-	$results = array();
-        $sql = "SELECT
-                    keywords_full,
-                    keywords,
-                    count(1) as cnt
-                FROM
-                    {$table_prefix}sph_stats
-		WHERE
-                    (date_added >= DATE_SUB(NOW(), INTERVAL 2 Month))
-                    AND (MATCH(keywords) AGAINST ('".$wpdb->escape($keywords)."' IN BOOLEAN MODE))
-                    and keywords_full != '".trim($wpdb->escape($keywords))."'
-                    $sqlStatus
-                GROUP BY
-                    keywords_full
-                ORDER BY
-                    cnt desc
-		LIMIT
-		 ".($limit+30) ;
-
-	$results = $wpdb->get_results($sql);
-
-	$results = $this->make_results_clear($results, $limit, $width, $break);
-
-	return $results;
-    }
-
-    function sphinx_stats_related_sphinx($keywords, $limit = 10, $width = 0, $break = '...', $approved=false)
+    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...')
     {
         global $wpdb, $table_prefix;
 
@@ -899,12 +796,6 @@ class SphinxSearch_FrontEnd
         $keywords = $this->unify_keywords($keywords);
 
         $sphinx->SetLimits(0, $limit + 30);
-        if ($approved){
-            $status = array(1);
-        } else {
-            $status = array(1,0);
-        }
-        $sphinx->SetFilter('status', $status);
         $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "@weight desc" );
 
         $res = $sphinx->Query($keywords,
@@ -935,56 +826,6 @@ class SphinxSearch_FrontEnd
 
     function sphinx_stats_latest($limit = 10, $width = 0, $break = '...', $approved=false)
     {
-        if ('true' == $this->config->get_option('stats_with_sphinx') &&
-            $this->sphinx_is_up()  ){
-            $res = $this->sphinx_stats_latest_sphinx($limit, $width, $break, $approved);
-        } else {
-            $res = $this->sphinx_stats_latest_fulltext($limit, $width, $break, $approved);
-        }
-        return $res;
-    }
-	
-	/**
-	 * Return N-latest search keywords
-	 *
-	 * @param integer $limit
-	 * @param integer $width
-	 * @param string $break
-	 * @return array
-	 */
-    function sphinx_stats_latest_fulltext($limit = 10, $width = 0, $break = '...', $approved=false)
-    {
-        global $wpdb, $table_prefix;
-
-        if ('true' == $this->config->get_option('check_stats_table_column_status')){
-            $sqlStatus = " and status in (0, 1) ";
-            if ($approved){
-                $sqlStatus = " and status = 1 ";
-            }
-        }
-
-        $sql = "SELECT
-                    keywords_full,
-                    keywords,
-                    date_added
-		FROM 
-                    {$table_prefix}sph_stats
-                where 1
-                    $sqlStatus
-                group by keywords
- 		ORDER BY 
-                    id DESC
-		LIMIT
-                    ".($limit+30)."" ;
-	$results = $wpdb->get_results($sql);
-
-	$results = $this->make_results_clear($results, $limit, $width, $break);
-		
-	return $results;
-    }
-
-    function sphinx_stats_latest_sphinx($limit = 10, $width = 0, $break = '...', $approved=false)
-    {
         global $wpdb, $table_prefix;
         
         $sphinx = $this->config->init_sphinx();
@@ -996,8 +837,8 @@ class SphinxSearch_FrontEnd
             $status = array(1,0);
         }
         $sphinx->SetFilter('status', $status);
-        $sphinx->SetSelect ( "*, MAX(@id) as last_id" );
-        $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "last_id desc" );
+        $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "date_added desc" );
+        $sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');
 
 
         $res = $sphinx->Query('',
