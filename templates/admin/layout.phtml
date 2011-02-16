@@ -1,0 +1,51 @@
+<?php
+/*
+	Copyright 2008  &copy; Percona Ltd  (email : office@percona.com)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+?>
+<?php echo $this->render('admin/header.phtml');?>
+<?php echo $this->render('admin/sidebar.phtml');?>
+
+<div class="has-sidebar sm-padded" >
+    <div class="has-sidebar-content" id="post-body-content">
+    <h2 class="tabs" id="post-body-content-tabs">
+        <a href="?page=sphinxsearch.php" class="nav-tab <?php echo empty($_GET['menu']) || $_GET['menu'] == 'wizard'?'nav-tab-active':''?>">Settings</a>
+        <a href="?page=sphinxsearch.php&menu=terms_editor" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu']=='terms_editor'?'nav-tab-active':''?>">Search management tools</a>
+        <a href="?page=sphinxsearch.php&menu=stats" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu']=='stats'?'nav-tab-active':''?>">Statistics</a>
+    </h2>
+        
+<?php
+$menu = !empty($_GET['menu'])?$_GET['menu'] : '';
+switch($menu){
+    case 'terms_editor':
+        echo $this->render('admin/terms_editor/layout.phtml');
+        break;
+    case 'stats':
+        echo $this->render('admin/stats/layout.phtml');
+        break;
+    case 'wizard':
+        echo $this->render('admin/wizard/layout.phtml');
+        break;
+    default:
+        echo $this->render('admin/settings/index.phtml');
+        break;
+}
+?>
+
+<?php echo $this->render('admin/footer.phtml');?>
+    
+    

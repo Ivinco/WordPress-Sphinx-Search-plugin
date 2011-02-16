@@ -46,7 +46,7 @@ class WizardController
 
     function  __construct(SphinxSearch_Config $config)
     {
-        $this->view = new SphinxView();
+        $this->view = $config->get_view();
         $this->_config = $config;
         $this->view->assign('header', 'Sphinx Search :: Wizard');        
     }
@@ -68,7 +68,6 @@ class WizardController
             $this->_config->update_admin_options($options);
             return $this->_next_action('start');
         }
-        $this->view->render('admin/wizard_layout.phtml');
     }
 
     function connection_action()
@@ -85,7 +84,7 @@ class WizardController
                 $this->view->sphinx_host = $_POST['sphinx_host'];
                 $this->view->sphinx_port = $_POST['sphinx_port'];
                 $this->view->sphinx_index = $_POST['sphinx_index'];                
-                $this->view->render('admin/wizard_sphinx_connection.phtml');
+                $this->view->render('admin/wizard/sphinx_connection.phtml');
              } else {
                 $this->_set_sphinx_connect();
                 $this->view->success_message = 'Connection parameters successfully set.';
@@ -95,7 +94,7 @@ class WizardController
             $this->view->sphinx_host = $this->_config->get_option('sphinx_host');
             $this->view->sphinx_port = $this->_config->get_option('sphinx_port');
             $this->view->sphinx_index = $this->_config->get_option('sphinx_index');
-            $this->view->render('admin/wizard_sphinx_connection.phtml');
+            $this->view->render('admin/wizard/sphinx_connection.phtml');
         }
         exit;
     }
@@ -144,14 +143,14 @@ class WizardController
                     return $this->_next_action('install');
                 } else {
                     $this->view->error_message = $res['err'];
-                     $this->view->render('admin/wizard_sphinx_detect.phtml');
+                     $this->view->render('admin/wizard/sphinx_detect.phtml');
                     exit;
                 }
             } else if('detect_system' == $_POST['detected_install']) {
                 if (empty($_POST['detected_system_searchd']) ||
                     empty($_POST['detected_system_indexer'])){
                     $this->view->error_message = 'Path to searchd or indexer can\'t be empty';
-                    $this->view->render('admin/wizard_sphinx_detect.phtml');
+                    $this->view->render('admin/wizard/sphinx_detect.phtml');
                     exit;
                 } else {
                     $this->_set_sphinx_detected($_POST['detected_system_searchd'], $_POST['detected_system_indexer']);
@@ -162,7 +161,7 @@ class WizardController
                 if (empty($_POST['detected_installed_searchd']) ||
                     empty($_POST['detected_installed_indexer'])){
                     $this->view->error_message = 'Path to searchd or indexer can\'t be empty';
-                    $this->view->render('admin/wizard_sphinx_detect.phtml');
+                    $this->view->render('admin/wizard/sphinx_detect.phtml');
                     exit;
                 } else {
                     $this->_set_sphinx_detected($_POST['detected_installed_searchd'], $_POST['detected_installed_indexer']);
@@ -171,7 +170,7 @@ class WizardController
                 }
             }
         } 
-        $this->view->render('admin/wizard_sphinx_detect.phtml');
+        $this->view->render('admin/wizard/sphinx_detect.phtml');
         exit;
     }
 
@@ -221,7 +220,7 @@ class WizardController
         } else {
             $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
         }
-        $this->view->render('admin/wizard_sphinx_folder.phtml');
+        $this->view->render('admin/wizard/sphinx_folder.phtml');
         exit;
     }
 
@@ -236,7 +235,7 @@ class WizardController
         }
         $this->view->config_content = $this->_generate_config_file_content();
         $this->view->sphinx_conf = $this->_config->get_option('sphinx_conf');
-        $this->view->render('/admin/wizard_sphinx_config.phtml');
+        $this->view->render('/admin/wizard/sphinx_config.phtml');
         exit;
     }
 
@@ -246,7 +245,7 @@ class WizardController
         $res = $sphinxService->start();
         $options['wizard_done'] = 'true';
         $this->_config->update_admin_options($options);
-        $this->view->render('/admin/wizard_sphinx_finish.phtml');
+        $this->view->render('/admin/wizard/sphinx_finish.phtml');
         exit;
     }
 
@@ -269,7 +268,7 @@ class WizardController
             }
         }
         $this->view->indexsation_done = false;
-        $this->view->render('admin/wizard_sphinx_indexsation.phtml');
+        $this->view->render('admin/wizard/sphinx_indexsation.phtml');
         exit;
     }
 

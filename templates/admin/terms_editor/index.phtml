@@ -6,8 +6,8 @@
 <div class="alignleft actions">
 <select name="action">
 <option value="-1" selected="selected">Bulk Actions</option>
-<option value="approve">Approve</option>
-<option value="ban">Ban</option>
+<option value="approve">Mark as approved</option>
+<option value="ban">Mark as banned</option>
 </select>
 <input type="submit" name="doaction" id="doaction" value="Apply" class="button-secondary apply" />
 
@@ -25,12 +25,13 @@
 <table class="widefat comments fixed" cellspacing="0">
     <thead>
         <tr>
-            <th scope="col" id="cb" class="manage-column column-cb check-column" style=""><input type="checkbox" /></th>
+            <th scope="col" id="cb" class="manage-column column-cb check-column"
+                style=""><input type="checkbox" /></th>
             <th scope="col" id="keyword" class="manage-column column-name" style="">
                 Search term                
             </th>
             <th scope="col" id="action" class="manage-column column-date" style="">
-                Last search date                
+                Last search
             </th>
             <th scope="col" id="action" class="manage-column column-posts num" style="">
                 Search count
@@ -41,7 +42,7 @@
         <tr>
             <th scope="col" class="manage-column column-cb check-column" style=""><input type="checkbox"/></th>
             <th scope="col" class="manage-column column-name" style="">Search term</th>
-            <th scope="col" id="action" class="manage-column column-date" style="">Last search date</th>
+            <th scope="col" id="action" class="manage-column column-date" style="">Last search</th>
             <th scope="col" class="manage-column column-posts num" style="">Search count</th>
         </tr>
     </tfoot>
@@ -51,9 +52,11 @@
         if (!empty($this->view->keywords)):
             foreach($this->view->keywords as $keyword):?>
                 <tr id="tag-1" class="alternate">
-                    <th scope="row" class="check-column"><input type="checkbox" value="<?php echo urlencode($keyword->keywords)?>" name="keywords[]"/></th>
+                    <th scope="row" class="check-column" style="padding:7px 0 7px;">
+                        <input type="checkbox" value="<?php echo urlencode($keyword->keywords)?>" name="keywords[]"/>
+                    </th>
                     <td class="name column-name"><?php echo $keyword->keywords?></td>
-                    <td class="name column-name"><?php echo $keyword->date_added?></td>
+                    <td class="name column-date"><?php echo date("Y-m-d H:i",strtotime($keyword->date_added))?></td>
                     <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
                 </tr>
             <?php endforeach;
@@ -78,8 +81,8 @@
 <div class="alignleft actions">
 <select name="action2">
 <option value="-1" selected="selected">Bulk Actions</option>
-<option value="approve">Approve</option>
-<option value="ban">Ban</option>
+<option value="approve">Mark as approved</option>
+<option value="ban">Mark as banned</option>
 </select>
 <input type="submit" name="doaction2" id="doaction" value="Apply" class="button-secondary apply" />
 

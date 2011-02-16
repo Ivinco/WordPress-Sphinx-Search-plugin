@@ -21,7 +21,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-class StatsController
+class TermsEditorController
 {
     /**
      * Special object to get/set plugin configuration parameters
@@ -46,9 +46,9 @@ class StatsController
     var $_table_prefix = null;
     var $_keywords_per_page = 50;
 
-    function  StatsController(SphinxSearch_Config $config)
+    function  TermsEditorController(SphinxSearch_Config $config)
     {
-        $this->__construct($config);        
+        $this->__construct($config);
     }
 
     function  __construct(SphinxSearch_Config $config)
@@ -56,9 +56,9 @@ class StatsController
         global $wpdb, $table_prefix;
 
         $this->_sphinx = $config->init_sphinx();
-        $this->_wpdb = $wpdb;
-        $this->_table_prefix = $table_prefix;
         $this->view = $config->get_view();
+        $this->_wpdb = $wpdb;
+        $this->_table_prefix = $table_prefix;        
         $this->_config = $config;
         $this->view->assign('header', 'Sphinx Search :: Statistics');
     }
@@ -86,9 +86,10 @@ class StatsController
         } else {
             $page = 1;
         }
-        $tab = !empty($_GET['tab'])? $_GET['tab'] : 'stats';
+        $tab = !empty($_GET['tab'])? $_GET['tab'] : 'new';
 
-        $keywords = $this->_get_stat_keywords($page);
+        $keywords = $this->_get_new_keywords($page, $tab);
+        
         //run after get keywords list
         $page_links = $this->_build_pagination($page);
 
@@ -100,7 +101,7 @@ class StatsController
         $this->view->page = $page;
         $this->view->total = !empty($this->_results['total_found'])?$this->_results['total_found']:0;
         $this->view->keywords_per_page = $this->_keywords_per_page;
-        
+
         $this->view->tab = $tab;
         $this->view->plugin_url = $this->_config->get_plugin_url();
     }
@@ -181,13 +182,13 @@ class StatsController
             'total' => ceil($total / $this->_keywords_per_page),
             'current' => $page
         );
-        
+
         if (!empty($_REQUEST['sterm'])){
             $pagination['add_args'] = array('sterm'=>urlencode(stripslashes($_REQUEST['sterm'])));
         }
 
         $page_links = paginate_links( $pagination );
-        
+
         return $page_links;
     }
 
@@ -195,23 +196,26 @@ class StatsController
     {
         $sterm_value = !empty($_REQUEST['sterm']) ? $_REQUEST['sterm'] : '';
 
-        switch ($status) {            
+        switch ($status) {
             case 'approved':
                 $status_filter = array(1);
+                $sort_order = "sumcnt desc";
                 break;
             case 'ban':
                 $status_filter = array(2);
+                $sort_order = "sumcnt desc";
                 break;
             case 'new':
             default:
                 $status_filter = array(0);
+                $sort_order = "date_added desc";
                 break;
         }
         $start = ( $page - 1 ) * $this->_keywords_per_page;
 
         $this->_sphinx->SetSelect ( "*, SUM(cnt) AS sumcnt" );
         $this->_sphinx->SetFilter('status', $status_filter);
-        $this->_sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "date_added desc" );
+        $this->_sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, $sort_order );
         $this->_sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');
         $this->_sphinx->SetLimits($start, $this->_keywords_per_page);
 
@@ -230,76 +234,11 @@ class StatsController
             order by FIELD(id, '.  implode(',', $ids).')';
 
         $keywords = $this->_wpdb->get_results($sql, OBJECT_K);
-        
+
         foreach($res['matches'] as $index => $match){
             $keywords[$index]->cnt = $match['attrs']['sumcnt'];
         }
         return $keywords;
     }
 
-    function _get_stat_keywords($page)
-    {
-        $period_param = !empty($_REQUEST['period']) ? intval($_REQUEST['period']) : 7;
-        switch (strtolower($period_param)) {
-
-            case '14':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-            case '30':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-            case '90':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-            case '180':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-            case '365':
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-            case '-1':
-                $sqlPeriod = '';
-                break;
-            case '7':
-            default:
-                $sqlPeriod = " and date_added > date_sub(now(), interval {$period_param} day) ";
-                break;
-        }
-
-        $sort_order = 'asc';
-        if(!empty($_REQUEST['sort_order']) && strtolower($_REQUEST['sort_order']) == 'desc'){
-            $sort_order = 'desc';
-        }
-
-        $sort_by_param = !empty($_REQUEST['sort_by']) ? $_REQUEST['sort_by'] : 'cnt';
-        switch (strtolower($sort_by_param)) {
-            case 'key':
-                $sort_by = 'keywords';
-                break;
-            case 'date':
-                $sort_by = 'date_added';
-                break;
-            case 'cnt':
-            default:
-                $sort_by = 'cnt';
-                break;
-        }
-        $start = ( $page - 1 ) * $this->_keywords_per_page;
-
-        $sql = 'select SQL_CALC_FOUND_ROWS id, keywords, keywords_full,
-                    max(date_added) as date_added, count(1) as cnt
-            from '.$this->_table_prefix.'sph_stats
-            where 1
-                '.$sqlPeriod.'
-            group by keywords
-            order by '.$sort_by.' '.$sort_order.'
-            limit '.$start.', '.$this->_keywords_per_page;
-        $keywords = $this->_wpdb->get_results($sql, OBJECT);
-
-        $this->view->keywords = $keywords;
-        $this->view->start = $start;
-        $this->view->period = $period_param;
-
-        return $keywords;
-    }
 }

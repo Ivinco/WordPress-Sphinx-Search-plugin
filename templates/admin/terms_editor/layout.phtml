@@ -1,0 +1,24 @@
+
+        <ul class="subsubsub">
+            <?php if($this->view->tab == 'new'):?>
+                <li class='all'><a href='?page=sphinxsearch.php&menu=terms_editor' class="current">New search terms</a> |</li>
+            <?php else:?>
+                <li class='all'><a href='?page=sphinxsearch.php&menu=terms_editor'>New search terms</a> |</li>
+            <?php endif; ?>
+            <?php if($this->view->tab == 'ban'):?>
+                <li class='moderated'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=ban' class="current">Banned search terms</a> |</li>
+            <?php else:?>
+                <li class='moderated'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=ban'>Banned search terms</a> |</li>
+            <?php endif; ?>
+            <?php if($this->view->tab == 'approved'):?>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved' class="current">Approved search terms</a> </li>
+            <?php else:?>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved'>Approved search terms</a> </li>
+            <?php endif; ?>
+        </ul>
+
+
+    <?php  echo $this->render('admin/terms_editor/index.phtml'); ?>
+    </div>
+</div>
+

@@ -1,9 +1,4 @@
-<div class="has-sidebar sm-padded" >
-    <div class="has-sidebar-content" id="post-body-content">
-    <h2 class="tabs" id="post-body-content-tabs">
-        <a href="?page=sphinxsearch.php" class="nav-tab nav-tab-active">Settings</a>
-        <a href="?page=sphinxsearch.php&menu=stats" class="nav-tab">Search terms</a>
-    </h2>
+
         
         <div class="meta-box-sortabless">
             <div class="postbox">
@@ -231,7 +226,7 @@
             </form>
 
             <div class="postbox">
-                <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
+                <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>&menu=wizard">
                 <input type="hidden" name="start_wizard" value="start" />
                 <h3 class="hndle">Configuration Wizard</h3>
                     <div class="inside">

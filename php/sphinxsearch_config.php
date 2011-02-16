@@ -49,6 +49,8 @@ class SphinxSearch_Config
 	 * Sphinx object
 	 */
 	var $sphinx;
+
+        var $_view = null;
 	
 	
 	function SphinxSearch_Config()
@@ -59,6 +61,8 @@ class SphinxSearch_Config
 		
 		//initialize sphinx object and set neccessary parameters
                 $this->init_sphinx();
+
+                $this->_view = new SphinxView();
 	}
 
         function init_sphinx()
@@ -67,6 +71,11 @@ class SphinxSearch_Config
             $this->sphinx->SetServer ( $this->admin_options['sphinx_host'], intval($this->admin_options['sphinx_port']) );
             $this->sphinx->SetMatchMode ( SPH_MATCH_EXTENDED2 );
             return $this->sphinx;
+        }
+
+        function get_view()
+        {
+            return $this->_view;
         }
 	
 	/**

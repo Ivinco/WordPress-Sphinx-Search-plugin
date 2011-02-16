@@ -37,7 +37,7 @@ class SphinxSearch_Backend {
 	{
 		$this->config = $config;
 
-                $this->sphinxView = new SphinxView();
+                $this->sphinxView = $config->get_view();
 	}
 	
       /**
@@ -55,13 +55,26 @@ class SphinxSearch_Backend {
             if (!empty($_POST['start_wizard']) ||
                     (empty($options['sphinx_conf']) &&
                         'false' == $options['wizard_done'])){
-                return $wizard->start_action();
+                $wizard->start_action();
             }
 
-            $stats = new StatsController($this->config);
+            
 
-            if (!empty($_GET['menu']) && 'stats' == $_GET['menu']){
-                return $stats->index_action();
+            if (!empty($_GET['menu'])){
+                switch($_GET['menu']){
+                    case 'terms_editor':
+                        $terms_editor = new TermsEditorController($this->config);
+                        $terms_editor->index_action();
+                        //return;
+                        break;
+                    case 'stats':
+                        $stats = new StatsController($this->config);
+                        $stats->index_action();
+                        //return;
+                        break;
+                }
+
+                
             }
 
             $sphinxService = new SphinxService($this->config);
@@ -106,7 +119,7 @@ class SphinxSearch_Backend {
                 This update will allow to use Sphinx Search for Top/Related and Latest search terms widgets!");
             }
 
-            $this->sphinxView->render('admin/settings_general.phtml');
+            $this->sphinxView->render('admin/layout.phtml');
 	}
 
      /**
