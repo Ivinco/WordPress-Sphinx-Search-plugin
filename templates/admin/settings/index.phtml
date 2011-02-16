@@ -35,6 +35,13 @@
                         <input type="submit" style="width:300px;" name="reindex_sphinx" class="button-primary"
                                value="Re-index WordPress index now" />
                     </p>
+                    <h4>Setup automatic re-index commands</h4>
+                    <p>
+                        Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:<br/>
+                        */5 * * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_delta.php<br/>
+                        5 0 * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_main.php<br/>
+                        */5 * * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_stats.php<br/>
+                        </p>
                 </div>
                 </form>
             </div>
