@@ -4,16 +4,19 @@
 
 <div class="tablenav">
 <div class="alignleft actions">
-<select name="action">
-<option value="-1" selected="selected">Bulk Actions</option>
-<option value="approve">Approve</option>
-<option value="ban">Ban</option>
-</select>
-<input type="submit" name="doaction" id="doaction" value="Apply" class="button-secondary apply" />
 
-<input type="text" name="sterm" value="<?php echo $this->view->sterm?>" size="30">
-<input type="submit" id="post-query-submit" value="Filter" class="button-secondary"
-       onClick="$('#apage').val('1')"/>
+<select name='period'>
+    <option <?php echo $this->view->period == 7 ? 'selected="selected"': ''?> value='7'>7 days</option>
+    <option <?php echo $this->view->period == 14 ? 'selected="selected"': ''?> value='14'>2 weeks</option>
+    <option <?php echo $this->view->period == 30 ? 'selected="selected"': ''?> value='30'>month</option>
+    <option <?php echo $this->view->period == 90 ? 'selected="selected"': ''?> value='90'>3 months</option>
+    <option <?php echo $this->view->period == 180 ? 'selected="selected"': ''?> value='180'>6 months</option>
+    <option <?php echo $this->view->period == 365 ? 'selected="selected"': ''?> value='365'>year</option>
+    <option <?php echo $this->view->period == -1 ? 'selected="selected"': ''?> value='-1'>Show all dates</option>
+</select>
+
+<input type="submit" id="post-query-submit" value="Filter" class="button-secondary" />
+
 
 </div>
 <br class="clear" />
@@ -25,40 +28,45 @@
 <table class="widefat comments fixed" cellspacing="0">
     <thead>
         <tr>
-            <th scope="col" id="cb" class="manage-column column-cb check-column" style=""><input type="checkbox" /></th>
             <th scope="col" id="keyword" class="manage-column column-name" style="">
-                Search term                
+                Search term
             </th>
             <th scope="col" id="action" class="manage-column column-date" style="">
-                Last search date                
+                Last search date
+                <a href="<?php echo $this->view->plugin_url?>&menu=stats&tab=<?php echo $this->view->tab?>&period=<?php echo $this->view->period?>&sort_by=date&sort_order=asc">
+                    <img src="<?php echo plugins_url('img/arrow_asc_small.gif', dirname(__FILE__)); ?>" />
+                </a>
+                <a href="<?php echo $this->view->plugin_url?>&menu=stats&tab=<?php echo $this->view->tab?>&period=<?php echo $this->view->period?>&sort_by=date&sort_order=desc">
+                    <img src="<?php echo plugins_url('img/arrow_desc_small.gif', dirname(__FILE__)); ?>" />
+                </a>
             </th>
             <th scope="col" id="action" class="manage-column column-posts num" style="">
                 Search count
+                <a href="<?php echo $this->view->plugin_url?>&menu=stats&tab=<?php echo $this->view->tab?>&period=<?php echo $this->view->period?>&sort_by=cnt&sort_order=asc">
+                    <img src="<?php echo plugins_url('img/arrow_asc_small.gif', dirname(__FILE__)); ?>" />
+                </a>
+                <a href="<?php echo $this->view->plugin_url?>&menu=stats&tab=<?php echo $this->view->tab?>&period=<?php echo $this->view->period?>&sort_by=cnt&sort_order=desc">
+                    <img src="<?php echo plugins_url('img/arrow_desc_small.gif', dirname(__FILE__)); ?>" />
+                </a>
             </th>
         </tr>
     </thead>
     <tfoot>
         <tr>
-            <th scope="col" class="manage-column column-cb check-column" style=""><input type="checkbox"/></th>
             <th scope="col" class="manage-column column-name" style="">Search term</th>
-            <th scope="col" id="action" class="manage-column column-date" style="">Last search date</th>
+            <th scope="col" id="action" class="manage-column column-date" style="">Last search</th>
             <th scope="col" class="manage-column column-posts num" style="">Search count</th>
         </tr>
     </tfoot>
 
     <tbody id="the-list" class="list:tags">
-    <?php
-        if (!empty($this->view->keywords)):
-            foreach($this->view->keywords as $keyword):?>
-                <tr id="tag-1" class="alternate">
-                    <th scope="row" class="check-column"><input type="checkbox" value="<?php echo urlencode($keyword->keywords)?>" name="keywords[]"/></th>
-                    <td class="name column-name"><?php echo $keyword->keywords?></td>
-                    <td class="name column-name"><?php echo $keyword->date_added?></td>
-                    <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
-                </tr>
-            <?php endforeach;
-        endif;
-       ?>
+    <?php foreach($this->view->keywords as $keyword):?>
+            <tr id="tag-1" class="alternate">
+                <td class="name column-name"><?php echo $keyword->keywords?></td>
+                <td class="name column-name"><?php echo $keyword->date_added?></td>
+                <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
+            </tr>
+        <?php endforeach; ?>
     </tbody>
 </table>
 
@@ -71,19 +79,9 @@
         '<span class="total-type-count">' . number_format_i18n( $this->view->total ) . '</span>',
         $this->view->page_links
 ); echo $page_links_text; ?></div>
-<input type="hidden" name="apage" id="apage" value="<?php echo esc_attr($this->view->page); ?>" />
+<input type="hidden" name="apage" value="<?php echo esc_attr($this->view->page); ?>" />
 <?php endif; ?>
 
-
-<div class="alignleft actions">
-<select name="action2">
-<option value="-1" selected="selected">Bulk Actions</option>
-<option value="approve">Approve</option>
-<option value="ban">Ban</option>
-</select>
-<input type="submit" name="doaction2" id="doaction" value="Apply" class="button-secondary apply" />
-
-</div>
 
 <br class="clear" />
 

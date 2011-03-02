@@ -9,12 +9,6 @@
         </ul>
 
 
-    <?php
-    if($this->view->tab == 'stats'){
-        echo $this->render('admin/stats/stats.phtml');
-    } else {
-        echo $this->render('admin/stats/index.phtml');
-    }
-    ?>
+    <?php echo $this->render('admin/stats/index.phtml'); ?>
     </div>
 </div>
