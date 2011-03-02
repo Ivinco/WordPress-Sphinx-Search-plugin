@@ -55,19 +55,19 @@ class TopSearchesWidget extends WP_Widget
             $limit = !empty($instance['search_limit']) ? $instance['search_limit'] : 10;
             if ( $search_show == 'show_related' ){
                 $title = $title_rel;
-                $words_html = $this->get_related($_GET['s'], $limit, $width, $break);
+                $words_html = $this->get_related($_GET['s'], $limit, $width, $break, $show_approved);
             }
             if (empty($words_html) || $search_show == 'show_top') {
                 $title = $title_top;
                 $words_html = $this->get_top($limit, $width, $break, $custom_terms_top, $show_approved, $period_limit);
             }
             $show_widget = true;
-        } else if ( is_single() && $posts_show != 'hide'){
+        } else if ( is_singular() && $posts_show != 'hide'){
             $limit = !empty($instance['posts_limit']) ? $instance['posts_limit'] : 10;
             if ( $posts_show == 'show_related' ){
                 $title = $title_rel;
                 $keywords = single_post_title( '', false );
-                $words_html = $this->get_related($keywords, $limit, $width, $break);
+                $words_html = $this->get_related($keywords, $limit, $width, $break, $show_approved);
             }
             if (empty($words_html) || $posts_show == 'show_top') {
                 $title = $title_top;
@@ -133,7 +133,7 @@ class TopSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('show_approved'); ?>"
                    type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
                  <label for="<?php echo $this->get_field_id('show_approved'); ?>">
-                    <?php _e('Show only approved keywords'); ?>
+                    <?php _e('Show only approved search terms'); ?>
                  </label>
             </p>
             <p><label for="<?php echo $this->get_field_id('period_limit'); ?>">
@@ -303,11 +303,11 @@ class TopSearchesWidget extends WP_Widget
         return $html;
     }
 
-    function get_related($keywords, $limit = 10, $width = 0, $break = '...')
+    function get_related($keywords, $limit = 10, $width = 0, $break = '...', $show_approved = false)
     {
         global $defaultObjectSphinxSearch;
 
-	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break);
+	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break, $show_approved);
         if (empty($result)){
             return false;
         }

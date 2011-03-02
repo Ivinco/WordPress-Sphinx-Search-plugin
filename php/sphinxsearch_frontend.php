@@ -787,13 +787,22 @@ class SphinxSearch_FrontEnd
 	return $results;
     }
 
-    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...')
+    function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...', $approved = false)
     {
         global $wpdb, $table_prefix;
 
         $sphinx = $this->config->init_sphinx();
+        $sphinx->SetMatchMode ( SPH_MATCH_ANY );
 
+        $keywords = $this->clear_keywords($keywords);
         $keywords = $this->unify_keywords($keywords);
+
+        if ($approved){
+            $status = array(1);
+        } else {
+            $status = array(1,0);
+        }
+        $sphinx->SetFilter('status', $status);
 
         $sphinx->SetLimits(0, $limit + 30);
         $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "@weight desc" );
@@ -940,7 +949,7 @@ class SphinxSearch_FrontEnd
 											'on top of' , 'with regard to' , 'in lieu of');
 		$coordinatingConjuctions = array('for', 'and', 'nor', 'but', 'or', 'yet', 'so', 'not');
 		
-		$articles = array('a', 'an', 'the');
+		$articles = array('a', 'an', 'the', 'is', 'as');
 		
 		$stopWords = array_merge($prepositions, $twoWordPrepositions);
 		$stopWords = array_merge($stopWords, $threeWordPrepositions);

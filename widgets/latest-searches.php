@@ -78,7 +78,7 @@ class LatestSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('show_approved'); ?>"
                    type="checkbox" value="true" <?php echo $show_approved == 'true' ? 'checked="checked"': ''; ?> />
                 <label for="<?php echo $this->get_field_id('show_approved'); ?>">
-                    <?php _e('Show only approved keywords:'); ?>
+                    <?php _e('Show only approved search terms:'); ?>
                 </label>
             </p>
             <p><label for="<?php echo $this->get_field_id('title'); ?>">
