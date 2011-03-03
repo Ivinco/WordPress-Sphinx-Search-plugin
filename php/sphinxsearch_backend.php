@@ -26,7 +26,12 @@ class SphinxSearch_Backend {
 	 * Config object
 	 */
 	var $config = '';
-	
+
+        /**
+         * View object
+         */
+        var $view = null;
+
 	/**
 	 * SphinxSearch_Backend Constructor
 	 *
@@ -37,7 +42,7 @@ class SphinxSearch_Backend {
 	{
 		$this->config = $config;
 
-                $this->sphinxView = $config->get_view();
+                $this->view = $config->get_view();
 
                 if ('terms_editor' == $_GET['menu'] && $_REQUEST['action'] == 'export'){
                     $terms_editor = new TermsEditorController($this->config);
@@ -60,6 +65,7 @@ class SphinxSearch_Backend {
             if (!empty($_POST['start_wizard']) ||
                     (empty($options['sphinx_conf']) &&
                         'false' == $options['wizard_done'])){
+                $this->view->menu = 'wizard';
                 $wizard->start_action();
             }
 
@@ -70,11 +76,13 @@ class SphinxSearch_Backend {
                     case 'terms_editor':
                         $terms_editor = new TermsEditorController($this->config);
                         $terms_editor->index_action();
+                        $this->view->menu = 'terms_editor';
                         //return;
                         break;
                     case 'stats':
                         $stats = new StatsController($this->config);
                         $stats->index_action();
+                        $this->view->menu = 'stats';
                         //return;
                         break;
                 }
@@ -105,30 +113,30 @@ class SphinxSearch_Backend {
             }
 
             
-            $this->sphinxView->assign('index_modify_time', $sphinxService->get_index_modify_time());
+            $this->view->assign('index_modify_time', $sphinxService->get_index_modify_time());
 
             if (!empty($error_message)){
-                $this->sphinxView->assign('error_message', $error_message);
+                $this->view->assign('error_message', $error_message);
             }
             if (!empty($success_message)){
-                $this->sphinxView->assign('success_message', $success_message);
+                $this->view->assign('success_message', $success_message);
             }
 		
             $devOptions = $this->config->get_admin_options(); //update options
-            $this->sphinxView->assign('devOptions', $devOptions);
+            $this->view->assign('devOptions', $devOptions);
             //load admin panel template
-            $this->sphinxView->assign('header', 'Sphinx Search for Wordpress');
+            $this->view->assign('header', 'Sphinx Search for Wordpress');
 
             if ('true' != $devOptions['check_stats_table_column_status']) {
                 global $table_prefix;
-                $this->sphinxView->assign('error_message',  "{$table_prefix}sph_stats table required an update.<br>
+                $this->view->assign('error_message',  "{$table_prefix}sph_stats table required an update.<br>
                 Please run the following command in MySQL client to update the table: <br>
                 alter table {$table_prefix}sph_stats add `status` tinyint(1) NOT NULL DEFAULT '0';
                 <br><br>
                 This update will allow to use Sphinx Search for Top/Related and Latest search terms widgets!");
             }
 
-            $this->sphinxView->render('admin/layout.phtml');
+            $this->view->render('admin/layout.phtml');
 	}
 
      /**

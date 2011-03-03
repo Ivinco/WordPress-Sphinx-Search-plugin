@@ -63,7 +63,7 @@
     <?php foreach($this->view->keywords as $keyword):?>
             <tr id="tag-1" class="alternate">
                 <td class="name column-name"><?php echo $keyword->keywords?></td>
-                <td class="name column-name"><?php echo date("Y-m-d H:i",strtotime($keyword->date_added))?></td>
+                <td class="name column-date"><?php echo date("Y-m-d H:i",strtotime($keyword->date_added))?></td>
                 <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
             </tr>
         <?php endforeach; ?>

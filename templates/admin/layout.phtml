@@ -29,8 +29,8 @@
     </h2>
         
 <?php
-$menu = !empty($_GET['menu'])?$_GET['menu'] : '';
-switch($menu){
+//$menu = !empty($_GET['menu'])?$_GET['menu'] : '';
+switch($this->view->menu){
     case 'terms_editor':
         echo $this->render('admin/terms_editor/layout.phtml');
         break;
