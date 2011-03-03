@@ -92,7 +92,7 @@ class SphinxSearch_Backend {
 
             $sphinxService = new SphinxService($this->config);
             $res = false;
-            $success_message = '';
+            $error_message = $success_message = '';
             if (!empty($_POST['reindex_sphinx'])){
                 $res = $sphinxService->reindex();
                 $success_message = 'Sphinx successfully reindexed.';
@@ -103,11 +103,14 @@ class SphinxSearch_Backend {
 		$res = $sphinxService->stop();
 		$success_message = 'Sphinx successfully stopped.';
             }elseif (isset($_POST['update_SphinxSearchSettings'])) {
-                $this->update_options();
-		$success_message = 'Settings updated.';
+                if (empty($_POST['sphinx_index'])){
+                    $error_message = 'Sphinx index name can not be empty!';
+                } else {
+                    $this->update_options();
+                    $success_message = 'Settings updated.';
+                }
             }
-            
-            $error_message = '';
+                        
             if (is_array($res)){
                 $error_message = $res['err'];
             }
