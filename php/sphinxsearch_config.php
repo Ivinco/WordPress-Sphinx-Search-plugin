@@ -125,8 +125,6 @@ class SphinxSearch_Config
 
                         'sphinx_cron_start' => 'false',
 
-                        'stats_with_sphinx' => 'false',
-
                         'check_stats_table_column_status' => 'false'
    			
    			);
