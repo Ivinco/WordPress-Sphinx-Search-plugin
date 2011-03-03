@@ -133,8 +133,10 @@ class StatsController
     function _get_stat_keywords($page, $period_param)
     {
         $start = ( $page - 1 ) * $this->_keywords_per_page;
-        
-        $this->_sphinx->SetFilterRange("date_added", strtotime("-{$period_param} days"), time());
+
+        if ($period_param > 0) {
+            $this->_sphinx->SetFilterRange("date_added", strtotime("-{$period_param} days"), time());
+        }
 
         $sort_order = 'asc';
         if(!empty($_REQUEST['sort_order']) && strtolower($_REQUEST['sort_order']) == 'desc'){
@@ -148,16 +150,15 @@ class StatsController
                 break;
             case 'cnt':
             default:
-                $sort_by = 'sumcnt';
+                $sort_by = '@count';
                 break;
         }
 
-        $this->_sphinx->SetSelect ( "*, SUM(cnt) AS sumcnt" );
         $this->_sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "$sort_by $sort_order" );
         if ('asc' == $sort_order){
-            $this->_sphinx->SetSortMode(SPH_SORT_ATTR_ASC, "$sort_by");
+            $this->_sphinx->SetSortMode(SPH_SORT_ATTR_ASC, "date_added");
         } else {
-            $this->_sphinx->SetSortMode(SPH_SORT_ATTR_DESC, "$sort_by");
+            $this->_sphinx->SetSortMode(SPH_SORT_ATTR_DESC, "date_added");
         }
         $this->_sphinx->SetLimits($start, $this->_keywords_per_page);
 
@@ -177,7 +178,7 @@ class StatsController
         $keywords = $this->_wpdb->get_results($sql, OBJECT_K);
         
         foreach($res['matches'] as $index => $match){
-            $keywords[$index]->cnt = $match['attrs']['sumcnt'];
+            $keywords[$index]->cnt = $match['attrs']['@count'];
         }
         return $keywords;
     }

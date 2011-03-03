@@ -250,21 +250,21 @@ class TermsEditorController
         switch ($status) {
             case 'approved':
                 $status_filter = array(1);
-                $sort_order = "sumcnt desc";
+                $sort_order = "@count desc";
                 break;
             case 'ban':
                 $status_filter = array(2);
-                $sort_order = "sumcnt desc";
+                $sort_order = "@count desc";
                 break;
             case 'new':
             default:
                 $status_filter = array(0);
                 $sort_order = "date_added desc";
+                
                 break;
         }
         $start = ( $page - 1 ) * $this->_keywords_per_page;
 
-        $this->_sphinx->SetSelect ( "*, SUM(cnt) AS sumcnt" );
         $this->_sphinx->SetFilter('status', $status_filter);
         $this->_sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, $sort_order );
         $this->_sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');
@@ -287,7 +287,7 @@ class TermsEditorController
         $keywords = $this->_wpdb->get_results($sql, OBJECT_K);
 
         foreach($res['matches'] as $index => $match){
-            $keywords[$index]->cnt = $match['attrs']['sumcnt'];
+            $keywords[$index]->cnt = $match['attrs']['@count'];
         }
         return $keywords;
     }
