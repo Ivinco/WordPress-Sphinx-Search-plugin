@@ -41,13 +41,17 @@ function ss_search_bar($is_sidebar = false)
         $search_comments = "checked='checked'";
     else $search_comments = '';
 		
-    $search_sortby_relevance = $search_sortby_date = '';
-    if (!empty($defaultObjectSphinxSearch->frontend->params['search_sortby']) &&
-        $defaultObjectSphinxSearch->frontend->params['search_sortby'] == 'date'
-			) 
+    $search_sortby_date_relevance = $search_sortby_relevance = $search_sortby_date = '';
+    if (!empty($defaultObjectSphinxSearch->frontend->params['search_sortby'])){
+        $ss_sort_by = $defaultObjectSphinxSearch->frontend->params['search_sortby'];
+    }
+    if ($ss_sort_by == 'date'){
 	$search_sortby_date = 'checked="true"';
-    else
-        $search_sortby_relevance = 'checked="false"';;
+    } else if ($ss_sort_by == 'date_relevance' ){
+	$search_sortby_date_relevance = 'checked="true"';		
+    } else {
+        $search_sortby_relevance = 'checked="true"';
+    }
 		
     if ($is_sidebar)
         require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/sphinx_search_bar.htm');

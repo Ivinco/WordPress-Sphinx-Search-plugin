@@ -147,6 +147,8 @@ class SphinxSearch_FrontEnd
 
 		if ( $this->params['search_sortby'] == 'date' ){ {
 			$sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');}
+		} else if ( $this->params['search_sortby'] == 'date_relevance' ){ 
+			$sphinx->SetSortMode(SPH_SORT_TIME_SEGMENTS, 'date_added');
 		} else {
 			$sphinx->SetSortMode(SPH_SORT_RELEVANCE);
 		}

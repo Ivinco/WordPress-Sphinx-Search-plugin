@@ -134,6 +134,8 @@ class SphinxSearch{
                 add_filter('the_content', array(&$this, 'the_content'));
                 add_filter('the_author', array(&$this, 'the_author'));
                 add_filter('the_time', array(&$this, 'the_time'));
+                add_action('wp_print_styles', array(&$this,'add_my_stylesheet'));
+
 
                // add_action('loop_start',  array(&$this, 'add_actions_filters'));
                 add_action('loop_end',  array(&$this, 'remove_actions_filters'));
@@ -170,6 +172,15 @@ class SphinxSearch{
             remove_filter( 'the_time', array(&$this, 'the_time') );
 
         }
+
+        function add_my_stylesheet()
+        {
+            $myStyleUrl = plugins_url('templates/sphinxsearch.css', __FILE__);
+            $myStyleFile = plugins_url('templates/sphinxsearch.css', __FILE__);
+            wp_register_style('sphinxStyleSheets', $myStyleUrl);
+            wp_enqueue_style( 'sphinxStyleSheets');
+        }
+
 	
 	/**
 	 * Replace post time to commen time
@@ -388,7 +399,7 @@ class SphinxSearch{
             $wizard = new WizardController($this->config);
             add_action('wp_ajax_'.$_POST['action'],
             array(&$wizard, $_POST['action'].'_action'));
-         }
+         }         
     }
 
     function load_widgets()
@@ -428,6 +439,17 @@ class SphinxSearch{
                 $options['check_stats_table_column_status'] = 'true';
                 $this->config->update_admin_options($options);
             }
+        }
+
+        if ('true' == $options['check_stats_table_column_status']){
+            //set up sphinx for stats in widgest or not
+            $wizard = new WizardController($this->config);
+            $config_file_name = $this->config->get_option('sphinx_conf');
+            $config_file_content = $wizard->_generate_config_file_content();
+            $wizard->_save_config($config_file_name, $config_file_content);
+
+            $sphinxService = new SphinxService($this->config);
+            $ret = $sphinxService->reindex('stats');
         }
     }
 }

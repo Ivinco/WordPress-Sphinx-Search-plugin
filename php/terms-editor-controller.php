@@ -69,11 +69,14 @@ class TermsEditorController
             $action = !empty($_POST['doaction']) ? $_POST['action'] : $_POST['action2'];
             switch($action){
                 case 'approve':
-                    $this->_approveKeywords($_POST['keywords']);
+                    $this->_approve_keywords($_POST['keywords']);
                     break;
                 case 'ban':
-                    print_r($_POST['keywords']);
-                    $this->_banKeywords($_POST['keywords']);
+                    $this->_ban_keywords($_POST['keywords']);
+                    break;
+                case 'import':
+                    $this->_import_keywords($_POST['import_keywords']);
+                    $this->view->success_message = 'Search terms added.';
                     break;
             }
 
@@ -106,7 +109,7 @@ class TermsEditorController
         $this->view->plugin_url = $this->_config->get_plugin_url();
     }
 
-    function _approveKeywords($keywords)
+    function _approve_keywords($keywords)
     {
         $sphinx = $this->_config->init_sphinx();
         foreach($keywords as $keyword){
@@ -135,7 +138,7 @@ class TermsEditorController
         }
     }
 
-    function _banKeywords($keywords)
+    function _ban_keywords($keywords)
     {
         $sphinx = $this->_config->init_sphinx();
         foreach($keywords as $keyword){
@@ -162,6 +165,54 @@ class TermsEditorController
            );
             $sphinx->ResetFilters();
         }
+    }
+
+    function _import_keywords($keywords)
+    {
+        $keywordsList = explode("\n", $keywords);
+
+        foreach($keywordsList as $keyword){
+            $keyword = trim($keyword);
+            $keyword = $this->_wpdb->escape($keyword);
+            $sql = "insert into ".$this->_table_prefix."sph_stats(keywords, date_added, keywords_full, status)
+                values('".$keyword."', NOW(), '".$keyword."', 1)";
+            $this->_wpdb->query($sql);
+        }
+    }
+
+    function _export_keywords()
+    {
+        $sqlType = '1';
+        switch($_POST['keywords_type']){
+            case 'new':
+                $sqlType = ' status = 0 ';
+                break;
+            case 'approved':
+                $sqlType = ' status = 1 ';
+                break;
+            case 'banned':
+                $sqlType = ' status = 2 ';
+                break;
+            case 'all':
+            default:
+                $sqlType = ' 1 ';
+                break;
+        }
+        $sql = "select keywords from ".$this->_table_prefix."sph_stats
+            where $sqlType group by keywords";
+        $keywords = $this->_wpdb->get_col($sql);
+
+        $keywordsCSV = array();
+        // We'll be outputting a PDF
+        header('Content-type: text/plain');
+
+        // It will be called downloaded.pdf
+        header('Content-Disposition: attachment; filename="keywords.txt"');
+
+        foreach($keywords as $keyword){
+            echo $keyword."\n";
+        }
+        exit;
     }
 
     function _build_pagination($page)

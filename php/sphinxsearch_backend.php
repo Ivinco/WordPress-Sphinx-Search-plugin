@@ -38,6 +38,11 @@ class SphinxSearch_Backend {
 		$this->config = $config;
 
                 $this->sphinxView = $config->get_view();
+
+                if ('terms_editor' == $_GET['menu'] && $_REQUEST['action'] == 'export'){
+                    $terms_editor = new TermsEditorController($this->config);
+                    $terms_editor->_export_keywords();
+                }
 	}
 	
       /**
@@ -102,8 +107,12 @@ class SphinxSearch_Backend {
             
             $this->sphinxView->assign('index_modify_time', $sphinxService->get_index_modify_time());
 
-            $this->sphinxView->assign('error_message', $error_message);
-            $this->sphinxView->assign('success_message', $success_message);
+            if (!empty($error_message)){
+                $this->sphinxView->assign('error_message', $error_message);
+            }
+            if (!empty($success_message)){
+                $this->sphinxView->assign('success_message', $success_message);
+            }
 		
             $devOptions = $this->config->get_admin_options(); //update options
             $this->sphinxView->assign('devOptions', $devOptions);
@@ -139,32 +148,7 @@ class SphinxSearch_Backend {
 		foreach(array('search_comments', 'search_posts', 'search_pages') as $option){
 			if (!empty($_POST[$option])) $devOptions[$option] = 'true';
 			else $devOptions[$option] = 'false';
-		}
-                
-                //use sphinx for stats in widgest or not
-                if (!empty($_POST['stats_with_sphinx']) && 
-                        $devOptions['stats_with_sphinx'] != 'true' &&
-                        'true' == $_POST['stats_with_sphinx']){
-                    $wizard = new WizardController($this->config);
-                    $config_file_name = $this->config->get_option('sphinx_conf');
-                    $config_file_content = $wizard->_generate_config_file_content();
-                    $wizard->_save_config($config_file_name, $config_file_content);
-                    
-                    $sphinxService = new SphinxService($this->config);
-                    $ret = $sphinxService->reindex('stats');
-                    
-                    if (!empty($ret['err'])){
-                        $this->sphinxView->assign('error_message', $ret['err']);
-                    } else {
-                        $devOptions['stats_with_sphinx'] = 'true';
-                    }
-                } 
-                
-                if (!empty($_POST['stats_with_sphinx']) &&
-                        $devOptions['stats_with_sphinx'] != 'false' &&
-                        $_POST['stats_with_sphinx'] == 'false')  {
-                    $devOptions['stats_with_sphinx'] = 'false';
-                }
+		}                
 
 		/**
 		 * sphinx_conf - path to sphinx conf file

@@ -251,6 +251,7 @@ class WizardController
 
     function indexing_action()
     {
+        $this->view->devOptions = $this->_config->get_admin_options();
         if (!empty($_POST['skip_wizard_indexsation'])){
             $this->view->success_message = 'Step was skipped.';
             return $this->_next_action('indexing');

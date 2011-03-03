@@ -3,6 +3,14 @@
     <h3 class="hndle">Sphinx data indexing</h3>
     <div class="inside">
 
+        <h4>Setup automatic re-index commands</h4>
+        <p>
+            Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:<br/>
+            */5 * * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_delta.php<br/>
+            5 0 * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_main.php<br/>
+            */5 * * * * /usr/bin/php <?php echo $this->view->devOptions['sphinx_path']?>/cron/cron_reindex_stats.php<br/>
+        </p>
+                        
         <form action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post" id="wizard_form">
                 <input type="hidden" name="process_indexing" value="1" />
                 <input type="hidden" name="action" value="indexing" />
