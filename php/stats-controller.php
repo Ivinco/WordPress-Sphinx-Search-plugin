@@ -138,19 +138,19 @@ class StatsController
             $this->_sphinx->SetFilterRange("date_added", strtotime("-{$period_param} days"), time());
         }
 
-        $sort_order = 'asc';
+        $sort_order = 'desc';
         if(!empty($_REQUEST['sort_order']) && strtolower($_REQUEST['sort_order']) == 'desc'){
-            $sort_order = 'desc';
+            $sort_order = 'asc';
         }
 
-        $sort_by_param = !empty($_REQUEST['sort_by']) ? $_REQUEST['sort_by'] : 'cnt';
+        $sort_by_param = !empty($_REQUEST['sort_by']) ? $_REQUEST['sort_by'] : 'date';
         switch (strtolower($sort_by_param)) {
-            case 'date':
-                $sort_by = 'date_added';
-                break;
             case 'cnt':
-            default:
                 $sort_by = '@count';
+                break;
+            case 'date':
+            default:
+                $sort_by = 'date_added';
                 break;
         }
 

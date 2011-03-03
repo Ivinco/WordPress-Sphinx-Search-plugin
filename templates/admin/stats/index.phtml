@@ -32,7 +32,7 @@
                 Search term
             </th>
             <th scope="col" id="action" class="manage-column column-date" style="">
-                Last search date
+                Last search
                 <a href="<?php echo $this->view->plugin_url?>&menu=stats&tab=<?php echo $this->view->tab?>&period=<?php echo $this->view->period?>&sort_by=date&sort_order=asc">
                     <img src="<?php echo plugins_url('img/arrow_asc_small.gif', dirname(__FILE__)); ?>" />
                 </a>
@@ -63,7 +63,7 @@
     <?php foreach($this->view->keywords as $keyword):?>
             <tr id="tag-1" class="alternate">
                 <td class="name column-name"><?php echo $keyword->keywords?></td>
-                <td class="name column-name"><?php echo $keyword->date_added?></td>
+                <td class="name column-name"><?php echo date("Y-m-d H:i",strtotime($keyword->date_added))?></td>
                 <td class="posts column-posts num"><?php echo $keyword->cnt?></td>
             </tr>
         <?php endforeach; ?>
