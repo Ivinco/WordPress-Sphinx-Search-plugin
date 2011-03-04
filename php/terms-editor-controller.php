@@ -76,7 +76,7 @@ class TermsEditorController
                     break;
                 case 'import':
                     $this->_import_keywords($_POST['import_keywords']);
-                    $this->view->success_message = 'Search terms added.';
+                    $this->view->success_message = 'Search terms added. New search terms will appear after next reindex of statistic index.';
                     break;
             }
 
