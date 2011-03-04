@@ -63,7 +63,7 @@ Website:
 = Requirements =
 
     * WordPress 2.0.2 or higher
-    * Sphinx Search 0.9.8 or higher
+    * Sphinx Search 0.9.9 or higher
     * Ability to install Sphinx if not installed
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
