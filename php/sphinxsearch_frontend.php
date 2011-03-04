@@ -146,11 +146,11 @@ class SphinxSearch_FrontEnd
 		
 
 		if ( $this->params['search_sortby'] == 'date' ){ {
-			$sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');}
-		} else if ( $this->params['search_sortby'] == 'date_relevance' ){ 
-			$sphinx->SetSortMode(SPH_SORT_TIME_SEGMENTS, 'date_added');
+                    $sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');}
+		} else if ( $this->params['search_sortby'] == 'relevance' ){
+                    $sphinx->SetSortMode(SPH_SORT_RELEVANCE);
 		} else {
-			$sphinx->SetSortMode(SPH_SORT_RELEVANCE);
+                    $sphinx->SetSortMode(SPH_SORT_TIME_SEGMENTS, 'date_added');
 		}
 
 		////////////

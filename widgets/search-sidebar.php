@@ -94,10 +94,10 @@ class SearchSidebarWidget extends WP_Widget
         }
         if ($ss_sort_by == 'date'){
             $search_sortby_date = 'checked="true"';
-        } else if ($ss_sort_by == 'date_relevance' ){
-            $search_sortby_date_relevance = 'checked="true"';
-        } else {
+        } else if ($ss_sort_by == 'relevance' ){
             $search_sortby_relevance = 'checked="true"';
+        } else {
+            $search_sortby_date_relevance = 'checked="true"';
         }
 
          require_once(SPHINXSEARCH_PLUGIN_DIR.'/templates/sphinx_search_bar.htm');
