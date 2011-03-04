@@ -139,7 +139,7 @@ class StatsController
         }
 
         $sort_order = 'desc';
-        if(!empty($_REQUEST['sort_order']) && strtolower($_REQUEST['sort_order']) == 'desc'){
+        if(!empty($_REQUEST['sort_order']) && strtolower($_REQUEST['sort_order']) == 'asc'){
             $sort_order = 'asc';
         }
 
