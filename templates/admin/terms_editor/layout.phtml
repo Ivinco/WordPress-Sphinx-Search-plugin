@@ -1,5 +1,5 @@
-
-        <ul class="subsubsub">
+<div style="width: 400px;">
+        <ul class="subsubsub" >
             <?php if($this->view->tab == 'new'):?>
                 <li class='all'><a href='?page=sphinxsearch.php&menu=terms_editor' class="current">New search terms</a> |</li>
             <?php else:?>
@@ -11,15 +11,16 @@
                 <li class='moderated'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=ban'>Banned search terms</a> |</li>
             <?php endif; ?>
             <?php if($this->view->tab == 'approved'):?>
-                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved' class="current">Approved search terms</a>  |</li>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved' class="current">Approved search terms</a>  </li>
             <?php else:?>
-                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved'>Approved search terms</a>  |</li>
+                <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=approved'>Approved search terms</a>  </li>
             <?php endif; ?>
+                <br/>
             <?php if($this->view->tab == 'import'):?>
                 <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=import' class="current">Import search terms</a>  |</li>
             <?php else:?>
                 <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=import'>Import search terms</a>  |</li>
-            <?php endif; ?>
+            <?php endif; ?>                
             <?php if($this->view->tab == 'export'):?>
                 <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=export' class="current">Export search terms</a>  |</li>
             <?php else:?>
@@ -31,7 +32,7 @@
                 <li class='approved'><a href='?page=sphinxsearch.php&menu=terms_editor&tab=blacklist'>Keyword Blacklist</a> </li>
             <?php endif; ?>
         </ul>
-
+</div>
 
     <?php  
     switch($this->view->tab){
