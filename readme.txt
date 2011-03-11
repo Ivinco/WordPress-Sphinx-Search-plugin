@@ -207,6 +207,7 @@ This release comes with the revamped UI for the plugin's WordPress wp-admin pane
 == Changelog ==
 
 = 3.0 =
+ * Added new sorting mode which sort by freshness and relevance
  * Added search terms management tool
  * Added custom search terms at the top of the Top/Related widget
  * New option "Show only approved search terms" in Top/Related and Latest widget
