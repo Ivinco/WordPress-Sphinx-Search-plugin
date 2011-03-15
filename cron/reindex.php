@@ -32,7 +32,7 @@ define('SPHINXSEARCH_PLUGIN_DIR', dirname(dirname(__FILE__)));
 define('SPHINXSEARCH_REINDEX_FILENAME', dirname(dirname(SPHINXSEARCH_PLUGIN_DIR)).'/uploads/need_reindex');
 
 if (count($argv) != 2 || !in_array($argv[1], array('delta', 'main'))){
-	echo " Reindexer of Sphinx index files, by Percona Ltd.
+	echo " Reindexer of Sphinx index files, by Ivinco LTD  (email : opensource@ivinco.com)
  Usage: php reindex.php [delta|main]
  Example: reindex.php delta
  It reindexes your delta index\n";
