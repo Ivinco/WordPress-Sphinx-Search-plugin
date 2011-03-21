@@ -44,9 +44,11 @@ class SphinxSearch_Backend {
 
                 $this->view = $config->get_view();
 
-                if ('terms_editor' == $_GET['menu'] && $_REQUEST['action'] == 'export'){
-                    $terms_editor = new TermsEditorController($this->config);
-                    $terms_editor->_export_keywords();
+                if (!empty($_GET['menu']) && !empty ($_REQUEST['action'])){
+                    if ('terms_editor' == $_GET['menu'] && $_REQUEST['action'] == 'export'){
+                        $terms_editor = new TermsEditorController($this->config);
+                        $terms_editor->_export_keywords();
+                    }
                 }
 	}
 	
@@ -85,6 +87,9 @@ class SphinxSearch_Backend {
                         $this->view->menu = 'stats';
                         //return;
                         break;
+                    case 'search_settings':
+                        $this->view->menu = 'search_settings';
+                        break;
                 }
 
                 
@@ -103,12 +108,8 @@ class SphinxSearch_Backend {
 		$res = $sphinxService->stop();
 		$success_message = 'Sphinx successfully stopped.';
             }elseif (isset($_POST['update_SphinxSearchSettings'])) {
-                if (empty($_POST['sphinx_index'])){
-                    $error_message = 'Sphinx index name can not be empty!';
-                } else {
-                    $this->update_options();
-                    $success_message = 'Settings updated.';
-                }
+                $this->update_options();
+                $success_message = 'Settings updated.';
             }
                         
             if (is_array($res)){
@@ -172,7 +173,7 @@ class SphinxSearch_Backend {
 		 * before_post - keyword before Post title
 		 */
 		foreach(array('sphinx_conf', 'sphinx_indexer', 'sphinx_searchd', 'sphinx_path',
-					  'sphinx_index', 'strip_tags', 'censor_words') as $option){
+					  'strip_tags', 'censor_words') as $option){
                     if (isset($_POST[$option])) $devOptions[$option] = trim($_POST[$option]);
 		}
 
@@ -194,7 +195,7 @@ class SphinxSearch_Backend {
 		 * excerpt_around - limit number of words in excerpt around the search keyword
 		 * sphinx_port - sphinx search connection port
 		 */
-		foreach(array('excerpt_limit', 'excerpt_around', 'sphinx_port') as $option){
+		foreach(array('excerpt_limit', 'excerpt_around') as $option){
 			if (isset($_POST[$option]))  $devOptions[$option] = $_POST[$option];
 		}
 

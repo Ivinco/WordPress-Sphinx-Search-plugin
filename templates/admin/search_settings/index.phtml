@@ -1,0 +1,121 @@
+
+
+        <div class="meta-box-sortabless">
+   
+            <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
+
+            <div class="postbox">
+                <h3 class="hndle">Search in</h3>
+                <div class="inside">
+                    <fieldset class="options">
+
+                    <table class="form-table" border="0">
+                    <tbody>
+                    <tr valign="top" >
+                        <th style="width:100px;"><label for="search_comments">Comments</label></th>
+                        <td>
+                        <input type="checkbox" id="search_comments" name="search_comments" value="true"
+                        <?php if ($this->view->devOptions['search_comments'] == "true")
+                        { _e('checked="checked"', "SphinxSearch"); }?>/>
+                        </td>
+                    </tr>
+                    <tr valign="top" >
+                        <th style="width:100px;"><label for="search_posts">Posts</label></th>
+                        <td>
+                            <input type="checkbox" id="search_posts" name="search_posts" value="true"
+                            <?php if ($this->view->devOptions['search_posts'] == "true")
+                                { _e('checked="checked"', "SphinxSearch"); }?>/>
+                        </td>
+                    </tr>
+                    <tr valign="top" >
+                        <th style="width:100px;"><label for="search_pages">Pages</label></th>
+                        <td><input type="checkbox" id="search_pages" name="search_pages" value="true"
+                            <?php if ($this->view->devOptions['search_pages'] == "true")
+                            { _e('checked="checked"', "SphinxSearch"); }?>/>
+                            </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    </fieldset>
+                    <p class="submit">
+                        <input type="submit" name="update_SphinxSearchSettings" class="button-primary"
+                        value="<?php _e('Update Settings', 'SphinxSearch') ?>" />
+                    </p>
+                </div>
+            </div>
+
+           <div class="postbox">
+                <h3 class="hndle">Keyword wrapper settings</h3>
+                <div class="inside">
+                    <fieldset class="options">
+                    <table class="form-table">
+                    <tbody>
+                    <tr valign="top" >
+                        <th scope="row">Before keyword in text</th>
+                        <td ><input type="text" id="excerpt_before_match" name="excerpt_before_match"
+                            value="<?php echo $this->view->devOptions['excerpt_before_match'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">After keyword in text</th>
+                        <td ><input type="text" id="excerpt_after_match" name="excerpt_after_match"
+                        value="<?php echo $this->view->devOptions['excerpt_after_match'];?>" /> </td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Before keyword in title</th>
+                        <td ><input type="text" id="excerpt_before_match_title" name="excerpt_before_match_title"
+                        value="<?php echo $this->view->devOptions['excerpt_before_match_title'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">After keyword in title</th>
+                        <td ><input type="text" id="excerpt_after_match_title" name="excerpt_after_match_title"
+                            value="<?php echo $this->view->devOptions['excerpt_after_match_title'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Snippet separator</th>
+                        <td ><input type="text" id="excerpt_chunk_separator" name="excerpt_chunk_separator"
+                            value="<?php echo $this->view->devOptions['excerpt_chunk_separator'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Snippet max length</th>
+                        <td ><input type="text" id="excerpt_limit" name="excerpt_limit" size="4"
+                            value="<?php echo $this->view->devOptions['excerpt_limit'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Maximum number of words around keyword</th>
+                        <td ><input type="text" id="excerpt_around" name="excerpt_around" size="4"
+                            value="<?php echo $this->view->devOptions['excerpt_around'];?>" /> </td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Prefix before Comment title</th>
+                        <td ><input type="text" id="before_comment" name="before_comment"
+                            value="<?php echo $this->view->devOptions['before_comment'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Prefix before Page title</th>
+                        <td ><input type="text" id="before_page" name="before_page"
+                            value="<?php echo $this->view->devOptions['before_page'];?>" /> </td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">Prefix before Post title</th>
+                        <td ><input type="text" id="before_post" name="before_post"
+                            value="<?php echo $this->view->devOptions['before_post'];?>" /></td>
+                    </tr>
+                    <tr valign="top" >
+                        <th scope="row">List of phrases to cut from search results (one phrase per line)</th>
+                        <td><textarea id="strip_tags" name="strip_tags" rows="10"
+                                      cols="25"><?php echo $this->view->devOptions['strip_tags'];?></textarea></td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    </fieldset>
+                    <p class="submit">
+                        <input type="submit" name="update_SphinxSearchSettings" class="button-primary"
+                            value="<?php _e('Update Settings', 'SphinxSearch') ?>" />
+                    </p>
+                </div>
+           </div>
+            </form>
+
+        </div>
+    </div>
+</div>

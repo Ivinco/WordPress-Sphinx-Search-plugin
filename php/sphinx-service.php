@@ -124,6 +124,9 @@ class SphinxService
       */
      function get_main_index_path($sphinx_conf)
      {
+         if (!file_exists($sphinx_conf)){
+             return '';
+         }
      	$content = file_get_contents($sphinx_conf);
         $sphinx_index_path = '';
      	if (preg_match("#\bpath\s+=\s+(.*)\b#", $content, $m))

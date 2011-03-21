@@ -63,6 +63,7 @@ class SphinxSearch_FrontEnd
 	 * IS searchd running
 	 */
 	var $is_searchd_up = true;
+        
 	var $top_ten_is_related = false;
 	
 	/**

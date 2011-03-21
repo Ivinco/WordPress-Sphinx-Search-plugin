@@ -23,8 +23,9 @@
 <div class="has-sidebar sm-padded" >
     <div class="has-sidebar-content" id="post-body-content">
     <h2 class="tabs" id="post-body-content-tabs">
-        <a href="?page=sphinxsearch.php" class="nav-tab <?php echo empty($_GET['menu']) || $_GET['menu'] == 'wizard'?'nav-tab-active':''?>">Settings</a>
-        <a href="?page=sphinxsearch.php&menu=terms_editor" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu']=='terms_editor'?'nav-tab-active':''?>">Search management tools</a>
+        <a href="?page=sphinxsearch.php" class="nav-tab <?php echo empty($_GET['menu']) || $_GET['menu'] == 'wizard'?'nav-tab-active':''?>">Control panel</a>
+        <a href="?page=sphinxsearch.php&menu=search_settings" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu'] == 'search_settings'?'nav-tab-active':''?>">Search settings</a>
+        <a href="?page=sphinxsearch.php&menu=terms_editor" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu']=='terms_editor'?'nav-tab-active':''?>">Search terms</a>
         <a href="?page=sphinxsearch.php&menu=stats" class="nav-tab <?php echo !empty($_GET['menu']) && $_GET['menu']=='stats'?'nav-tab-active':''?>">Statistics</a>
     </h2>
         
@@ -33,6 +34,9 @@
 switch($this->view->menu){
     case 'terms_editor':
         echo $this->render('admin/terms_editor/layout.phtml');
+        break;
+    case 'search_settings':
+        echo $this->render('admin/search_settings/index.phtml');
         break;
     case 'stats':
         echo $this->render('admin/stats/layout.phtml');

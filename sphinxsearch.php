@@ -455,7 +455,6 @@ class SphinxSearch{
 }
 
 register_activation_hook(__FILE__,'sphinx_plugin_activation');
-
 /**
 * Install table structure
 *

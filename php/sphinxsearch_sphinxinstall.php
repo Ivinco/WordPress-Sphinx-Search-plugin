@@ -409,6 +409,8 @@ class SphinxSearch_Install
      function setup_sphinx_counter_tables()
      {
          global $table_prefix, $wpdb;
+
+         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
          //////////////////
 	//Create sph_counter
 	//table
@@ -419,10 +421,9 @@ class SphinxSearch_Install
                max_doc_id int(11) NOT NULL,
                PRIMARY KEY  (counter_id)
              );";
-	$res = $wpdb->query($sql);
-	if (false === $res){
-            return array('err' => "Can\'t create table {$table_prefix}sph_counter .<br/>"."Command: ".$wpdb->last_query );
-	}
+
+        dbDelta($sql);
+	
 	//////////////////
 	//Create sph_stats
 	//table
@@ -437,10 +438,7 @@ class SphinxSearch_Install
 				KEY `keywords` (`keywords`),
 				FULLTEXT `ft_keywords` (`keywords`)
 				) ENGINE=MyISAM;";
-	$res = $wpdb->query($sql);
-	if (false === $res){
-            return array('err' => "Can\'t create table {$table_prefix}sph_stats .<br/>"."Command: ".$wpdb->last_query );
-	}
+	dbDelta($sql);
         return true;
      }
 }

@@ -30,6 +30,10 @@
     width: 99.5%;
 }
 
+fieldset.options {
+    margin-left: 8px;
+}
+
 a.sm_button {
     background-position: 5px 50%;
     background-repeat: no-repeat;
@@ -57,6 +61,7 @@ h2#post-body-content-tabs{
     border-bottom: 1px solid #CCCCCC;
     padding-bottom: 0;
     margin-top: 1px;
+    min-width: 600px;
 }
 
 #comments-form {

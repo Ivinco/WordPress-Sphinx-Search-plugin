@@ -7,7 +7,7 @@
                         <input type="hidden" name="action" value="connection" />
                         <table class="form-table">
                             <tr>
-                                <th scope="row"><label for="sphinx_host">Host name</label></th>
+                                <th scope="row"><label for="sphinx_host">Host name or IP address</label></th>
                                 <td>
                                     <input type="text" name="sphinx_host" id="sphinx_host"
                                      value="<?php echo $this->view->sphinx_host?>" />
@@ -21,7 +21,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row"><label for="sphinx_index">Index prefix</label></th>
+                                <th scope="row"><label for="sphinx_index">Index name</label></th>
                                 <td>
                                     <input type="text" name="sphinx_index" id="sphinx_index"
                                            value="<?php echo $this->view->sphinx_index?>" />
