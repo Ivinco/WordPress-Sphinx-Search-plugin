@@ -5,14 +5,14 @@
             <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
 
             <div class="postbox">
-                <h3 class="hndle">Search in</h3>
+                <h3 class="hndle">Select what to include in the search:</h3>
                 <div class="inside">
                     <fieldset class="options">
 
                     <table class="form-table" border="0">
                     <tbody>
                     <tr valign="top" >
-                        <th style="width:100px;"><label for="search_comments">Comments</label></th>
+                        <th ><label for="search_comments">Comment content</label></th>
                         <td>
                         <input type="checkbox" id="search_comments" name="search_comments" value="true"
                         <?php if ($this->view->devOptions['search_comments'] == "true")
@@ -20,7 +20,7 @@
                         </td>
                     </tr>
                     <tr valign="top" >
-                        <th style="width:100px;"><label for="search_posts">Posts</label></th>
+                        <th ><label for="search_posts">Post content</label></th>
                         <td>
                             <input type="checkbox" id="search_posts" name="search_posts" value="true"
                             <?php if ($this->view->devOptions['search_posts'] == "true")
@@ -28,7 +28,7 @@
                         </td>
                     </tr>
                     <tr valign="top" >
-                        <th style="width:100px;"><label for="search_pages">Pages</label></th>
+                        <th ><label for="search_pages">Page content</label></th>
                         <td><input type="checkbox" id="search_pages" name="search_pages" value="true"
                             <?php if ($this->view->devOptions['search_pages'] == "true")
                             { _e('checked="checked"', "SphinxSearch"); }?>/>
@@ -45,7 +45,7 @@
             </div>
 
            <div class="postbox">
-                <h3 class="hndle">Keyword wrapper settings</h3>
+                <h3 class="hndle">Keyword highlighting settings</h3>
                 <div class="inside">
                     <fieldset class="options">
                     <table class="form-table">
@@ -70,6 +70,17 @@
                         <td ><input type="text" id="excerpt_after_match_title" name="excerpt_after_match_title"
                             value="<?php echo $this->view->devOptions['excerpt_after_match_title'];?>" /></td>
                     </tr>
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+
+           <div class="postbox">
+                <h3 class="hndle">Snippet settings</h3>
+                <div class="inside">
+                    <fieldset class="options">
+                    <table class="form-table">
+                    <tbody>
                     <tr valign="top" >
                         <th scope="row">Snippet separator</th>
                         <td ><input type="text" id="excerpt_chunk_separator" name="excerpt_chunk_separator"
@@ -85,6 +96,18 @@
                         <td ><input type="text" id="excerpt_around" name="excerpt_around" size="4"
                             value="<?php echo $this->view->devOptions['excerpt_around'];?>" /> </td>
                     </tr>
+
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+
+           <div class="postbox">
+                <h3 class="hndle">Search results settings</h3>
+                <div class="inside">
+                    <fieldset class="options">
+                    <table class="form-table">
+                    <tbody>
                     <tr valign="top" >
                         <th scope="row">Prefix before Comment title</th>
                         <td ><input type="text" id="before_comment" name="before_comment"
@@ -101,7 +124,7 @@
                             value="<?php echo $this->view->devOptions['before_post'];?>" /></td>
                     </tr>
                     <tr valign="top" >
-                        <th scope="row">List of phrases to cut from search results (one phrase per line)</th>
+                        <th scope="row">Phrase filter (list of phrases to exclude from posts content)</th>
                         <td><textarea id="strip_tags" name="strip_tags" rows="10"
                                       cols="25"><?php echo $this->view->devOptions['strip_tags'];?></textarea></td>
                     </tr>
