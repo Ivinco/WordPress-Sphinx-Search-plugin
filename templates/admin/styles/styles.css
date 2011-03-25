@@ -61,9 +61,12 @@ h2#post-body-content-tabs{
     border-bottom: 1px solid #CCCCCC;
     padding-bottom: 0;
     margin-top: 1px;
-    min-width: 600px;
 }
 
 #comments-form {
     float: left; width: 100%;
+}
+
+body.wp-admin {
+ min-width: 1250px;
 }
