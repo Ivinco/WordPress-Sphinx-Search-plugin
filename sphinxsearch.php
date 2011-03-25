@@ -109,7 +109,6 @@ class SphinxSearch{
 	 */
 	function SphinxSearch()
 	{
-
 		$this->config = new SphinxSearch_Config();
                 $this->sphinxService = new SphinxService($this->config);
 		$this->backend = new SphinxSearch_BackEnd($this->config);		

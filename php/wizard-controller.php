@@ -192,21 +192,51 @@ class WizardController
                 $error_message = 'Path '.$sphinx_install_path.' does not exist!';
             } else if (!is_writable($sphinx_install_path)){
                 $error_message = 'Path '.$sphinx_install_path.' is not writeable!';
-            } else {
-                $this->_setup_sphinx_path();
-                $config_file_name = $this->_generate_config_file_name();
-                $config_file_content = $this->_generate_config_file_content();
-                $this->_save_config($config_file_name, $config_file_content);
+            } 
 
+            if (empty($error_message)){
                 if (!file_exists($sphinx_install_path.'/var')){
                     mkdir($sphinx_install_path.'/var');
                 }
+                if (!file_exists($sphinx_install_path.'/var')){
+                    $error_message = 'Path '.$sphinx_install_path.'/var does not exist!';
+                }
+
                 if (!file_exists($sphinx_install_path.'/var/data')){
                     mkdir($sphinx_install_path.'/var/data');
                 }
+                if (!file_exists($sphinx_install_path.'/var/data')){
+                    $error_message .= '<br/>Path '.$sphinx_install_path.'/var/data does not exist!';
+                }
+
                 if (!file_exists($sphinx_install_path.'/var/log')){
                     mkdir($sphinx_install_path.'/var/log');
                 }
+
+                if (!file_exists($sphinx_install_path.'/var/log')){
+                    $error_message .= '<br/>Path '.$sphinx_install_path.'/var/log does not exist!';
+                }
+            }
+
+            if (empty($error_message)) {
+                $this->_setup_sphinx_path();
+                $config_file_name = $this->_generate_config_file_name();
+                if (empty($config_file_name)){
+                    $error_message = 'Path '.$sphinx_install_path.' is not writeable!';
+                }
+            }
+
+            if (empty($error_message)) {
+                $config_file_content = $this->_generate_config_file_content();
+                $res = $this->_save_config($config_file_name, $config_file_content);
+
+                if (false == $res){
+                    $error_message = 'Path '.$sphinx_install_path.'/sphinx.conf is not writeable!';
+                }
+            }
+            
+            if (empty($error_message)) {
+                
                 //setup cronjob files
                 $sphinx_install = new SphinxSearch_Install($this->_config);
                 $sphinx_install->setup_cron_job();
@@ -304,6 +334,9 @@ class WizardController
      {
          $options = $this->_config->get_admin_options();
          $filename = $options['sphinx_path'].'/sphinx.conf';
+         if (!is_writable($filename)){
+             return false;
+         }
          file_put_contents($filename, '');
          $options['sphinx_conf'] = $filename;
          $this->_config->update_admin_options($options);
@@ -330,7 +363,11 @@ class WizardController
       */
      function _save_config($filename, $content)
      {
+         if (!is_writable($filename)){
+             return false;
+         }
          file_put_contents($filename, $content);
+         return true;
      }
 
      /**

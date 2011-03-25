@@ -94,7 +94,7 @@ class SphinxSearch_FrontEnd
 		//initialize config
 		$this->config = $config;
 
-		if (get_magic_quotes_gpc()) {
+		if (is_search() && get_magic_quotes_gpc()) {
 		    $_GET['s'] = stripslashes($_GET['s']); 
 		}
 		

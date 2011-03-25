@@ -108,6 +108,9 @@ class SphinxService
       */
      function get_searchd_pid_filename($sphinx_conf)
      {
+         if (!file_exists($sphinx_conf) || !is_readable($sphinx_conf)){
+             return false;
+         }
      	$content = file_get_contents($sphinx_conf);
      	if (preg_match("#\bpid_file\s+=\s+(.*)\b#", $content, $m))
      	{
@@ -124,7 +127,7 @@ class SphinxService
       */
      function get_main_index_path($sphinx_conf)
      {
-         if (!file_exists($sphinx_conf)){
+         if (!file_exists($sphinx_conf)  || !is_readable($sphinx_conf)){
              return '';
          }
      	$content = file_get_contents($sphinx_conf);
