@@ -60,7 +60,11 @@ table.form-table {
 h2#post-body-content-tabs{
     border-bottom: 1px solid #CCCCCC;
     padding-bottom: 0;
-    margin-top: 1px;
+    margin-top: 1px;    
+}
+
+h2 .nav-tab {
+    font: italic 14px/20px Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 }
 
 #comments-form {

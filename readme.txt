@@ -169,7 +169,6 @@ CREATE TABLE `wp_sph_stats` (
 	`keywords_full` varchar(255) NOT NULL default '',
         `status` tinyint(1) NOT NULL DEFAULT '0',
 	PRIMARY KEY  (`id`),
-        FULLTEXT `ft_keywords` (`keywords`),
 	KEY `keywords` (`keywords`)
 ) ENGINE=MyISAM;
 
