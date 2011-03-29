@@ -23,12 +23,12 @@ Key Features
 
  * Sort search results by Relevance, Freshness or in both modes
  * Related searches widget is a great SEO tool for finding related search terms
- * Top searches widget is another SEO tool which display Top search terms when no related search terms found
- * Latest searches widget is a SEO tool which are used to display latest search terms of what are people are searing for right now
- * Widget settings have plenty of options for controlling widget behavior and quality of widget content
+ * Top searches widget is another SEO tool which displays top search terms when no related search terms found
+ * Latest searches widget is a SEO tool which is used to display latest search terms of those people are doing right now
+ * Widget settings have plenty of options to control widget behavior and quality of widget content
  * Search through posts, pages and comments content
  * Search Management Tools is a set of tools for managing search terms
- * Search Statistics Tool is an analytic tool which can help your to analyze search trends of your blog
+ * Search Statistics Tool is an analytic tool which can help you analyze search trends of your blog
 
 Support
 
@@ -65,7 +65,7 @@ Setup scheduled jobs to re-index your website data periodically
 To setup periodical re-indexing, you should run Wizard to create special schedule files.
 The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/.
 When wizard finishes, edit your Crontab file.
-Use “crontab -e” command in the Linux terminal and add the following lines to your crontab:
+Use “crontab -e” command in Linux terminal and add the following lines to your crontab:
 #WordPress Delta index update
 #Following cron job update delta index every 5 minutes:
 */5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_delta.php
@@ -139,8 +139,8 @@ Or use run this command manually in terminal:
 1. You can search by Relevance, Freshness or in both modes
 2. Related searches widget is a great SEO tool for finding related search terms
 3. Search Management Tools is a set of tools for managing search terms
-4. Search Statistics Tool is an analytic tool which can help your to analyze search trends of your blog
-5. Widget settings have plenty of options for controlling widget behavior and quality of widget content
+4. Search Statistics Tool is an analytic tool which can help you analyze search trends of your blog
+5. Widget settings have plenty of options to control widget behavior and quality of widget content
 
 == Arbitrary section ==
 
@@ -172,7 +172,7 @@ CREATE TABLE `wp_sph_stats` (
 	KEY `keywords` (`keywords`)
 ) ENGINE=MyISAM;
 
-If your WordPress installation's table prefix is not "wp_", substitute
+If your WordPress installation's table prefix is not "wp_", substitute it with
 the correct value.
 
 = Start Sphinx Search at boot =
