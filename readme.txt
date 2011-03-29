@@ -184,18 +184,37 @@ the correct value.
 
 == Upgrade Notice ==
 
+= 3.0 =
+ This release comes with big improvements in performance of Top/Related and Latest widgets.
+ We replaced MySQL FullText engine with Sphinx Search engine in all components (widgets, search management tool and statitics report).
+ We added new search mode "Freshness & Relevance" which works perfect for blogs and news sites.
+
+Technically this update will:
+ * Upgrade wp_sph_stats table: add new field `status`.
+ * Add new Sphinx index 'stats' to sphinx.conf.
+
+You should do manually:
+ * schedule new process to reindex stats index periodically. You can see new command at the plugin Admin page.
+
+
 = 2.0 =
 This release comes with the revamped UI for the plugin's WordPress wp-admin panel, including new Configuration Wizard to help you install the Sphinx Search Server. Besides we've implemented sidebar widgets for displaying top/related and latest search terms and the extended search form, added search term highlighting for search results, and implemented numerous fixes to make this plugin work better and easier to setup.
 
 == Changelog ==
 
 = 3.0 =
- * Added new sorting mode which sort by freshness and relevance
- * Added search terms management tool
- * Added custom search terms at the top of the Top/Related widget
- * New option "Show only approved search terms" in Top/Related and Latest widget
- * New option "Show search terms by period of time for last: days, weeks or months" in Top/Related and Latest widget
- * Run php in quite mode in sphinx.conf to prevent display of HTTP headers
+ * Added search management tool
+ * Added search statistics/analytic report
+ * Added new search mode "Freshness & Relevance"
+ * Reworked Admin user interface, made it more simple and clear.
+ * Added ability to add custom search terms to the top of the Top/Related widget
+ * New option "Show only approved search terms" in Top/Related and Latest widgets
+ * New option "Show top Searches for last: day, week, months..." in Top/Related widget
+ * Added option to run php in quiet mode in sphinx.conf to prevent displaying HTTP headers
+ * Replaced MySQL FullText engine with Sphinx Search in Top/Related and Latest widgets
+ * Built search management tool and statistics tool over Sphinx Search
+ * Added custom css styles file (templates/style.css) for search forms
+
 
 = 2.1 =
  * Added more settings to Top/Related widget.
