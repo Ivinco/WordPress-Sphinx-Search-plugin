@@ -334,9 +334,6 @@ class WizardController
      {
          $options = $this->_config->get_admin_options();
          $filename = $options['sphinx_path'].'/sphinx.conf';
-         if (!is_writable($filename)){
-             return false;
-         }
          file_put_contents($filename, '');
          $options['sphinx_conf'] = $filename;
          $this->_config->update_admin_options($options);
