@@ -9,8 +9,6 @@ License: GPLv2
 
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
 
-Visit a [tutorial](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "page") page for the key features information.
-
 == Description ==
 
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites. It is especially useful if your WordPress site becomes very large.
@@ -38,8 +36,11 @@ See release notes, report bugs and feature wishes on Launchpad: https://bugs.lau
 E-mail:
 opensource@ivinco.com
 
-Website:
-[Ivinco](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Ivinco WordPress Sphinx Search plugin")
+Websites:
+
+[WordPress Sphinx Search tutorial](http://www.ivinco.com/software/wordpress-sphinx-search-tutorial "Ivinco WordPress Sphinx Search tutorial")
+
+[WordPress Sphinx Search documentation](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Ivinco WordPress Sphinx Search documentation")
 
 == Installation ==
 
@@ -47,7 +48,6 @@ Website:
 
     * WordPress 2.0.2 or higher
     * Sphinx Search 0.9.9 or higher
-    * Ability to install Sphinx if not installed
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
 = Installation guide =
@@ -61,7 +61,6 @@ Website:
    4. Open Sphinx Search settings page and follow Wizard steps to setup Sphinx Search Server first time
 
 = Setup scheduled jobs to re-index your website data periodically =
-Setup scheduled jobs to re-index your website data periodically
 To setup periodical re-indexing, you should run Wizard to create special schedule files.
 The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/.
 When wizard finishes, edit your Crontab file.
@@ -186,19 +185,8 @@ the correct value.
 
 = 3.0 =
  This release comes with big improvements in performance of Top/Related and Latest widgets.
- We replaced MySQL FullText engine with Sphinx Search engine in all components (widgets, search management tool and statitics report).
+ We replaced MySQL FullText engine with Sphinx Search engine in all components.
  We added new search mode "Freshness & Relevance" which works perfect for blogs and news sites.
-
-Technically this update will:
- * Upgrade wp_sph_stats table: add new field `status`.
- * Add new Sphinx index 'stats' to sphinx.conf.
-
-You should do manually:
- * schedule new process to reindex stats index periodically. You can see new command at the plugin Admin page.
-
-
-= 2.0 =
-This release comes with the revamped UI for the plugin's WordPress wp-admin panel, including new Configuration Wizard to help you install the Sphinx Search Server. Besides we've implemented sidebar widgets for displaying top/related and latest search terms and the extended search form, added search term highlighting for search results, and implemented numerous fixes to make this plugin work better and easier to setup.
 
 == Changelog ==
 
