@@ -97,6 +97,15 @@ class SphinxService
              if ( file_exists("/proc/$pid") ){
                  return true;
              }             
+         } else {
+             $pid = $this->get_searchd_pid_filename($this->_config->get_option('sphinx_conf'));
+             $pid = trim($pid);
+             if (!$pid){
+                 return false;
+             }
+             if ( file_exists("/proc/$pid") ){
+                 return true;
+             }
          }
          return false;
      }

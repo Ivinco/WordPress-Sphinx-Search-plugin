@@ -30,7 +30,8 @@ Key Features
 
 Support
 
-This plugin is developed by [Ivinco](http://www.ivinco.com/ "Ivinco"). If you need commercial support, or if you’d like WordPress Sphinx Search Plugin customized for your needs, we can help. Visit [plugin website](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "plugin website") for the latest news.
+This plugin is developed by [Ivinco](http://www.ivinco.com/ "Ivinco"). If you need commercial support, or if you’d like WordPress Sphinx Search Plugin
+customized for your needs, we can help. Visit [plugin website](http://www.ivinco.com/software/wordpress-sphinx-search/ "plugin website") for the latest news.
 See release notes, report bugs and feature wishes on Launchpad: https://bugs.launchpad.net/wp-sphinx-plugin
 
 E-mail:
@@ -38,9 +39,9 @@ opensource@ivinco.com
 
 Websites:
 
-[WordPress Sphinx Search tutorial](http://www.ivinco.com/software/wordpress-sphinx-search-tutorial "Ivinco WordPress Sphinx Search tutorial")
+[WordPress Sphinx Search plugin website](http://www.ivinco.com/software/wordpress-sphinx-search/ "Ivinco WordPress Sphinx Search Home")
 
-[WordPress Sphinx Search documentation](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/ "Ivinco WordPress Sphinx Search documentation")
+[WordPress Sphinx Search tutorial](http://www.ivinco.com/software/wordpress-sphinx-search-tutorial/ "Ivinco WordPress Sphinx Search Tutorial")
 
 == Installation ==
 
@@ -51,7 +52,7 @@ Websites:
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
 = Installation guide =
-[Online step-by-step installation guide](http://www.ivinco.com/software/wordpress-sphinx-search-plugin/#installation "Step-by-step installation guide")
+[Online step-by-step installation guide](http://www.ivinco.com/software/wordpress-sphinx-search-tutorial/#installation "Step-by-step installation guide")
 
 = Install the plugin =
 
