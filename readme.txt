@@ -132,6 +132,7 @@ A: You are using CGI version of php, by default it shows a http header like "X-P
 To prevent this, PHP needs to be invoked with the '-q' option for 'quiet'. Open sphinx.conf in editor and change first line to:
 #!/usr/bin/php -q
 
+
 Q: I got WARNING: index 'wp_main': preload: failed to open /path/to/indexes/wp_main.sph No such file or directory; NOT SERVING
 
 A: That means you have no indexes to serve. You need to build them. You may do it via wp-admin or manually:
