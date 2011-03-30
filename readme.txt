@@ -105,16 +105,21 @@ Use “Sphinx Latest Searches” widget or add it as template tag:
 == Frequently Asked Questions ==
 
 Q: What is Sphinx Search Server?
+
 A: Sphinx is a full-text search engine which provides fast and relevant full-text search functionality. Read more on Sphinx website http://sphinxsearch.com
 
 Q: How to install Sphinx Search manually?
+
 A: To manually install Sphinx use the official Sphinx Search documentation.
 
 Q: How to update the search index?
+
 A: The best option to update search index is to setup cron job task for it. Also you may manually update search indexes through WordPress Sphinx Search administrative interface.
 
 Q: I have just installed and run the wizard, however I have the following error message. What to do?
+
 Can not start searchd, try to start it manually.
+
 A: If you use version 2.1 or higher you can see the exact command below message “Can not start searchd, try to start it manually.” which you need to run manually through terminal on your server.
 If you have ‘Permissions problem’ try to run the command as super user.
 
@@ -122,11 +127,13 @@ Q: How to run indexer manually
 A: Open terminal and run following command: /path/to/indexer -c /path/to/sphinx.conf --rotate --all
 
 Q: When I run searchd or indexer I got ERROR: invalid section type 'X-Powered-By' in ../sphinx.conf line 1 col 1.
+
 A: You are using CGI version of php, by default it shows a http header like "X-Powered-By: PHP/4.3.6"
 To prevent this, PHP needs to be invoked with the '-q' option for 'quiet'. Open sphinx.conf in editor and change first line to:
 #!/usr/bin/php -q
 
 Q: I got WARNING: index 'wp_main': preload: failed to open /path/to/indexes/wp_main.sph No such file or directory; NOT SERVING
+
 A: That means you have no indexes to serve. You need to build them. You may do it via wp-admin or manually:
 On wp-admin>Settings>Sphinx Search page click "Re-index WordPress index"
 Or use run this command manually in terminal:
