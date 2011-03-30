@@ -98,11 +98,12 @@ class SphinxService
                  return true;
              }             
          } else {
-             $pid = $this->get_searchd_pid_filename($this->_config->get_option('sphinx_conf'));
-             $pid = trim($pid);
-             if (!$pid){
+             $pid_filename = $this->get_searchd_pid_filename($this->_config->get_option('sphinx_conf'));
+             if ( !file_exists($pid_filename) ){
                  return false;
              }
+             $pid = file_get_contents($pid_filename);
+             $pid = trim($pid);
              if ( file_exists("/proc/$pid") ){
                  return true;
              }
