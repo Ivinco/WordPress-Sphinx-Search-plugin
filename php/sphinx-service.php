@@ -110,7 +110,7 @@ class SphinxService
                      }
              }
          }
-         system("ps", $retval);
+         exec("ps", $output, $retval);
          if (0 == $retval){
             $pid_filename = $this->_config->get_option('sphinx_searchd_pid');
              if ( file_exists($pid_filename) && is_readable($pid_filename) ){
