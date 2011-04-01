@@ -91,7 +91,7 @@ class SphinxService
       */
      function is_sphinx_running()
      {
-         if (file_exists($this->_config->get_option('sphinx_searchd_pid'))){
+         if (file_exists($this->_config->get_option('sphinx_searchd_pid')) && is_readable($this->_config->get_option('sphinx_searchd_pid'))){
              $pid = file_get_contents($this->_config->get_option('sphinx_searchd_pid'));
              $pid = trim($pid);
              if ( file_exists("/proc/$pid") ){
@@ -99,7 +99,7 @@ class SphinxService
              }             
          } else {
              $pid_filename = $this->get_searchd_pid_filename($this->_config->get_option('sphinx_conf'));
-             if ( !file_exists($pid_filename) ){
+             if ( !file_exists($pid_filename) || !is_readable($pid_filename) ){
                  return false;
              }
              $pid = file_get_contents($pid_filename);

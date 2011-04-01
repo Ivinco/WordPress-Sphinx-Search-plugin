@@ -216,6 +216,7 @@ the correct value.
  * Replaced MySQL FullText engine with Sphinx Search in Top/Related and Latest widgets
  * Built search management tool and statistics tool over Sphinx Search
  * Added custom css styles file (templates/style.css) for search forms
+ * Ivinco icon looking more smoothly with transparent background
 
 
 = 2.1 =
