@@ -66,6 +66,7 @@ To setup periodical re-indexing, you should run Wizard to create special schedul
 The default location of these files is: /path/to/wp-content/uploads/sphinx/cron/.
 When wizard finishes, edit your Crontab file.
 Use “crontab -e” command in Linux terminal and add the following lines to your crontab:
+`
 #WordPress Delta index update
 #Following cron job update delta index every 5 minutes:
 */5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_delta.php
@@ -75,28 +76,28 @@ Use “crontab -e” command in Linux terminal and add the following lines to yo
 #WordPress Stats index update
 #Following cron job update stats index every 5 minutes
 */5 * * * * /usr/bin/php /path/to/wp-content/uploads/sphinx/cron/cron_reindex_stats.php
-
+`
 = Setup templates and widgets =
 Extended search form on search results page
-<?php if (function_exists('ss_search_bar'))
-    echo ss_search_bar();/*put it in search page*/?>
+`<?php if (function_exists('ss_search_bar'))
+    echo ss_search_bar();/*put it in search page*/?>`
 
 To find out if the current post is comment
-<?php if (function_exists('ss_isComment') )
-    if (ss_isComment()) echo 'It is comment'; else echo '';?>
+`<?php if (function_exists('ss_isComment') )
+    if (ss_isComment()) echo 'It is comment'; else echo '';?>`
 
 Extended search form at the sidebar
 Use “Sphinx Search sidebar” widget or add it as template tag:
-<?php if (function_exists('ss_search_bar'))
-    echo ss_search_bar(true); /*put it in sidebar*/?>
+`<?php if (function_exists('ss_search_bar'))
+    echo ss_search_bar(true); /*put it in sidebar*/?>`
 
 Related/Top searches at the sidebar
 Use “Sphinx Related/Top Searches” widget or add it as template tag:
-<?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>
+`<?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>`
 
 Latest searches at the sidebar
 Use “Sphinx Latest Searches” widget or add it as template tag:
-<?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>
+`<?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>`
 
 = Upgrade the plugin =
 
@@ -114,23 +115,25 @@ A: To manually install Sphinx use the official Sphinx Search documentation.
 
 Q: How to update the search index?
 
-A: The best option to update search index is to setup cron job task for it. Also you may manually update search indexes through WordPress Sphinx Search administrative interface.
+A: The best option to update search index is to setup cron job task for it.
+Also you may manually update search indexes through WordPress Sphinx Search administrative interface.
 
 Q: I have just installed and run the wizard, however I have the following error message. What to do?
 
 Can not start searchd, try to start it manually.
 
-A: If you use version 2.1 or higher you can see the exact command below message “Can not start searchd, try to start it manually.” which you need to run manually through terminal on your server.
+A: If you use version 2.1 or higher you can see the exact command below message “Can not start searchd, try to start it manually.”
+ which you need to run manually through terminal on your server.
 If you have ‘Permissions problem’ try to run the command as super user.
 
 Q: How to run indexer manually
-A: Open terminal and run following command: /path/to/indexer -c /path/to/sphinx.conf --rotate --all
+A: Open terminal and run following command: `/path/to/indexer -c /path/to/sphinx.conf --rotate --all`
 
 Q: When I run searchd or indexer I got ERROR: invalid section type 'X-Powered-By' in ../sphinx.conf line 1 col 1.
 
 A: You are using CGI version of php, by default it shows a http header like "X-Powered-By: PHP/4.3.6"
 To prevent this, PHP needs to be invoked with the '-q' option for 'quiet'. Open sphinx.conf in editor and change first line to:
-#!/usr/bin/php -q
+`#!/usr/bin/php -q`
 
 
 Q: I got WARNING: index 'wp_main': preload: failed to open /path/to/indexes/wp_main.sph No such file or directory; NOT SERVING
@@ -138,7 +141,7 @@ Q: I got WARNING: index 'wp_main': preload: failed to open /path/to/indexes/wp_m
 A: That means you have no indexes to serve. You need to build them. You may do it via wp-admin or manually:
 On wp-admin>Settings>Sphinx Search page click "Re-index WordPress index"
 Or use run this command manually in terminal:
-/path/to/indexer -c /path/to/etc/sphinx.conf --all --rotate
+`/path/to/indexer -c /path/to/etc/sphinx.conf --all --rotate`
 
 
 
@@ -156,39 +159,41 @@ Or use run this command manually in terminal:
 
 To enable semi-live index updates also known as "main+delta" scheme, 
 the plugin will create the following table in your MySQL database:
+`
 # in MySQL
 CREATE TABLE wp_sph_counter
 (
     counter_id INTEGER PRIMARY KEY NOT NULL,
     max_doc_id INTEGER NOT NULL
 );
-
+`
 If your WordPress installation's table prefix is not "wp_", substitute
 the correct value.
 
 = Top and last search terms =
 In order to be able to store search statistics the plugin will run 
 the following SQL query during the activation process:
+`
 # in MySQL
-CREATE TABLE `wp_sph_stats` (
-	`id` int(11) unsigned NOT NULL auto_increment,
-	`keywords` varchar(255) NOT NULL default '',
-	`date_added` datetime NOT NULL default '0000-00-00 00:00:00',
-	`keywords_full` varchar(255) NOT NULL default '',
-        `status` tinyint(1) NOT NULL DEFAULT '0',
-	PRIMARY KEY  (`id`),
-	KEY `keywords` (`keywords`)
-) ENGINE=MyISAM;
-
+CREATE TABLE wp_sph_stats (
+	id int(11) unsigned NOT NULL auto_increment,
+	keywords varchar(255) NOT NULL default '',
+	date_added datetime NOT NULL default '0000-00-00 00:00:00',
+	keywords_full varchar(255) NOT NULL default '',
+        status tinyint(1) NOT NULL DEFAULT '0',
+	PRIMARY KEY  (id),
+	KEY keywords (keywords)
+);
+`
 If your WordPress installation's table prefix is not "wp_", substitute it with
 the correct value.
 
 = Start Sphinx Search at boot =
-# How to automatically start Sphinx Search daemon at boot:
+#How to automatically start Sphinx Search daemon at boot:
 *   In Debian based systems i.e. Ubuntu:
-% update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults
+`% update-rc.d "/path/to/bin/searchd --config /path/to/etc/sphinx.conf" defaults`
 *   In Redhat based systems i.e. Fedora:
-% chkconfig --add "/path/to/bin/searchd --config /path/to/etc/sphinx.conf"
+`% chkconfig --add "/path/to/bin/searchd --config /path/to/etc/sphinx.conf"`
 
 == Upgrade Notice ==
 
