@@ -49,22 +49,22 @@
                     <tr valign="top" >
                         <th scope="row">Before keyword in text</th>
                         <td ><input type="text" id="excerpt_before_match" name="excerpt_before_match"
-                            value="<?php echo $this->view->devOptions['excerpt_before_match'];?>" /></td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['excerpt_before_match']));?>" /></td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">After keyword in text</th>
                         <td ><input type="text" id="excerpt_after_match" name="excerpt_after_match"
-                        value="<?php echo $this->view->devOptions['excerpt_after_match'];?>" /> </td>
+                        value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['excerpt_after_match']));?>" /> </td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">Before keyword in title</th>
                         <td ><input type="text" id="excerpt_before_match_title" name="excerpt_before_match_title"
-                        value="<?php echo $this->view->devOptions['excerpt_before_match_title'];?>" /></td>
+                        value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['excerpt_before_match_title']));?>" /></td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">After keyword in title</th>
                         <td ><input type="text" id="excerpt_after_match_title" name="excerpt_after_match_title"
-                            value="<?php echo $this->view->devOptions['excerpt_after_match_title'];?>" /></td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['excerpt_after_match_title']));?>" /></td>
                     </tr>
                     </tbody>
                     </table>
@@ -80,7 +80,7 @@
                     <tr valign="top" >
                         <th scope="row">Snippet separator</th>
                         <td ><input type="text" id="excerpt_chunk_separator" name="excerpt_chunk_separator"
-                            value="<?php echo $this->view->devOptions['excerpt_chunk_separator'];?>" /></td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['excerpt_chunk_separator']));?>" /></td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">Snippet max length</th>
@@ -107,17 +107,17 @@
                     <tr valign="top" >
                         <th scope="row">Prefix before Comment title</th>
                         <td ><input type="text" id="before_comment" name="before_comment"
-                            value="<?php echo $this->view->devOptions['before_comment'];?>" /></td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['before_comment']));?>" /></td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">Prefix before Page title</th>
                         <td ><input type="text" id="before_page" name="before_page"
-                            value="<?php echo $this->view->devOptions['before_page'];?>" /> </td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['before_page']));?>" /> </td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">Prefix before Post title</th>
                         <td ><input type="text" id="before_post" name="before_post"
-                            value="<?php echo $this->view->devOptions['before_post'];?>" /></td>
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['before_post']));?>" /></td>
                     </tr>
                     <tr valign="top" >
                         <th scope="row">Phrase filter (list of phrases to exclude from posts content)</th>

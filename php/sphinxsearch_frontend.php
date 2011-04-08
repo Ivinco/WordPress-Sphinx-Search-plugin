@@ -620,8 +620,8 @@ class SphinxSearch_FrontEnd
 					'limit'  => $this->config->admin_options['excerpt_limit'],
 					'around' => $this->config->admin_options['excerpt_around'],
 					'chunk_separator' => $this->config->admin_options['excerpt_chunk_separator'],
-					'after_match' => $this->config->admin_options['excerpt_after_match'.$isTitle],
-					'before_match' => $this->config->admin_options['excerpt_before_match'.$isTitle]
+					'after_match' => '{sphinx_after_match}',//$this->config->admin_options['excerpt_after_match'.$isTitle],
+					'before_match' => '{sphinx_before_match}' //$this->config->admin_options['excerpt_before_match'.$isTitle]
 					);
 					
 		$excerpts = $sphinx->BuildExcerpts(
@@ -639,9 +639,18 @@ class SphinxSearch_FrontEnd
 			return false;
 		}
 
+
+            $sphinx_after_match = stripslashes($this->config->admin_options['excerpt_after_match'.$isTitle]);
+            $sphinx_before_match = stripslashes($this->config->admin_options['excerpt_before_match'.$isTitle]);
             $i = 0;
             foreach ($post_content as $k=>$v){
-                    $post_content[$k] = $excerpts[$i++];
+		$excerpts[$i] = str_replace(
+				array('{sphinx_after_match}', '{sphinx_before_match}'),
+				array($sphinx_after_match, $sphinx_before_match),
+				$excerpts[$i]
+		);
+                $post_content[$k] = $excerpts[$i];
+		$i++;
             }
         
             return $post_content;
@@ -655,7 +664,7 @@ class SphinxSearch_FrontEnd
 	 */
 	function the_content($content = '')
 	{
-		$content = $this->strip_udf_tags($content, true);
+		$content = $this->strip_udf_tags($content, false);
 		return $content;
 	}
 	
