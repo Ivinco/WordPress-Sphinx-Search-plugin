@@ -54,10 +54,13 @@ define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
  * Use latest sphinx API from Sphinx distributive directory 
  * otherwise use it from plugin directory which come with plugin 
  */
-if (file_exists(SPHINXSEARCH_SPHINX_INSTALL_DIR.'/api/sphinxapi.php'))
-	include_once(SPHINXSEARCH_SPHINX_INSTALL_DIR.'/api/sphinxapi.php');
-else 
-	include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxapi.php');
+
+if( !extension_loaded('sphinx') ) {
+    if (file_exists(SPHINXSEARCH_SPHINX_INSTALL_DIR.'/api/sphinxapi.php'))
+        include_once(SPHINXSEARCH_SPHINX_INSTALL_DIR.'/api/sphinxapi.php');
+    else
+        include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxapi.php');
+}
 	
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_config.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_frontend.php');

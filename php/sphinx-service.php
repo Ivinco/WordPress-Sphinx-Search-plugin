@@ -91,7 +91,7 @@ class SphinxService
       */
      function is_sphinx_running()
      {
-         if ( is_readable("/proc/") ) {
+         if ( ini_get("open_basedir") == "" && is_readable("/proc/") ) {
              $pid_filename = $this->_config->get_option('sphinx_searchd_pid');
              if ( file_exists($pid_filename) && is_readable($pid_filename) ){
                  $pid = file_get_contents($pid_filename);

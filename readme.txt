@@ -143,6 +143,20 @@ On wp-admin>Settings>Sphinx Search page click "Re-index WordPress index"
 Or use run this command manually in terminal:
 `/path/to/indexer -c /path/to/etc/sphinx.conf --all --rotate`
 
+Q: Sphinx installs fine, but when I go to search for something on the blog I
+get no results.
+
+A: Check Sphinx version, Sphinx version should be 0.9.9 or higher.
+
+Q: How do I modify the plugin php script to specify the path where I have Sphinx installed?
+
+A: Run Sphinx Configuration wizard from WP Admin panel.
+There are two important steps:
+1. Install or use existing Sphinx binaries
+There you can specify the path to your own indexer and searchd
+2. Setup path to Sphinx indexes
+There you can specify where to store index files and sphinx.conf file. This path should be writeable by web server.
+
 
 
 == Screenshots ==
