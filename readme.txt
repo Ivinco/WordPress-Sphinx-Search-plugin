@@ -143,8 +143,7 @@ On wp-admin>Settings>Sphinx Search page click "Re-index WordPress index"
 Or use run this command manually in terminal:
 `/path/to/indexer -c /path/to/etc/sphinx.conf --all --rotate`
 
-Q: Sphinx installs fine, but when I go to search for something on the blog I
-get no results.
+Q: Sphinx installs fine, but when I go to search for something on the blog I get no results.
 
 A: Check Sphinx version, Sphinx version should be 0.9.9 or higher.
 
@@ -156,6 +155,18 @@ There are two important steps:
 There you can specify the path to your own indexer and searchd
 2. Setup path to Sphinx indexes
 There you can specify where to store index files and sphinx.conf file. This path should be writeable by web server.
+
+Q: Cannot activate plugin. If I try to activate the plugin I get the following PHP error:
+Fatal error: Cannot redeclare class SphinxClient in /home/wordpress/wp-content/plugins/wordpress-sphinx-plugin/php/sphinxapi.php
+
+A: Check that you haven't:
+1. any other plugins which loaded Sphinx Search API library.
+2. Sphinx Search PECL extension installed
+
+Q: I’ve got an error “Indexer: configuration files not found.” on clocking “Run Indexing & Contunue” (“Sphinx data indexing” step of Wizard).
+
+A: Check that the user which is running your web server (it's usually apache, www-data or smth like this)
+can run indexer/searchd and can read/write into sphinx.conf. Then run Sphinx Configuration wizard from WP Admin panel again.
 
 
 
