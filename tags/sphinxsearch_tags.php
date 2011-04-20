@@ -22,7 +22,7 @@
 */
 function ss_isComment() {
     global $post;
-    return $post->comment_ID;
+    return $post->comment_id;
 }
 		
 function ss_search_bar($is_sidebar = false)

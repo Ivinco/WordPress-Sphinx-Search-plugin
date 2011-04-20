@@ -230,6 +230,7 @@ the correct value.
 == Changelog ==
 
 = 3.0.1 =
+ * Fixed bug in ss_isComment tag
  * Fixed search term highlighting bug
 
 = 3.0 =

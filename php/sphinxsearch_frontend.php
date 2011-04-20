@@ -378,7 +378,7 @@ class SphinxSearch_FrontEnd
 			$pID = $post['post_id'];
 			if (is_object($posts_data_assoc[$pID])) {				
 				$posts_data_assoc_arry[$pID] = get_object_vars($posts_data_assoc[$pID]);
-			}
+			}                        
 			//it is comment
 			if ($post['is_comment'])  {
 				$cID = $post['comment_id'];
