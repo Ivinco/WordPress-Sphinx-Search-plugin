@@ -79,6 +79,12 @@ class SphinxSearch_FrontEnd
 	var $posts_count = 0;
 	var $pages_count = 0;
 	var $comments_count = 0;
+
+        /**
+         *
+         * 
+         */
+        var $_top_ten_total = 0;
 	
 	/**
 	 * Delegate config object from SphinxSearch_Config class
@@ -779,6 +785,8 @@ class SphinxSearch_FrontEnd
             return array();
         }
 
+        $this->_top_ten_total = $res['total'];
+
         $ids = array_keys($res['matches']);
 
         $sql = "SELECT
@@ -797,6 +805,11 @@ class SphinxSearch_FrontEnd
 	$results = $this->make_results_clear($results, $limit, $width, $break);
 
 	return $results;
+    }
+
+    function get_top_ten_total()
+    {
+        return $this->_top_ten_total;
     }
 
     function sphinx_stats_related($keywords, $limit = 10, $width = 0, $break = '...', $approved = false)

@@ -62,13 +62,13 @@ function ss_search_bar($is_sidebar = false)
 function ss_top_searches($limit = 10, $width = 0, $break = '...')
 {
     global $defaultObjectSphinxSearch;
-		
+
     $result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top_ten($limit, $width, $break);
     echo "<ul>";
     foreach ($result as $res){
         echo "<li><a href='/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
     }
-    echo "</ul>";
+    echo "</ul>";    
 }
 	
 function ss_latest_searches($limit = 10, $width = 0, $break = '...')
@@ -102,3 +102,35 @@ function sphinx_get_type_count($type){
     echo $defaultObjectSphinxSearch->frontend->get_type_count($type);
 }
 	
+
+
+function ss_top_searches_pager($limit = 10, $width = 0, $break = '...')
+{
+    global $defaultObjectSphinxSearch, $wp_query, $wp_rewrite;
+
+    $wp_query->query_vars['paged'] > 1 ? $current = $wp_query->query_vars['paged'] : $current = 1;
+
+    $result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
+    $html = "<ul>";
+    foreach ($result as $res){
+        $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+    }
+    $html .= "</ul>";
+
+    $pagination = array(
+	'base' => @add_query_arg('page','%#%'),
+	'format' => '',
+	'total' => $defaultObjectSphinxSearch->frontend->get_top_ten_total(),
+	'current' => $current,
+	'show_all' => true,
+	'type' => 'plain'
+	);
+
+    if( $wp_rewrite->using_permalinks() ){
+            $pagination['base'] = user_trailingslashit( trailingslashit( remove_query_arg( 's', get_pagenum_link( 1 ) ) ) . 'page/%#%/', 'paged' );
+    }
+
+    $html .= paginate_links( $pagination );
+
+    echo $html;
+}
