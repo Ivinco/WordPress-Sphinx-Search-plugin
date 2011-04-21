@@ -104,13 +104,20 @@ function sphinx_get_type_count($type){
 	
 
 
-function ss_top_searches_pager($limit = 10, $width = 0, $break = '...')
+function ss_top_searches_pager($max_per_page = 10, $show_all = false)
 {
-    global $defaultObjectSphinxSearch, $wp_query, $wp_rewrite;
+    global $defaultObjectSphinxSearch;
 
-    $wp_query->query_vars['paged'] > 1 ? $current = $wp_query->query_vars['paged'] : $current = 1;
+    if ( $_GET['toppage'] > 1) {
+        $current = (int)$_GET['toppage'];
+        $start = (int)($_GET['toppage']-1)*$max_per_page;
+    } else {
+        $current = 1;
+        $start = 0;
+    }
 
-    $result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break);
+    $result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($max_per_page, 0, '...', false , 0, $start);
+
     $html = "<ul>";
     foreach ($result as $res){
         $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
@@ -118,19 +125,15 @@ function ss_top_searches_pager($limit = 10, $width = 0, $break = '...')
     $html .= "</ul>";
 
     $pagination = array(
-	'base' => @add_query_arg('page','%#%'),
+	'base' => @add_query_arg('toppage','%#%'),
 	'format' => '',
 	'total' => $defaultObjectSphinxSearch->frontend->get_top_ten_total(),
 	'current' => $current,
-	'show_all' => true,
+	'show_all' => false,
 	'type' => 'plain'
 	);
 
-    if( $wp_rewrite->using_permalinks() ){
-            $pagination['base'] = user_trailingslashit( trailingslashit( remove_query_arg( 's', get_pagenum_link( 1 ) ) ) . 'page/%#%/', 'paged' );
-    }
-
     $html .= paginate_links( $pagination );
 
-    echo $html;
+    echo $html; 
 }

@@ -756,13 +756,13 @@ class SphinxSearch_FrontEnd
     }
 
 
-    function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30)
+    function sphinx_stats_top($limit = 10, $width = 0, $break = '...', $approved=false, $period_limit = 30, $start = 0)
     {
         global $wpdb, $table_prefix;
 
         $sphinx = $this->config->init_sphinx();
 
-        $sphinx->SetLimits(0, $limit + 30);
+        $sphinx->SetLimits($start, $limit + 30);
         if ($approved){
             $status = array(1);
         } else {
