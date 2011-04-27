@@ -127,7 +127,7 @@ function ss_top_searches_pager($max_per_page = 10, $show_all = false)
     $pagination = array(
 	'base' => @add_query_arg('toppage','%#%'),
 	'format' => '',
-	'total' => $defaultObjectSphinxSearch->frontend->get_top_ten_total(),
+	'total' => $defaultObjectSphinxSearch->frontend->get_top_ten_total()/$max_per_page,
 	'current' => $current,
 	'show_all' => false,
 	'type' => 'list'
