@@ -95,6 +95,14 @@ Related/Top searches at the sidebar
 Use “Sphinx Related/Top Searches” widget or add it as template tag:
 `<?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>`
 
+Top searches with pagination
+Use “ss_top_searches_pager()” template tag to enable pagination for top search terms:
+`<?php if (function_exists('ss_top_searches_pager')) ss_top_searches_pager(); ?>`
+Parameters:
+ * $max_per_page - limit how many search terms display per page, by default 10
+ * $show_all - If set to True, then it will show all of the pages instead of a 
+short list of the pages near the current page. By default, the 'show_all' is set to false
+
 Latest searches at the sidebar
 Use “Sphinx Latest Searches” widget or add it as template tag:
 `<?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>`
