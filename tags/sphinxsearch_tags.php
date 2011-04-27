@@ -130,7 +130,7 @@ function ss_top_searches_pager($max_per_page = 10, $show_all = false)
 	'total' => $defaultObjectSphinxSearch->frontend->get_top_ten_total(),
 	'current' => $current,
 	'show_all' => false,
-	'type' => 'plain'
+	'type' => 'list'
 	);
 
     $html .= paginate_links( $pagination );
