@@ -4,7 +4,7 @@ Donate link: http://www.ivinco.com/
 Tags: search, sphinx
 Requires at least: 2.0.2
 Tested up to: 3.1
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2
 
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
@@ -87,16 +87,24 @@ To find out if the current post is comment
     if (ss_isComment()) echo 'It is comment'; else echo '';?>`
 
 Extended search form at the sidebar
-Use “Sphinx Search sidebar” widget or add it as template tag:
+Use "Sphinx Search sidebar" widget or add it as template tag:
 `<?php if (function_exists('ss_search_bar'))
     echo ss_search_bar(true); /*put it in sidebar*/?>`
 
 Related/Top searches at the sidebar
-Use “Sphinx Related/Top Searches” widget or add it as template tag:
+Use "Sphinx Related/Top Searches" widget or add it as template tag:
 `<?php if (function_exists('ss_top_searches')) ss_top_searches(); ?>`
 
+Top searches with pagination
+Use "ss_top_searches_pager($max_per_page=10, $show_all=false)" template tag to enable pagination for top search terms:
+`<?php if (function_exists('ss_top_searches_pager')) ss_top_searches_pager(); ?>`
+Parameters:
+ * $max_per_page - limit how many search terms display per page, by default 10
+ * $show_all - If set to True, then it will show all of the pages instead of a
+short list of the pages near the current page. By default, the 'show_all' is set to false
+
 Latest searches at the sidebar
-Use “Sphinx Latest Searches” widget or add it as template tag:
+Use "Sphinx Latest Searches" widget or add it as template tag:
 `<?php if (function_exists('ss_latest_searches')) ss_latest_searches(); ?>`
 
 = Upgrade the plugin =
@@ -228,6 +236,9 @@ the correct value.
  We added new search mode "Freshness & Relevance" which works perfect for blogs and news sites.
 
 == Changelog ==
+
+= 3.0.2 = 
+ * Added new template tag: top search terms with pagination
 
 = 3.0.1 =
  * Fixed bug in ss_isComment tag
