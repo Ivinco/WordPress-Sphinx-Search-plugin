@@ -154,6 +154,9 @@ class SphinxSearch{
                 //widgets
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
+                //seo urls
+                //add_action( 'template_redirect', array(&$this, 'sphinx_search_friendly_redirect') );
+
 	}
 
         function add_actions_filters()
@@ -454,6 +457,35 @@ class SphinxSearch{
             $ret = $sphinxService->reindex('stats');
         }
     }
+/*
+ * lighttpd rewrite rules - processing of pagination isn't done yet
+ *  "^/search/([^\?]+)\/(\?(.*))?" => "/index.php?s=$1&$3"
+    function sphinx_search_friendly_redirect()
+    {
+	if ( is_search() && strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) === false && strpos( $_SERVER['REQUEST_URI'], '/search/' ) === false ) {
+		$query_array = array();
+		if (!empty($_GET['search_comments'])){
+			$query_array[] = "search_comments=".$_GET['search_comments'];
+		}
+		if (!empty($_GET['search_posts'])){
+			$query_array[] = "search_posts=".$_GET['search_posts'];
+		}
+		if (!empty($_GET['search_pages'])){
+			$query_array[] = "search_pages=".$_GET['search_pages'];
+		}
+		if (!empty($_GET['search_sortby'])){
+			$query_array[] = "search_sortby=".$_GET['search_sortby'];
+		}
+		$query_string = '';
+		if (!empty($query_array)){
+			$query_string = "?".implode("&",$query_array);
+		}
+		wp_redirect( home_url( '/search/' . str_replace( array( ' ', '%20' ),  array( '+', '+' ), get_query_var( 's' ) ) .'/' ) . $query_string );
+		exit();
+	}
+    }
+ *
+ */
 }
 
 register_activation_hook(__FILE__,'sphinx_plugin_activation');
@@ -468,4 +500,6 @@ function sphinx_plugin_activation()
     $sphinxInstall = new SphinxSearch_Install($config);
     $sphinxInstall->setup_sphinx_counter_tables();
 }
+
+
 
