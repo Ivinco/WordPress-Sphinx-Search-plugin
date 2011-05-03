@@ -785,8 +785,7 @@ class SphinxSearch_FrontEnd
 
         if (empty($res['matches']) || !is_array($res['matches'])){
             return array();
-        }
-
+        }        
         $this->_top_ten_total = $res['total'];
 
         $ids = array_keys($res['matches']);
