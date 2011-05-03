@@ -764,7 +764,7 @@ class SphinxSearch_FrontEnd
 
         $sphinx = $this->config->init_sphinx();
 
-        $sphinx->SetLimits($start, $limit + 30);
+        $sphinx->SetLimits($start, $limit + 30, 100000);
         if ($approved){
             $status = array(1);
         } else {
