@@ -180,6 +180,8 @@ class SphinxSearch_FrontEnd
 		//replace key - buffer to key buffer
 		$this->search_string = $this->unify_keywords($this->search_string);
 
+                echo $this->search_string;
+
 		$res = $sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 
 		if (empty($res["matches"]) && $this->is_simple_query($this->search_string)){
@@ -1108,11 +1110,14 @@ class SphinxSearch_FrontEnd
 
   function unify_keywords($keywords)
   {
-		//replace key-buffer to key buffer
-		//replace key -buffer to key -buffer
-		//replace key- buffer to key buffer
-		//replace key - buffer to key buffer
-    return preg_replace("#([\w\S])\-([\s\w])#", "\${1} \${2}", $keywords);
+      //replace key-buffer to key buffer
+      //replace key -buffer to key -buffer
+      //replace key- buffer to key buffer
+      //replace key - buffer to key buffer
+      $keywords = preg_replace("#([\w\S])\-([\w\S])#", "\$1 \$2", $keywords);
+      $keywords = preg_replace("#([\w\S])\s\-\s([\w\S])#", "\$1 \$2", $keywords);
+      $keywords = preg_replace("#([\w\S])-\s([\w\S])#", "\$1 \$2", $keywords);
+      return $keywords;
   }
 
 }
