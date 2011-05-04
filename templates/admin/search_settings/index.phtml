@@ -5,6 +5,36 @@
             <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
 
             <div class="postbox">
+                <h3 class="hndle">Search friendly URLs:</h3>
+                <div class="inside">
+                    <fieldset class="options">
+
+                    <table class="form-table" border="0">
+                    <tbody>
+                    <tr valign="top" >
+                        <th ><label for="seo_url_user">Make friendly URLs for user entered search</label></th>
+                        <td>
+                        <input type="checkbox" id="seo_url_user" name="seo_url_user" value="true"
+                        <?php if ($this->view->devOptions['seo_url_user'] == "true")
+                        { _e('checked="checked"', "SphinxSearch"); }?>/>
+                        </td>
+                    </tr>
+
+                    <tr valign="top" >
+                        <th ><label for="seo_url_all">Make friendly URLs for any search</label></th>
+                        <td>
+                        <input type="checkbox" id="seo_url_all" name="seo_url_all" value="true"
+                        <?php if ($this->view->devOptions['seo_url_all'] == "true")
+                        { _e('checked="checked"', "SphinxSearch"); }?>/>
+                        </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="postbox">
                 <h3 class="hndle">Select what to include in the search:</h3>
                 <div class="inside">
                     <fieldset class="options">
@@ -104,6 +134,11 @@
                     <fieldset class="options">
                     <table class="form-table">
                     <tbody>
+                    <tr valign="top" >
+                        <th scope="row">Limit maximum number of search results (value above 100,000 required change max_matches option in sphinx.conf)</th>
+                        <td ><input type="text" id="sphinx_max_matches" name="sphinx_max_matches"
+                            value="<?php echo stripslashes(htmlspecialchars($this->view->devOptions['sphinx_max_matches']));?>" /></td>
+                    </tr>
                     <tr valign="top" >
                         <th scope="row">Prefix before Comment title</th>
                         <td ><input type="text" id="before_comment" name="before_comment"

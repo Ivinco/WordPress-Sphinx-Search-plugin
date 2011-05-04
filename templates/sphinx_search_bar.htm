@@ -21,10 +21,13 @@ function toggle_sidebar(){
             alt="WordPress Sphinx Search Plugin by Ivinco" /></a> <?php _e('Search'); ?>
     </label>
     <form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>">
+        <?php if ('true' == $defaultObjectSphinxSearch->get_seo_url_user() ):?>
+            <input type="hidden" name="rd" value="1" />
+        <?php endif; ?>
         <ul>
             <li>
                 <input type="text" name="s" id="sbar" size="15"
-                       value="<?php echo htmlspecialchars(!empty($_GET['s']) ? $_GET['s']:'');?>"/>
+                       value="<?php echo $defaultObjectSphinxSearch->get_search_string();?>"/>
                 <input type="submit" id="submit" value="<?php _e('Search'); ?>" /><br/>
                 <a href="javascript:void(0);" onclick="toggle_sidebar();"
                    style="font-size:10px;">Advanced</a>

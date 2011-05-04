@@ -155,7 +155,7 @@ class SphinxSearch{
                 add_action( 'widgets_init', array(&$this, 'load_widgets') );
 
                 //seo urls
-                //add_action( 'template_redirect', array(&$this, 'sphinx_search_friendly_redirect') );
+                add_action( 'template_redirect', array(&$this, 'sphinx_search_friendly_redirect') );
 
 	}
 
@@ -257,9 +257,9 @@ class SphinxSearch{
             if (!$this->_sphinxRunning()){
                 return $sqlQuery;
             }
-            $_GET['s'] = stripslashes($_GET['s']);
+
             //Qeuery Sphinx for Search results
-            if ($this->frontend->query() ){
+            if ($this->frontend->query(stripslashes(urldecode(get_search_query()))) ){
                 $this->frontend->parse_results();
             }
             //returning empty string we disabled to run default query
@@ -418,6 +418,16 @@ class SphinxSearch{
         }
     }
 
+    function get_search_string()
+    {
+        return $this->frontend->get_search_string();
+    }
+
+    function get_seo_url_user()
+    {
+        return $this->config->get_option('seo_url_user');
+    }
+
     /**
      * @access private
      * @return boolean
@@ -457,12 +467,28 @@ class SphinxSearch{
             $ret = $sphinxService->reindex('stats');
         }
     }
-/*
- * lighttpd rewrite rules - processing of pagination isn't done yet
- *  "^/search/([^\?]+)\/(\?(.*))?" => "/index.php?s=$1&$3"
+
     function sphinx_search_friendly_redirect()
     {
-	if ( is_search() && strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) === false && strpos( $_SERVER['REQUEST_URI'], '/search/' ) === false ) {
+        $redirect = true;
+        
+        if ( !is_search() ||
+                strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) !== false ||
+                strpos( $_SERVER['REQUEST_URI'], '/search/' ) !== false ) {
+            return false;
+        } else {
+            $redirect = true;
+        }
+
+        if (empty($_GET['rd']) || 'false' == $this->config->get_option('seo_url_user')) {
+            $redirect = false;
+        }
+        
+        if ('true' == $this->config->get_option('seo_url_all')) {
+            $redirect = true;
+        }
+
+	if ( $redirect ) {
 		$query_array = array();
 		if (!empty($_GET['search_comments'])){
 			$query_array[] = "search_comments=".$_GET['search_comments'];
@@ -484,8 +510,7 @@ class SphinxSearch{
 		exit();
 	}
     }
- *
- */
+
 }
 
 register_activation_hook(__FILE__,'sphinx_plugin_activation');

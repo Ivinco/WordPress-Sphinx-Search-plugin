@@ -17,10 +17,13 @@ function toggle(){
 </script>
 
 <div id="searchpanel" align="center">
-		<form id="searchform" method="get" action="<?php get_bloginfo('url') ?>">
+		<form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>">
+                    <?php if ('true' == $defaultObjectSphinxSearch->get_seo_url_user() ):?>
+                        <input type="hidden" name="rd" value="1" />
+                    <?php endif; ?>
 			<div>
 				<nobr>
-				<input type="text" name="s" id="s" size="55" value="<?php echo htmlspecialchars($_GET['s']);?>" /> 
+				<input type="text" name="s" id="s" size="35" value="<?php echo $defaultObjectSphinxSearch->get_search_string();?>" />
 				<input type="submit" id="submit" value="<?php _e('Search'); ?>" /> 
 				<a href="javascript:void(0);" onclick="toggle();" style="font-size:10px;">Advanced</a>
 				<span style="font-size:12px;">Total found: 
@@ -35,9 +38,9 @@ function toggle(){
 					<?php endif; ?>			
 			
 			<div style="width:100%; text-align:left;font-size:12px;">
-			<a href="/?s=<?php echo htmlspecialchars($_GET['s']);?>&search_posts=true">Posts (<?php echo sphinx_get_type_count('posts') ?>)</a>
-			<a href="/?s=<?php echo htmlspecialchars($_GET['s']);?>&search_pages=true">Pages (<?php echo sphinx_get_type_count('pages') ?>)</a>
-			<a href="/?s=<?php echo htmlspecialchars($_GET['s']);?>&search_comments=true">Comments (<?php echo sphinx_get_type_count('comments') ?>)</a>
+			<a href="/?s=<?php echo urlencode($defaultObjectSphinxSearch->get_search_string());?>&search_posts=true">Posts (<?php echo sphinx_get_type_count('posts') ?>)</a>
+			<a href="/?s=<?php echo urlencode($defaultObjectSphinxSearch->get_search_string());?>&search_pages=true">Pages (<?php echo sphinx_get_type_count('pages') ?>)</a>
+			<a href="/?s=<?php echo urlencode($defaultObjectSphinxSearch->get_search_string());?>&search_comments=true">Comments (<?php echo sphinx_get_type_count('comments') ?>)</a>
 			</div>
 		<div id="searchform_advanced" style="display:none;"></div>	
 	</form>

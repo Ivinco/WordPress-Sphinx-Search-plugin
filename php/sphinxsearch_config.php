@@ -92,6 +92,8 @@ class SphinxSearch_Config
    			'search_comments' => 'true',
    			'search_pages'    => 'true',
    			'search_posts'    => 'true',
+                        'seo_url_user'    => 'false',
+                        'seo_url_all'     => 'false',
    			
    			'excerpt_before_match' => '<b>',
    			'excerpt_after_match' => '</b>',
@@ -109,6 +111,7 @@ class SphinxSearch_Config
    			'sphinx_conf' => '',
    			'sphinx_indexer' => '',
    			'sphinx_searchd' => '',
+                        'sphinx_max_matches' => 10000, //set the maximum number of search results
 
    			'sphinx_searchd_pid' => '',
    			'sphinx_installed' => 'false',

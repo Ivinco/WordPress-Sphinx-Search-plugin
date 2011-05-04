@@ -157,7 +157,8 @@ class SphinxSearch_Install
      		'{wp_term_taxonomy}' => $wpdb->term_taxonomy,
      		'{wp_terms}' => $wpdb->terms,
                 '{path_to_php}' => $wizard->detect_program('php'),
-                '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir)))
+                '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir))),
+                '{max_matches}' => $this->config->admin_options['sphinx_max_matches']
      		);
 
      	$rewrited_content = str_replace(array_keys($search), $search, $template_content);
