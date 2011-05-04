@@ -506,7 +506,8 @@ class SphinxSearch{
 		if (!empty($query_array)){
 			$query_string = "?".implode("&",$query_array);
 		}
-		wp_redirect( home_url( '/search/' . str_replace( array( ' ', '%20' ),  array( '+', '+' ), get_query_var( 's' ) ) .'/' ) . $query_string );
+
+		wp_redirect( home_url( '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
 		exit();
 	}
     }
