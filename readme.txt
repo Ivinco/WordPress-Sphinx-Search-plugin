@@ -176,6 +176,16 @@ Q: I’ve got an error “Indexer: configuration files not found.” on clocking
 A: Check that the user which is running your web server (it's usually apache, www-data or smth like this)
 can run indexer/searchd and can read/write into sphinx.conf. Then run Sphinx Configuration wizard from WP Admin panel again.
 
+Q: How to set maximum number of search results above 100.000?
+
+A: 1)Go to Sphinx Search plugin directory and open rep/sphinx.conf in text editor.
+2)Find max_matches parameter in searchd section at the bottom of the file
+3)Set new value i.e. max_matches = 1000000
+4)Open Sphinx Search control panel in WP Admin
+5)Click on "Run Sphinx configuration Wizard" and skip all steps in the Wizard, it rebuild sphinx.conf file at the last step, click Finish.
+6)Restart Sphinx Search (click on "Stop Sphinx daemon" and then "Start Sphinx daemon")
+7)Open tab "Search settings" and set the same max_matches value in the field "Maximum number of search results".
+
 
 
 == Screenshots ==
