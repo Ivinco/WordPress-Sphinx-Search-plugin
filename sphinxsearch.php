@@ -136,6 +136,7 @@ class SphinxSearch{
                 add_filter('the_content', array(&$this, 'the_content'));
                 add_filter('the_author', array(&$this, 'the_author'));
                 add_filter('the_time', array(&$this, 'the_time'));
+                add_filter('get_search_query', array(&$this, 'get_search_query'));
                 add_action('wp_print_styles', array(&$this,'add_my_stylesheet'));
 
 
@@ -259,13 +260,18 @@ class SphinxSearch{
             }
 
             //Qeuery Sphinx for Search results
-            if ($this->frontend->query(stripslashes(urldecode(get_search_query()))) ){
+            if ($this->frontend->query(stripslashes(get_search_query())) ){
                 $this->frontend->parse_results();
             }
             //returning empty string we disabled to run default query
             //instead of that we add our owen search results 
             return '';
 	}
+        
+        function get_search_query($query)
+        {
+            return urldecode($query);
+        }
 
 
 
@@ -423,11 +429,6 @@ class SphinxSearch{
         return $this->frontend->get_search_string();
     }
 
-    function get_seo_url_user()
-    {
-        return $this->config->get_option('seo_url_user');
-    }
-
     /**
      * @access private
      * @return boolean
@@ -479,10 +480,6 @@ class SphinxSearch{
         } else {
             $redirect = true;
         }
-
-        if (empty($_GET['rd']) || 'false' == $this->config->get_option('seo_url_user')) {
-            $redirect = false;
-        }
         
         if ('true' == $this->config->get_option('seo_url_all')) {
             $redirect = true;
@@ -506,8 +503,14 @@ class SphinxSearch{
 		if (!empty($query_array)){
 			$query_string = "?".implode("&",$query_array);
 		}
+                
+                $permalinkOption = get_option('permalink_structure');
+                $permPrefix = '';
+                if (false !== strpos($permalinkOption, '/index.php') ) {
+                    $permPrefix = '/index.php';
+                }
 
-		wp_redirect( home_url( '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
+		wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
 		exit();
 	}
     }

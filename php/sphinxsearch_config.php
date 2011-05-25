@@ -92,7 +92,6 @@ class SphinxSearch_Config
    			'search_comments' => 'true',
    			'search_pages'    => 'true',
    			'search_posts'    => 'true',
-                        'seo_url_user'    => 'false',
                         'seo_url_all'     => 'false',
    			
    			'excerpt_before_match' => '<b>',
@@ -140,6 +139,10 @@ class SphinxSearch_Config
                         $this->admin_options['sphinx_running'] = 'false';
                     }
    		}
+                
+                if ('' == get_option('permalink_structure')){
+                    $this->admin_options['seo_url_all'] = '';
+                }
    		
 		if (!empty($this->admin_options)) {
 			foreach ($this->admin_options as $key => $option){

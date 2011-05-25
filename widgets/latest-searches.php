@@ -25,6 +25,7 @@
  */
 class LatestSearchesWidget extends WP_Widget
 {
+    var $instance = null;
     /** constructor */
     function  LatestSearchesWidget()
     {
@@ -38,6 +39,7 @@ class LatestSearchesWidget extends WP_Widget
     /** @see WP_Widget::widget */
     function widget($args, $instance)
     {
+        $this->instance = $instance;
         extract( $args );
         $title = apply_filters('widget_title', $instance['title']);
         $limit = !empty($instance['limit']) ? $instance['limit'] : 10;
@@ -60,6 +62,7 @@ class LatestSearchesWidget extends WP_Widget
         $instance['width'] = strip_tags($new_instance['width']);
         $instance['break'] = strip_tags($new_instance['break']);
         $instance['show_approved'] = strip_tags($new_instance['show_approved']);
+        $instance['friendly_url'] = strip_tags($new_instance['friendly_url']);
         return $instance;
     }
 
@@ -72,6 +75,7 @@ class LatestSearchesWidget extends WP_Widget
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         $show_approved = !empty($instance['show_approved']) ? esc_attr($instance['show_approved']) : false;
+        $friendly_url = !empty($instance['friendly_url']) ? esc_attr($instance['friendly_url']) : '';
         ?>
             <p>
                 <input class="checkbox" id="<?php echo $this->get_field_id('show_approved'); ?>"
@@ -105,6 +109,12 @@ class LatestSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('break'); ?>"
                    type="text" value="<?php echo $break; ?>" />
             </label></p>
+            <p><label for="<?php echo $this->get_field_id('friendly_url'); ?>">
+            <?php _e('Enable friendly URLs:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('friendly_url'); ?>"
+                   name="<?php echo $this->get_field_name('friendly_url'); ?>"
+                   type="checkbox" value="true" <?php echo ("true" == $friendly_url)?'checked="checked"':''; ?>/>
+            </label></p>
         <?php
 
     }
@@ -114,12 +124,34 @@ class LatestSearchesWidget extends WP_Widget
         global $defaultObjectSphinxSearch;
         
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break, $show_approved);
-	echo "<ul>";
+        
+        if (empty($result)){
+            return false;
+        }
+        
+        $permalinkOption = get_option('permalink_structure');
+        $permPrefix = '';
+        if (false !== strpos($permalinkOption, '/index.php') ) {
+            $permPrefix = '/index.php';
+        }
+        
+	$html = "<ul>";
             foreach ($result as $res)
             {
-                echo "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+                if("true" == $this->instance['friendly_url']){
+                    $html .= "<li><a href='". get_bloginfo('url') .
+                        $permPrefix . "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                        htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                        htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+                } else {
+                    $html .= "<li><a href='". get_bloginfo('url') .
+                        "/?s=".urlencode(stripslashes($res->keywords_full))."' title='".
+                        htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                        htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+                }
             }
-	echo "</ul>";
+	$html .= "</ul>";
+        echo $html;
     }
 }
 
