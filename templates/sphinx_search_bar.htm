@@ -21,9 +21,6 @@ function toggle_sidebar(){
             alt="WordPress Sphinx Search Plugin by Ivinco" /></a> <?php _e('Search'); ?>
     </label>
     <form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>">
-        <?php if ('true' == $defaultObjectSphinxSearch->get_seo_url_user() ):?>
-            <input type="hidden" name="rd" value="1" />
-        <?php endif; ?>
         <ul>
             <li>
                 <input type="text" name="s" id="sbar" size="15"

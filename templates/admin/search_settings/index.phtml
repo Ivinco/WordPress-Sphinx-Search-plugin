@@ -13,22 +13,12 @@
                     <tbody>
                     <?php if ( get_option('permalink_structure') == '' ):?>
                     <tr valign="top" >
-                        <th colspan="2">Before enable Search friendly URLs, setup non default <a href="<?php echo get_bloginfo('url');?>/wp-admin/options-permalink.php">Permalink Settings</a> 
+                        <th colspan="2">Before enable Search friendly URLs, setup non default <a href="<?php echo get_bloginfo('url');?>/wp-admin/options-permalink.php">Permalink structure</a> 
                         </th>
                     </tr>
                     <?php else:?>
-                    
                     <tr valign="top" >
-                        <th ><label for="seo_url_user">Make friendly URLs for user entered search</label></th>
-                        <td>
-                        <input type="checkbox" id="seo_url_user" name="seo_url_user" value="true"
-                        <?php if ($this->view->devOptions['seo_url_user'] == "true")
-                        { _e('checked="checked"', "SphinxSearch"); }?>/>
-                        </td>
-                    </tr>
-
-                    <tr valign="top" >
-                        <th ><label for="seo_url_all">Make friendly URLs for any search</label></th>
+                        <th ><label for="seo_url_all">Enable friendly URLs:</label></th>
                         <td>
                         <input type="checkbox" id="seo_url_all" name="seo_url_all" value="true"
                         <?php if ($this->view->devOptions['seo_url_all'] == "true")

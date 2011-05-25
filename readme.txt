@@ -246,6 +246,11 @@ the correct value.
  We added new search mode "Freshness & Relevance" which works perfect for blogs and news sites.
 
 == Changelog ==
+= 3.3.0 = 
+ * Added friendly URLs support
+ * Added ability to enable/disable friendly urls in Top/Related and Latest search terms widgets
+ * Added ability to set maximum number of search results
+ * Fixed several bugs
 
 = 3.0.2 = 
  * Added new template tag: top search terms with pagination

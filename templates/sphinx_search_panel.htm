@@ -18,9 +18,6 @@ function toggle(){
 
 <div id="searchpanel" align="center">
 		<form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>">
-                    <?php if ('true' == $defaultObjectSphinxSearch->get_seo_url_user() ):?>
-                        <input type="hidden" name="rd" value="1" />
-                    <?php endif; ?>
 			<div>
 				<nobr>
 				<input type="text" name="s" id="s" size="35" value="<?php echo $defaultObjectSphinxSearch->get_search_string();?>" />

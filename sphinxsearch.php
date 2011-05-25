@@ -429,11 +429,6 @@ class SphinxSearch{
         return $this->frontend->get_search_string();
     }
 
-    function get_seo_url_user()
-    {
-        return $this->config->get_option('seo_url_user');
-    }
-
     /**
      * @access private
      * @return boolean
@@ -484,10 +479,6 @@ class SphinxSearch{
             return false;
         } else {
             $redirect = true;
-        }
-
-        if (empty($_GET['rd']) || 'false' == $this->config->get_option('seo_url_user')) {
-            $redirect = false;
         }
         
         if ('true' == $this->config->get_option('seo_url_all')) {
