@@ -124,12 +124,23 @@ class LatestSearchesWidget extends WP_Widget
         global $defaultObjectSphinxSearch;
         
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_latest($limit, $width, $break, $show_approved);
+        
+        if (empty($result)){
+            return false;
+        }
+        
+        $permalinkOption = get_option('permalink_structure');
+        $permPrefix = '';
+        if (false !== strpos($permalinkOption, '/index.php') ) {
+            $permPrefix = '/index.php';
+        }
+        
 	$html = "<ul>";
             foreach ($result as $res)
             {
                 if("true" == $this->instance['friendly_url']){
                     $html .= "<li><a href='". get_bloginfo('url') .
-                        "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                        $permPrefix . "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
                         htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
                         htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
                 } else {

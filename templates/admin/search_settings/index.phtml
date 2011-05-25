@@ -8,9 +8,16 @@
                 <h3 class="hndle">Search friendly URLs:</h3>
                 <div class="inside">
                     <fieldset class="options">
-
+ 
                     <table class="form-table" border="0">
                     <tbody>
+                    <?php if ( get_option('permalink_structure') == '' ):?>
+                    <tr valign="top" >
+                        <th colspan="2">Before enable Search friendly URLs, setup non default <a href="<?php echo get_bloginfo('url');?>/wp-admin/options-permalink.php">Permalink Settings</a> 
+                        </th>
+                    </tr>
+                    <?php else:?>
+                    
                     <tr valign="top" >
                         <th ><label for="seo_url_user">Make friendly URLs for user entered search</label></th>
                         <td>
@@ -28,6 +35,7 @@
                         { _e('checked="checked"', "SphinxSearch"); }?>/>
                         </td>
                     </tr>
+                    <?php endif; ?>
                     </tbody>
                     </table>
                     </fieldset>

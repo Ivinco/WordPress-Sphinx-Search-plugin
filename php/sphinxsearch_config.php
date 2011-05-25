@@ -140,6 +140,11 @@ class SphinxSearch_Config
                         $this->admin_options['sphinx_running'] = 'false';
                     }
    		}
+                
+                if ('' == get_option('permalink_structure')){
+                    $this->admin_options['seo_url_user'] = '';
+                    $this->admin_options['seo_url_all'] = '';
+                }
    		
 		if (!empty($this->admin_options)) {
 			foreach ($this->admin_options as $key => $option){

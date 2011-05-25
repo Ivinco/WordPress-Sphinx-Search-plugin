@@ -278,6 +278,12 @@ class TopSearchesWidget extends WP_Widget
 
         $custom_top = trim($custom_top);
         $custom_top_arry = explode("\n", $custom_top);        
+        
+        $permalinkOption = get_option('permalink_structure');
+        $permPrefix = '';
+        if (false !== strpos($permalinkOption, '/index.php') ) {
+            $permPrefix = '/index.php';
+        }
 
 	$html = "<ul>";
         if (!empty($custom_top_arry)){
@@ -293,7 +299,7 @@ class TopSearchesWidget extends WP_Widget
                 $limit--;
                 if("true" == $this->instance['friendly_url']){
                     $html .= "<li><a href='". get_bloginfo('url') .
-                    "/search/".urlencode(stripslashes($term))."/' title='".
+                    $permPrefix . "/search/".urlencode(stripslashes($term))."/' title='".
                     htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".
                             htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
                 } else {
@@ -312,13 +318,14 @@ class TopSearchesWidget extends WP_Widget
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_top($limit, $width, $break, $show_approved, $period_limit);
         if (empty($result)){
-            return false;
+            $html .= "</ul>";
+            return $html;
         }
         
         foreach ($result as $res){
             if("true" == $this->instance['friendly_url']){
                 $html .= "<li><a href='". get_bloginfo('url') .
-                    "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                    $permPrefix . "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
                     htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
                     htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
             } else {
@@ -335,18 +342,25 @@ class TopSearchesWidget extends WP_Widget
 
     function get_related($keywords, $limit = 10, $width = 0, $break = '...', $show_approved = false)
     {
-        global $defaultObjectSphinxSearch;
+        global $defaultObjectSphinxSearch;                
 
 	$result = $defaultObjectSphinxSearch->frontend->sphinx_stats_related($keywords, $limit, $width, $break, $show_approved);
         if (empty($result)){
             return false;
         }
+        
+        $permalinkOption = get_option('permalink_structure');
+        $permPrefix = '';
+        if (false !== strpos($permalinkOption, '/index.php') ) {
+            $permPrefix = '/index.php';
+        }
+        
         $html = '';
 	$html .= "<ul>";
         foreach ($result as $res){
             if("true" == $this->instance['friendly_url']){
                 $html .= "<li><a href='". get_bloginfo('url') .
-                    "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                    $permPrefix . "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
                     htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
                     htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
             } else {

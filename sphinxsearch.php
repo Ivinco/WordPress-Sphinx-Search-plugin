@@ -512,8 +512,14 @@ class SphinxSearch{
 		if (!empty($query_array)){
 			$query_string = "?".implode("&",$query_array);
 		}
+                
+                $permalinkOption = get_option('permalink_structure');
+                $permPrefix = '';
+                if (false !== strpos($permalinkOption, '/index.php') ) {
+                    $permPrefix = '/index.php';
+                }
 
-		wp_redirect( home_url( '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
+		wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
 		exit();
 	}
     }

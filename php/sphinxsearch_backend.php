@@ -151,7 +151,7 @@ class SphinxSearch_Backend {
 	{
 		//get options array
 		$devOptions = $this->config->admin_options;
-
+                
 
 		/**
 		 * search_comments - search in comments
@@ -216,7 +216,8 @@ class SphinxSearch_Backend {
 				$devOptions['sphinx_path'] = dirname($devOptions['sphinx_searchd']);
 			}
 		}
-
+                
+                
 		$this->config->update_admin_options($devOptions);
 	}
 
