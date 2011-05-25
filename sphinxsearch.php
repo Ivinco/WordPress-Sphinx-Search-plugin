@@ -136,6 +136,7 @@ class SphinxSearch{
                 add_filter('the_content', array(&$this, 'the_content'));
                 add_filter('the_author', array(&$this, 'the_author'));
                 add_filter('the_time', array(&$this, 'the_time'));
+                add_filter('get_search_query', array(&$this, 'get_search_query'));
                 add_action('wp_print_styles', array(&$this,'add_my_stylesheet'));
 
 
@@ -259,13 +260,18 @@ class SphinxSearch{
             }
 
             //Qeuery Sphinx for Search results
-            if ($this->frontend->query(stripslashes(urldecode(get_search_query()))) ){
+            if ($this->frontend->query(stripslashes(get_search_query())) ){
                 $this->frontend->parse_results();
             }
             //returning empty string we disabled to run default query
             //instead of that we add our owen search results 
             return '';
 	}
+        
+        function get_search_query($query)
+        {
+            return urldecode($query);
+        }
 
 
 

@@ -100,12 +100,6 @@ class SphinxSearch_FrontEnd
 		
 		//initialize config
 		$this->config = $config;
-
-		//if (is_search() && get_magic_quotes_gpc()) {
-		    //$_GET['s'] = stripslashes(urldecode($_GET['s']));
-		//}
-		
-		//$this->search_string = !empty($_GET['s']) ? $_GET['s'] : urldecode(get_search_query());
 				
 		if (!isset($_GET['search_comments']) && !isset($_GET['search_posts']) && !isset($_GET['search_pages'])){
 			$this->params['search_comments'] = $this->config->admin_options['search_comments']=='false'?'':'true';

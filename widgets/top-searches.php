@@ -25,6 +25,7 @@
  */
 class TopSearchesWidget extends WP_Widget
 {
+    var $instance = null;
     /** constructor */
     function  TopSearchesWidget()
     {
@@ -36,6 +37,7 @@ class TopSearchesWidget extends WP_Widget
     /** @see WP_Widget::widget */
     function widget($args, $instance)
     {
+        $this->instance = $instance;
         extract( $args );
 
         $title_rel = apply_filters('widget_title', $instance['title_rel']);
@@ -55,7 +57,7 @@ class TopSearchesWidget extends WP_Widget
             $limit = !empty($instance['search_limit']) ? $instance['search_limit'] : 10;
             if ( $search_show == 'show_related' ){
                 $title = $title_rel;
-                $words_html = $this->get_related($_GET['s'], $limit, $width, $break, $show_approved);
+                $words_html = $this->get_related(get_search_query(), $limit, $width, $break, $show_approved);
             }
             if (empty($words_html) || $search_show == 'show_top') {
                 $title = $title_top;
@@ -107,6 +109,7 @@ class TopSearchesWidget extends WP_Widget
         $instance['break'] = strip_tags($new_instance['break']);
         $instance['show_approved'] = strip_tags($new_instance['show_approved']);
         $instance['period_limit'] = strip_tags($new_instance['period_limit']);
+        $instance['friendly_url'] = strip_tags($new_instance['friendly_url']);
         return $instance;
     }
 
@@ -127,6 +130,7 @@ class TopSearchesWidget extends WP_Widget
         $width = !empty($instance['width']) ? esc_attr($instance['width']) : 0;
         $break = !empty($instance['break']) ? esc_attr($instance['break']) : '...';
         $period_limit = !empty($instance['period_limit']) ? intval($instance['period_limit']) : '';
+        $friendly_url = !empty($instance['friendly_url']) ? esc_attr($instance['friendly_url']) : '';
         ?>
             <p>
                 <input class="checkbox" id="<?php echo $this->get_field_id('show_approved'); ?>"
@@ -258,6 +262,12 @@ class TopSearchesWidget extends WP_Widget
                    name="<?php echo $this->get_field_name('break'); ?>"
                    type="text" value="<?php echo $break; ?>" />
             </label></p>
+            <p><label for="<?php echo $this->get_field_id('friendly_url'); ?>">
+            <?php _e('Enable friendly URLs:'); ?>
+            <input class="widefat" id="<?php echo $this->get_field_id('friendly_url'); ?>"
+                   name="<?php echo $this->get_field_name('friendly_url'); ?>"
+                   type="checkbox" value="true" <?php echo ("true" == $friendly_url)?'checked="checked"':''; ?>/>
+            </label></p>
         <?php
 
     }
@@ -281,7 +291,17 @@ class TopSearchesWidget extends WP_Widget
                     continue;
                 }
                 $limit--;
-                $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($term))."' title='".htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
+                if("true" == $this->instance['friendly_url']){
+                    $html .= "<li><a href='". get_bloginfo('url') .
+                    "/search/".urlencode(stripslashes($term))."/' title='".
+                    htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".
+                            htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
+                } else {
+                    $html .= "<li><a href='". get_bloginfo('url') .
+                    "/?s=".urlencode(stripslashes($term))."' title='".
+                    htmlspecialchars(stripslashes($term), ENT_QUOTES)."'>".
+                            htmlspecialchars(stripslashes($term), ENT_QUOTES)."</a></li>";
+                }
             }
         }
 
@@ -296,7 +316,17 @@ class TopSearchesWidget extends WP_Widget
         }
         
         foreach ($result as $res){
-            $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            if("true" == $this->instance['friendly_url']){
+                $html .= "<li><a href='". get_bloginfo('url') .
+                    "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                    htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                    htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            } else {
+                $html .= "<li><a href='". get_bloginfo('url') .
+                    "/?s=".urlencode(stripslashes($res->keywords_full))."' title='".
+                    htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                    htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            }
         }
         
 	$html .= "</ul>";
@@ -314,7 +344,17 @@ class TopSearchesWidget extends WP_Widget
         $html = '';
 	$html .= "<ul>";
         foreach ($result as $res){
-            $html .= "<li><a href='". get_bloginfo('url') ."/?s=".urlencode(stripslashes($res->keywords_full))."' title='".htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            if("true" == $this->instance['friendly_url']){
+                $html .= "<li><a href='". get_bloginfo('url') .
+                    "/search/".urlencode(stripslashes($res->keywords_full))."/' title='".
+                    htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                    htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            } else {
+                $html .= "<li><a href='". get_bloginfo('url') .
+                    "/?s=".urlencode(stripslashes($res->keywords_full))."' title='".
+                    htmlspecialchars(stripslashes($res->keywords), ENT_QUOTES)."'>".
+                    htmlspecialchars(stripslashes($res->keywords_cut), ENT_QUOTES)."</a></li>";
+            }
         }
 	$html .= "</ul>";
         return $html;
