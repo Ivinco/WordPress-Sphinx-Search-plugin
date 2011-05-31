@@ -263,7 +263,7 @@ class TopSearchesWidget extends WP_Widget
                    type="text" value="<?php echo $break; ?>" />
             </label></p>
             <p><label for="<?php echo $this->get_field_id('friendly_url'); ?>">
-            <?php _e('Enable friendly URLs:'); ?>
+            <?php _e('Show friendly URLs:'); ?>
             <input class="widefat" id="<?php echo $this->get_field_id('friendly_url'); ?>"
                    name="<?php echo $this->get_field_name('friendly_url'); ?>"
                    type="checkbox" value="true" <?php echo ("true" == $friendly_url)?'checked="checked"':''; ?>/>

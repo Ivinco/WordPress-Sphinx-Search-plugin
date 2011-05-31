@@ -696,7 +696,7 @@ class SphinxSearch_FrontEnd
 
         function get_search_string()
         {
-            return htmlspecialchars($this->search_string_original);
+            return $this->search_string_original;
         }
 	
 	/**
