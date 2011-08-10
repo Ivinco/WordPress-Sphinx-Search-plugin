@@ -1,6 +1,8 @@
 WordPress Sphinx Search Plugin
 ========
 
+This is fork of [https://github.com/Ivinco/WordPress-Sphinx-Search-plugin](https://github.com/Ivinco/WordPress-Sphinx-Search-plugin)
+
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
 
 Description
