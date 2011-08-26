@@ -4,7 +4,7 @@
     If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
 
     Visit plugin website for the latest news:
-    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,21 +27,21 @@ class SphinxSearch_FrontEnd
 	 * Sphinx Search Results
 	 */
 	var $search_results = '';
-	
+
 	/**
 	 * Posts info returned by Sphinx
 	 *
 	 * @var array
 	 */
 	var $posts_info = array();
-	
+
 	/**
 	 * Total posts found
 	 *
 	 * @var int
 	 */
 	var $post_count = 0;
-	
+
 	/**
 	 *  Search keyword
 	 *
@@ -49,31 +49,31 @@ class SphinxSearch_FrontEnd
 	 */
 	var $search_string = '';
         var $search_string_original = '';
-	
+
 	/**
 	 * Search params
 	 */
 	var $params = array();
-	
+
 	/**
 	 * Config object
 	 */
 	var $config = '';
-	
+
 	/**
 	 * IS searchd running
 	 */
 	var $is_searchd_up = true;
-        
+
 	var $top_ten_is_related = false;
-	
+
 	/**
-	 * IS search mode MATCH ANY 
+	 * IS search mode MATCH ANY
 	 *
 	 * @var boolean
 	 */
 	var $used_match_any = false;
-	
+
 	/**
 	 * Post/Pages/Comments count variables
 	 */
@@ -83,10 +83,10 @@ class SphinxSearch_FrontEnd
 
         /**
          *
-         * 
+         *
          */
         var $_top_ten_total = 0;
-	
+
 	/**
 	 * Delegate config object from SphinxSearch_Config class
 	 * get search keyword from GET parameters
@@ -97,59 +97,59 @@ class SphinxSearch_FrontEnd
 	function SphinxSearch_FrontEnd($config)
 	{
 		global $wpdb;
-		
+
 		//initialize config
 		$this->config = $config;
-				
+
 		if (!isset($_GET['search_comments']) && !isset($_GET['search_posts']) && !isset($_GET['search_pages'])){
 			$this->params['search_comments'] = $this->config->admin_options['search_comments']=='false'?'':'true';
 			$this->params['search_posts'] = $this->config->admin_options['search_posts']=='false'?'':'true';
 			$this->params['search_pages'] = $this->config->admin_options['search_pages']=='false'?'':'true';
 		}else{
-			$this->params['search_comments'] = $wpdb->escape($_GET['search_comments']); 
-			$this->params['search_posts'] = $wpdb->escape($_GET['search_posts']); 			
-			$this->params['search_pages'] = $wpdb->escape($_GET['search_pages']); 
+			$this->params['search_comments'] = $wpdb->escape($_GET['search_comments']);
+			$this->params['search_posts'] = $wpdb->escape($_GET['search_posts']);
+			$this->params['search_pages'] = $wpdb->escape($_GET['search_pages']);
 		}
-		
+
 
 		if (!empty($_GET['search_sortby'])){
-			$this->params['search_sortby'] = $wpdb->escape($_GET['search_sortby']); 		
+			$this->params['search_sortby'] = $wpdb->escape($_GET['search_sortby']);
 		}else {
 			$this->params['search_sortby'] = '';//sort by relevance, by default
 		}
 	}
-	
+
 	/**
 	 * Make Query to Sphinx search daemon and return result ids
 	 *
 	 * @return array
 	 */
 	function query($search_string)
-	{ 
+	{
 		global $wp_query;
 
                 $this->search_string_original = $search_string;
-                
+
                 $this->search_string = $search_string;
 
                 $sphinx = $this->config->init_sphinx();
 
 		////////////
 		// set filters
-		////////////		
+		////////////
 
 		if ( empty($this->params['search_comments']) ){
-			$sphinx->SetFilter('isComment', array(0)); 
+			$sphinx->SetFilter('isComment', array(0));
 		}
-				
+
 		if ( empty($this->params['search_pages']) ){
 			$sphinx->SetFilter('isPage', array(0));
 		}
-			
+
 		if ( empty($this->params['search_posts']) ){
 			$sphinx->SetFilter('isPost', array(0));
 		}
-		
+
 
 		if ( $this->params['search_sortby'] == 'date' ){ {
                     $sphinx->SetSortMode(SPH_SORT_ATTR_DESC, 'date_added');}
@@ -168,16 +168,16 @@ class SphinxSearch_FrontEnd
 		$posts_per_page = intval(get_settings('posts_per_page'));
 		$offset = intval( ( $searchpage - 1 ) * $posts_per_page);
 		$sphinx->SetLimits($offset, $posts_per_page, $this->config->admin_options['sphinx_max_matches']);
-		
+
 		////////////
 		// do query
-		////////////		
-		
+		////////////
+
 		//replace key-buffer to key buffer
 		//replace key -buffer to key -buffer
 		//replace key- buffer to key buffer
 		//replace key - buffer to key buffer
-		$this->search_string = $this->unify_keywords($this->search_string);                
+		$this->search_string = $this->unify_keywords($this->search_string);
 
 		$res = $sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 
@@ -186,11 +186,11 @@ class SphinxSearch_FrontEnd
 			$res = $sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 			$this->used_match_any = true;
 		}
-                
+
 		//to do something usefull with error
 		if ( $res === false ){
 			$error = $sphinx->getLastError();
-			if (preg_match('/connection/', $error) and preg_match('/failed/', $error)) 
+			if (preg_match('/connection/', $error) and preg_match('/failed/', $error))
 				$this->is_searchd_up = false;
 			return array();
 		}
@@ -226,14 +226,14 @@ class SphinxSearch_FrontEnd
 				$this->insert_sphinx_stats($this->search_string);
 			}
 		}
-                
+
 		//if no posts found return empty array
 		if (!is_array($res["matches"])) return array();
-		
+
 		//group results
 		$sphinx->ResetFilters();
 		$sphinx->SetGroupBy('post_type', SPH_GROUPBY_ATTR, "@count desc");
-		$sphinx->SetLimits(0, 1000);	
+		$sphinx->SetLimits(0, 1000);
 		$res_tmp = $sphinx->Query ( $this->search_string, $this->config->admin_options['sphinx_index'] );
 		if ($res_tmp['matches']){
 			foreach ($res_tmp['matches'] as $m){
@@ -250,13 +250,13 @@ class SphinxSearch_FrontEnd
 				}
 			}
 		}
-		
-		//save matches	
+
+		//save matches
 		$this->search_results = $res;
 
 		return $this;
 	}
-	
+
 	/**
 	 * Is query simple, if yes we use match any mode if nothing found in extended mode
 	 *
@@ -271,7 +271,7 @@ class SphinxSearch_FrontEnd
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Parse matches and collect posts ids and comments ids
 	 *
@@ -279,21 +279,21 @@ class SphinxSearch_FrontEnd
 	function parse_results()
 	{
 		global $wpdb;
-		
+
 		$content = array();
 		foreach($this->search_results["matches"] as $key => $val){
 			if ($val['attrs']['comment_id'] == 0)
-				$content['posts'][] = array ( 'post_id' => ($key-1)/2, 'weight' => $val['weight'], 'comment_id' => 0, 'is_comment' => 0); 
-			else 
+				$content['posts'][] = array ( 'post_id' => ($key-1)/2, 'weight' => $val['weight'], 'comment_id' => 0, 'is_comment' => 0);
+			else
 				$content['posts'][] = array( 'comment_id' => ($key)/2, 'weight' => $val['weight'], 'post_id' => $val['attrs']['post_id'], 'is_comment' => 1);
 		}
 
 		$this->posts_info = $content['posts'];
 		$this->post_count = $this->search_results['total_found'];
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Make new posts based on our Sphinx Search Results
 	 *
@@ -306,35 +306,35 @@ class SphinxSearch_FrontEnd
 		////////////////////////////
 		//fetching coments and posts data
 		////////////////////////////
-		
+
 		$posts_ids = array();
 		$comments_ids = array();
 		foreach($this->posts_info as $p){
 			if ($p['is_comment']){
-				$comments_ids[] = $p['comment_id'];				
+				$comments_ids[] = $p['comment_id'];
 			}
-			$posts_ids[] = $p['post_id'];			
+			$posts_ids[] = $p['post_id'];
 		}
 		$posts_data = array();
 		if (!empty($posts_ids)){
 			$query = "SELECT * FROM $wpdb->posts WHERE ID in (".implode(',',$posts_ids).")";
 			$posts_data = $wpdb->get_results($query);
 		}
-		
+
 		$comments_data = array();
 		if (!empty($comments_ids)){
 			$query = "SELECT * FROM $wpdb->comments WHERE comment_ID in (".implode(',',$comments_ids).")";
 			$comments_data = $wpdb->get_results($query);
 		}
-		
+
 		unset($posts_ids);
 		unset($comments_ids);
-		
+
 		////////////////////////////
-		//Make assoc array of 
+		//Make assoc array of
 		//posts and comments data
 		////////////////////////////
-		
+
 		$posts_content = array();
 		$posts_titles = array();
 		$posts_data_assoc = array();
@@ -342,7 +342,7 @@ class SphinxSearch_FrontEnd
 		foreach ($posts_data as $k => $p){
 			//make id as indexes
 			$posts_data_assoc[$p->ID] = $p;
-			
+
 			$posts_content[$p->ID] = $p->post_content;
 			$posts_titles[$p->ID] = $p->post_title;
 		}
@@ -355,51 +355,51 @@ class SphinxSearch_FrontEnd
 
 		unset($posts_data);
 		unset($comments_data);
-		
+
 		////////////////////////////
-		//excerpts of contents 
+		//excerpts of contents
 		//and titles
 		////////////////////////////
-		
-		$posts_content_excerpt = $this->get_excerpt($posts_content); 
-		$posts_titles_excerpt = $this->get_excerpt($posts_titles, true); 
-		$comments_content_excerpt = $this->get_excerpt($comments_content); 
+
+		$posts_content_excerpt = $this->get_excerpt($posts_content);
+		$posts_titles_excerpt = $this->get_excerpt($posts_titles, true);
+		$comments_content_excerpt = $this->get_excerpt($comments_content);
 		//check if server is down
 		if ( $posts_content_excerpt === false || $posts_titles_excerpt === false || $comments_content_excerpt === false )
 			return null;
-		
+
 		unset($posts_content);
 		unset($posts_titles);
 		unset($comments_content);
 		////////////////////////////
-		//merge posts and comments 
+		//merge posts and comments
 		//excerpts into gloabl
 		//posts array
 		////////////////////////////
 
-		$posts = array();		
+		$posts = array();
 		foreach($this->posts_info as $post){
 			$posts_data_assoc_arry = array();
 			$pID = $post['post_id'];
-			if (is_object($posts_data_assoc[$pID])) {				
+			if (is_object($posts_data_assoc[$pID])) {
 				$posts_data_assoc_arry[$pID] = get_object_vars($posts_data_assoc[$pID]);
-			}                        
+			}
 			//it is comment
 			if ($post['is_comment'])  {
 				$cID = $post['comment_id'];
-				
+
 				$posts_data_assoc_arry[$pID]['post_content'] = $comments_content_excerpt[$cID];
                                 $posts_data_assoc_arry[$pID]['post_excerpt'] = $comments_content_excerpt[$cID];
-				
+
 				$posts_data_assoc_arry[$pID]['post_title'] = strip_tags($posts_titles_excerpt[$pID]);
 				$posts_data_assoc_arry[$pID]['sphinx_post_title'] = $this->config->admin_options['before_comment'].$posts_titles_excerpt[$pID];
 				$posts_data_assoc_arry[$pID]['comment_id'] = $cID;
-				$posts_data_assoc_arry[$pID]['post_date_orig'] = $posts_data_assoc_arry[$pID]['post_date'];				
+				$posts_data_assoc_arry[$pID]['post_date_orig'] = $posts_data_assoc_arry[$pID]['post_date'];
 				$posts_data_assoc_arry[$pID]['post_date_gmt_orig'] = $posts_data_assoc_arry[$pID]['post_date_gmt'];
 				$posts_data_assoc_arry[$pID]['post_date'] = $comments_content_data[$cID]['comment_date'];
 				$posts_data_assoc_arry[$pID]['comment_author'] = $comments_content_data[$cID]['comment_author'];
 				$posts_data_assoc_arry[$pID]['comment_date'] = $comments_content_data[$cID]['comment_date'];
-				$posts[] = $posts_data_assoc_arry[$pID];		
+				$posts[] = $posts_data_assoc_arry[$pID];
 			}else {
 				$posts_data_assoc_arry[$pID]['post_content'] = $posts_content_excerpt[$pID];
                                 $posts_data_assoc_arry[$pID]['post_excerpt'] = $posts_content_excerpt[$pID];
@@ -410,15 +410,15 @@ class SphinxSearch_FrontEnd
 					$posts_data_assoc_arry[$pID]['post_title'] = strip_tags($posts_titles_excerpt[$pID]);
 					$posts_data_assoc_arry[$pID]['sphinx_post_title'] = $this->config->admin_options['before_post'].$posts_titles_excerpt[$pID];
 				}
-				$posts[] = $posts_data_assoc_arry[$pID];			
+				$posts[] = $posts_data_assoc_arry[$pID];
 			}
 		}
-		
+
 		////////////////////////////
-		//Convert posts array to 
+		//Convert posts array to
 		//posts object required by WP
 		////////////////////////////
-		
+
 		$obj_posts = null;
 		foreach($posts as $index => $post){
 			foreach($post as $var => $value){
@@ -429,15 +429,15 @@ class SphinxSearch_FrontEnd
 		return $obj_posts;
 	}
 
-	
+
 	/**
-	 * Return modified blog title 
+	 * Return modified blog title
 	 *
 	 * @param string $title
 	 * @return string
 	 */
 	function wp_title($title = '')
-	{            
+	{
             return urldecode($title);
 	}
 
@@ -451,22 +451,22 @@ class SphinxSearch_FrontEnd
 	{
             global $post;
 
-            if (!is_search() || !in_the_loop()) return $title;       
-            
+            if (!is_search() || !in_the_loop()) return $title;
+
             return $post->sphinx_post_title;
 	}
-	
-	
+
+
 	/**
 	 * Custom title Tag for post title
 	 *
 	 * @return unknown
 	 */
 	function sphinx_the_title()
-	{		
+	{
             return the_title();
 	}
-	
+
 	/**
 	 * Replace post time to commen time
 	 *
@@ -477,9 +477,9 @@ class SphinxSearch_FrontEnd
 	function the_time($the_time, $d)
 	{
 		global $post;
-		if (!$post->comment_id){	
+		if (!$post->comment_id){
 			return $the_time;
-		}	
+		}
 		if ($d == ''){
 			$the_time = date(get_option('time_format'), strtotime($post->comment_date));
 		}else {
@@ -487,7 +487,7 @@ class SphinxSearch_FrontEnd
 		}
 		return $the_time;
 	}
-	
+
 	/**
 	 * Replace post author name to comment author name
 	 *
@@ -502,7 +502,7 @@ class SphinxSearch_FrontEnd
 		}
 		return $post->comment_author;
 	}
-	
+
 	/**
 	 * Return modified permalink for comments
 	 *
@@ -512,14 +512,14 @@ class SphinxSearch_FrontEnd
 	function the_permalink($permalink = '')
 	{
 		global $post;
-		
+
 		if (!empty($post->comment_id)){
 			return $permalink.'#comment-'.$post->comment_id;
 		} else {
 			return $permalink;
 		}
-	}	
-	
+	}
+
 	/**
 	 * Correct date time for comment records in search results
 	 *
@@ -528,13 +528,13 @@ class SphinxSearch_FrontEnd
 	 * @return string
 	 */
 	function post_link($permalink, $post=null)
-	{	
+	{
 		global $post;
-		
+
 		if (empty($post->comment_id)){
 			return $permalink;
 		}
-		
+
 		$rewritecode = array(
 			'%year%',
 			'%monthnum%',
@@ -548,13 +548,13 @@ class SphinxSearch_FrontEnd
 			'%author%',
 			'%pagename%'
 		);
-			
+
 		$permalink = get_option('permalink_structure');
-	
+
 		if ( '' != $permalink && !in_array($post->post_status, array('draft', 'pending')) ) {
 			//Fix comment date to post date
 			$unixtime = strtotime($post->post_date_orig);
-			
+
 			$category = '';
 			if (strpos($permalink, '%category%') !== false) {
 				$cats = get_the_category($post->ID);
@@ -566,7 +566,7 @@ class SphinxSearch_FrontEnd
 					$category = get_category_parents($parent, FALSE, '/', TRUE) . $category;
 				}
 			}
-	
+
 			$authordata = get_userdata($post->post_author);
                         $author = '';
                         if (is_object($authordata)){
@@ -595,7 +595,7 @@ class SphinxSearch_FrontEnd
 			return $permalink;
 		}
 	}
-	
+
 	 /**
 	 * Return Sphinx based Excerpts with highlitted words
 	 *
@@ -609,10 +609,10 @@ class SphinxSearch_FrontEnd
 	{
             $sphinx = $this->config->init_sphinx();
 		$is_string = false;
-		if(empty($post_content)) return array(); 
-			
+		if(empty($post_content)) return array();
+
 		if ($isTitle){
-			$isTitle = "_title";	
+			$isTitle = "_title";
 		}
 
 		//strip html tags
@@ -620,7 +620,7 @@ class SphinxSearch_FrontEnd
 		foreach ($post_content as $post_key => $post_value){
 			$post_content[$post_key] = $this->strip_udf_tags($post_value, true);
 		}
-		
+
 		$opts = array(
 					'limit'  => $this->config->admin_options['excerpt_limit'],
 					'around' => $this->config->admin_options['excerpt_around'],
@@ -628,13 +628,13 @@ class SphinxSearch_FrontEnd
 					'after_match' => '{sphinx_after_match}',//$this->config->admin_options['excerpt_after_match'.$isTitle],
 					'before_match' => '{sphinx_before_match}' //$this->config->admin_options['excerpt_before_match'.$isTitle]
 					);
-					
+
 		$excerpts = $sphinx->BuildExcerpts(
                     $post_content,
                     $this->config->admin_options['sphinx_index'].'main',
                     $this->search_string,
                     $opts
-		); 
+		);
 		//to do something usefull with error
 		if ( $excerpts === false ){
 			$error = $sphinx->getLastError();
@@ -657,10 +657,10 @@ class SphinxSearch_FrontEnd
                 $post_content[$k] = $excerpts[$i];
 		$i++;
             }
-        
+
             return $post_content;
 	}
-	
+
 	/**
 	 * Clear content from user defined tags
 	 *
@@ -672,7 +672,7 @@ class SphinxSearch_FrontEnd
 		$content = $this->strip_udf_tags($content, false);
 		return $content;
 	}
-	
+
 	/**
 	 * Strip html and user defined tags
 	 *
@@ -698,7 +698,7 @@ class SphinxSearch_FrontEnd
         {
             return $this->search_string_original;
         }
-	
+
 	/**
 	 * Save statistic by about each search query
 	 *
@@ -710,7 +710,7 @@ class SphinxSearch_FrontEnd
 		global $wpdb, $table_prefix;
 
 		if (is_paged()) return;
-		
+
 		$keywords = $this->clear_from_tags($keywords_full);
 		$keywords = trim($keywords);
 		$keywords_full = trim($keywords_full);
@@ -721,7 +721,7 @@ class SphinxSearch_FrontEnd
                 $status = $wpdb->get_var($sql);
                 $status = intval($status);
 
-		$sql = "INSERT INTO 
+		$sql = "INSERT INTO
                             {$table_prefix}sph_stats
                             (keywords, keywords_full, date_added, status)
                         VALUES
@@ -734,9 +734,9 @@ class SphinxSearch_FrontEnd
 		$wpdb->query($sql);
 		return true;
 	}
-	
+
 	/**
-	 * Return TOP-N popual search keywords 
+	 * Return TOP-N popual search keywords
 	 *
 	 * @param integer $limit
 	 * @param integer $width
@@ -755,7 +755,7 @@ class SphinxSearch_FrontEnd
             }
         }
         $results = $this->sphinx_stats_top($limit, $width, $break);
-		
+
 	return $results;
     }
 
@@ -778,7 +778,7 @@ class SphinxSearch_FrontEnd
             $minTime = strtotime("-{$period_limit} days");
             $sphinx->SetFilterRange('date_added', $minTime, time());
         }
-        
+
         $sphinx->SetGroupBy ( "keywords_crc", SPH_GROUPBY_ATTR, "@count desc" );
 
 
@@ -787,7 +787,7 @@ class SphinxSearch_FrontEnd
 
         if (empty($res['matches']) || !is_array($res['matches'])){
             return array();
-        }        
+        }
         $this->_top_ten_total = $res['total'];
 
         $ids = array_keys($res['matches']);
@@ -848,10 +848,10 @@ class SphinxSearch_FrontEnd
                 FROM
                     {$table_prefix}sph_stats
 		WHERE
-                    id in (".  implode(",", $ids).")   
+                    id in (".  implode(",", $ids).")
                     and keywords_full != '".trim($wpdb->escape($keywords))."'
                 ORDER BY FIELD(id, ".  implode(",", $ids).")
-		LIMIT 
+		LIMIT
 		 ".($limit+30)."" ;
 
 	$results = $wpdb->get_results($sql);
@@ -864,7 +864,7 @@ class SphinxSearch_FrontEnd
     function sphinx_stats_latest($limit = 10, $width = 0, $break = '...', $approved=false)
     {
         global $wpdb, $table_prefix;
-        
+
         $sphinx = $this->config->init_sphinx();
 
         $sphinx->SetLimits(0, $limit + 30, $this->config->admin_options['sphinx_max_matches']);
@@ -904,12 +904,12 @@ class SphinxSearch_FrontEnd
 
 	return $results;
     }
-	
+
     function make_results_clear($results, $limit, $width = 0, $break = '...')
     {
         $counter = 0;
         $clear_results = array();
-        
+
         foreach ($results as $res){
             if ($counter == $limit){
                 break;
@@ -929,7 +929,7 @@ class SphinxSearch_FrontEnd
         }
 	return $clear_results;
     }
-	
+
 	/**
 	 * Is sphinx top ten is related
 	 *
@@ -939,7 +939,7 @@ class SphinxSearch_FrontEnd
 	{
 		return $this->top_ten_is_related;
 	}
-	
+
 	/**
 	 * Is sphinx daemon running
 	 *
@@ -959,26 +959,26 @@ class SphinxSearch_FrontEnd
 	function clear_keywords($keywords)
 	{
 		$temp = strtolower(trim($keywords));
-		
-		$prepositions = array('aboard' , 'about' , 'above' , 'absent' , 'across' , 'after' , 'against' , 'along' , 'alongside' , 
-							'amid' , 'amidst' , 'among' , 'amongst' , 'into ' , 'onto' , 'around' , 'as' , 'astride' , 'at' , 'atop' , 
-							'before' , 'behind' , 'below' , 'beneath' , 'beside' , 'besides' , 'between' , 'beyond' , 'by' , 'despite' , 
+
+		$prepositions = array('aboard' , 'about' , 'above' , 'absent' , 'across' , 'after' , 'against' , 'along' , 'alongside' ,
+							'amid' , 'amidst' , 'among' , 'amongst' , 'into ' , 'onto' , 'around' , 'as' , 'astride' , 'at' , 'atop' ,
+							'before' , 'behind' , 'below' , 'beneath' , 'beside' , 'besides' , 'between' , 'beyond' , 'by' , 'despite' ,
 							'down' , 'during' , 'except' , 'following' , 'for' , 'from' , 'in' , 'inside' , 'into' , 'like' , 'mid' ,
-							 'minus' , 'near' , 'nearest' , 'notwithstanding' , 'of' , 'off' , 'on' , 'onto' , 'opposite' , 
-							 'out' , 'outside' , 'over' , 'past' , 're' , 'round' , 'since' , 'through' , 'throughout' , 
-							 'till' , 'to' , 'toward' , 'towards' , 'under' , 'underneath' , 'unlike' , 'until' , 'up' , 
-							 'upon' , 'via' , 'with' , 'within' , 'without' , 'anti', 'betwixt' , 'circa' , 'cum' , 'per' , 
+							 'minus' , 'near' , 'nearest' , 'notwithstanding' , 'of' , 'off' , 'on' , 'onto' , 'opposite' ,
+							 'out' , 'outside' , 'over' , 'past' , 're' , 'round' , 'since' , 'through' , 'throughout' ,
+							 'till' , 'to' , 'toward' , 'towards' , 'under' , 'underneath' , 'unlike' , 'until' , 'up' ,
+							 'upon' , 'via' , 'with' , 'within' , 'without' , 'anti', 'betwixt' , 'circa' , 'cum' , 'per' ,
 							 'qua' , 'sans' , 'unto' , 'versus' , 'vis-a-vis' , 'concerning' , 'considering' , 'regarding');
-		$twoWordPrepositions = array('according to' , 'ahead of' , 'as to' , 'aside from' , 'because of' , 'close to' , 
-										'due to' , 'far from' , 'in to' , 'inside of' , 'instead of' , 'on to' , 'out of' , 
+		$twoWordPrepositions = array('according to' , 'ahead of' , 'as to' , 'aside from' , 'because of' , 'close to' ,
+										'due to' , 'far from' , 'in to' , 'inside of' , 'instead of' , 'on to' , 'out of' ,
 										'outside of' , 'owing to' , 'near to' , 'next to' , 'prior to' , 'subsequent to');
-		$threeWordPrepositions = array('as far as' , 'as well as' , 'by means of' , 'in accordance with' , 'in addition to' , 
-											'in front of' , 'in place of' , 'in spite of' , 'on account of' , 'on behalf of' , 
+		$threeWordPrepositions = array('as far as' , 'as well as' , 'by means of' , 'in accordance with' , 'in addition to' ,
+											'in front of' , 'in place of' , 'in spite of' , 'on account of' , 'on behalf of' ,
 											'on top of' , 'with regard to' , 'in lieu of');
 		$coordinatingConjuctions = array('for', 'and', 'nor', 'but', 'or', 'yet', 'so', 'not');
-		
+
 		$articles = array('a', 'an', 'the', 'is', 'as');
-		
+
 		$stopWords = array_merge($prepositions, $twoWordPrepositions);
 		$stopWords = array_merge($stopWords, $threeWordPrepositions);
 		$stopWords = array_merge($stopWords, $coordinatingConjuctions);
@@ -986,22 +986,22 @@ class SphinxSearch_FrontEnd
 		foreach ($stopWords as $k=>$word){
 			$stopWords[$k] = '/\b'.preg_quote($word).'\b/';
 		}
-		
-		$temp = preg_replace($stopWords, ' ', $temp);		
+
+		$temp = preg_replace($stopWords, ' ', $temp);
 		$temp = str_replace('"', ' ', $temp);
 		$temp = preg_replace('/\s+/', ' ', $temp);
 		$temp = trim($temp);
 		//if (empty($temp)) return '';
-		
+
 		//$temp = trim(preg_replace('/\s+/', ' ', $temp));
-		
+
 		return $temp;
 	}
-	
+
 	function clear_censor_keywords($keywords)
 	{
 		$temp = strtolower(trim($keywords));
-		
+
 		$censorWords = array(
 			"ls magazine","89","www.89.com","El Gordo Y La Flaca Univicion.Com",
 			"ls-magazine","big tits","lolita","google","porsche","none","shemale","buy tramadol now","generic cialis",
@@ -1038,26 +1038,26 @@ class SphinxSearch_FrontEnd
 			'testical','testicle','titfuck','tits','titt','tittie5','tittiefucker','titties','tittyfuck',
 			'tittywank','titwank','tw4t','twat','twathead','twatty','twunt','twunter','wang','wank',
 			'wanker','wanky','whoar','whore','willies','willy');
-		
+
 		if (!empty($this->config->admin_options['censor_words'])){
 			$censorWordsAdminOptions = explode("\n", $this->config->admin_options['censor_words']);
 			foreach($censorWordsAdminOptions as $k => $v){
 				$censorWordsAdminOptions[$k] = trim($v);
 			}
-			$censorWords = array_unique(array_merge($censorWords, $censorWordsAdminOptions)); 
-		}		
+			$censorWords = array_unique(array_merge($censorWords, $censorWordsAdminOptions));
+		}
 		foreach ($censorWords as $k=>$word){
 			$censorWords[$k] = '/'.preg_quote($word).'/';
 		}
-		
+
 		$temp = preg_replace($censorWords, ' ', $temp);
 		$temp = str_replace('"', ' ', $temp);
 		$temp = preg_replace('/\s+/', ' ', $temp);
 		$temp = trim($temp);
-		
+
 		return $temp;
 	}
-	
+
 	/**
 	 * Remove search tags from search keyword
 	 *
@@ -1068,14 +1068,14 @@ class SphinxSearch_FrontEnd
 	{
 		$stopWords = array('@title', '@body', '@category', '!', '-', '~', '(', ')', '|');
 		$keywords = trim(str_replace($stopWords, ' ', $keywords));
-			
+
 		if (empty($keywords)) return '';
-		
+
 		$keyword = trim(preg_replace('/\s+/', ' ', $keywords));
-		
+
 		return $keyword;
 	}
-	
+
 	function get_type_count($type)
 	{
 		switch ($type){
@@ -1092,14 +1092,14 @@ class SphinxSearch_FrontEnd
 
   /**
    * Check whether keywords string has full matches
-   * 
+   *
    * @param string $keywords
    * @return boolean
    */
   function has_full_matches($keywords)
   {
         $sphinx = $this->config->init_sphinx();
-      
+
         $keywords = $this->unify_keywords($keywords);
         $sphinx->ResetFilters();
         $sphinx->ResetGroupBy();
@@ -1118,6 +1118,11 @@ class SphinxSearch_FrontEnd
       $keywords = preg_replace("#([\w\S])\-([\w\S])#", "\$1 \$2", $keywords);
       $keywords = preg_replace("#([\w\S])\s\-\s([\w\S])#", "\$1 \$2", $keywords);
       $keywords = preg_replace("#([\w\S])-\s([\w\S])#", "\$1 \$2", $keywords);
+
+      $from = array ( '\\', '(',')','|','!','@','~','"','&', '/', '^', '$', '=' );
+      $to   = array ( '\\\\', '\(','\)','\|','\!','\@','\~','\"', '\&', '\/', '\^', '\$', '\=' );
+
+      $keywords = str_replace ( $from, $to, $keywords );
       return $keywords;
   }
 

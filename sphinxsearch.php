@@ -2,8 +2,8 @@
 /*
 Plugin Name: WordPress Sphinx Search Plugin
 Plugin URI: http://www.ivinco.com/software/wordpress-sphinx-search-plugin/
-Description: Power of Sphinx Search Engine for Your Blog! 
-Version: 3.0
+Description: Power of Sphinx Search Engine for Your Blog!
+Version: 3.3.1
 Author: Ivinco
 Author URI: http://www.ivinco.com/
 License: A GPL2
@@ -12,7 +12,7 @@ License: A GPL2
     If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
 
     Visit plugin website for the latest news:
-    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ if (empty($uploaddir) ){
 define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
 /**
- * Use latest sphinx API from Sphinx distributive directory 
- * otherwise use it from plugin directory which come with plugin 
+ * Use latest sphinx API from Sphinx distributive directory
+ * otherwise use it from plugin directory which come with plugin
  */
 
 if( !extension_loaded('sphinx') ) {
@@ -61,7 +61,7 @@ if( !extension_loaded('sphinx') ) {
     else
         include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxapi.php');
 }
-	
+
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_config.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_frontend.php');
 include_once(SPHINXSEARCH_PLUGIN_DIR.'/php/sphinxsearch_backend.php');
@@ -89,22 +89,22 @@ include_once(SPHINXSEARCH_PLUGIN_DIR.'/tags/sphinxsearch_tags.php');
 $defaultObjectSphinxSearch = new SphinxSearch();
 
 class SphinxSearch{
-	
+
 	/**
 	 *  Config object
 	 */
 	var $config;
-	
+
 	/**
 	 *  Frontend object
 	 */
 	var $frontend;
-	
+
 	/**
 	 *  Backend object
 	 */
 	var $backend;
-	
+
 	/**
 	 * Construct
 	 *
@@ -114,21 +114,21 @@ class SphinxSearch{
 	{
 		$this->config = new SphinxSearch_Config();
                 $this->sphinxService = new SphinxService($this->config);
-		$this->backend = new SphinxSearch_BackEnd($this->config);		
+		$this->backend = new SphinxSearch_BackEnd($this->config);
 		$this->frontend = new SphinxSearch_FrontEnd($this->config);
-                
+
 		//bind neccessary filters
-		
+
 		//prepare post results
 		add_filter('posts_request', array(&$this, 'posts_request'));
 		add_filter('posts_results', array(&$this, 'posts_results'));
-		
+
 		//return number of found posts
 		add_filter('found_posts', array(&$this, 'found_posts'));
-		
-		//content filters 		
+
+		//content filters
 		add_filter('wp_title', array(&$this, 'wp_title'));
-				
+
 		//bind neccessary actions
                 add_filter('post_link', array(&$this, 'post_link'));
                 add_filter('the_permalink', array(&$this, 'the_permalink'));
@@ -142,11 +142,11 @@ class SphinxSearch{
 
                // add_action('loop_start',  array(&$this, 'add_actions_filters'));
                 add_action('loop_end',  array(&$this, 'remove_actions_filters'));
-		
+
 		//action to prepare admin menu
 		add_action('admin_menu', array(&$this, 'options_page'));
                 add_action('admin_init', array(&$this, 'admin_init'));
-		
+
 		//frontend actions
 		add_action('wp_insert_post', array(&$this, 'wp_insert_post'));
 		add_action('comment_post', array(&$this, 'comment_post'));
@@ -162,7 +162,7 @@ class SphinxSearch{
 
         function add_actions_filters()
         {
-            
+
         }
 
         function remove_actions_filters()
@@ -187,7 +187,7 @@ class SphinxSearch{
             wp_enqueue_style( 'sphinxStyleSheets');
         }
 
-	
+
 	/**
 	 * Replace post time to commen time
 	 *
@@ -202,7 +202,7 @@ class SphinxSearch{
             }
             return $this->frontend->the_time($the_time, $d);
 	}
-	
+
 	/**
 	 * Replace post author name to comment author name
 	 *
@@ -216,7 +216,7 @@ class SphinxSearch{
             }
             return $this->frontend->the_author($display_name);
 	}
-	
+
 	/**
 	 * Correct link in search results
 	 *
@@ -231,7 +231,7 @@ class SphinxSearch{
             }
             return $this->frontend->post_link($permalink, $post);
 	}
-	
+
 	/**
 	 * Clear content from user defined tags
 	 *
@@ -246,7 +246,7 @@ class SphinxSearch{
             $content = $this->frontend->the_content($content);
             return $content;
 	}
-	
+
 	/**
 	 * Query Sphinx for search result and parse results return empty query for WP
 	 *
@@ -264,10 +264,10 @@ class SphinxSearch{
                 $this->frontend->parse_results();
             }
             //returning empty string we disabled to run default query
-            //instead of that we add our owen search results 
+            //instead of that we add our owen search results
             return '';
 	}
-        
+
         function get_search_query($query)
         {
             return urldecode($query);
@@ -282,13 +282,13 @@ class SphinxSearch{
 	 * @return object $posts
 	 */
 	function posts_results($posts)
-	{			
+	{
 		if (!$this->_sphinxRunning()){
                     return $posts;
                 }
 		return  $this->frontend->posts_results();
 	}
-	
+
 	/**
 	 * Return total number of found posts
 	 *
@@ -302,7 +302,7 @@ class SphinxSearch{
                 }
 		return $this->frontend->post_count;
 	}
-	
+
 	/**
 	 * Query frontend for new permalink
 	 *
@@ -316,7 +316,7 @@ class SphinxSearch{
                 }
 		return $this->frontend->the_permalink($permalink);
 	}
-	
+
 	/**
 	 * Change blog title to: <keyword> - wp_title()
 	 *
@@ -351,7 +351,7 @@ class SphinxSearch{
                 $options['sphinx_need_reindex'] = true;
 		$this->config->update_admin_options($options);
 	}
-	
+
 	/**
 	 * Set flag for cron job to remind about update
 	 *
@@ -362,7 +362,7 @@ class SphinxSearch{
 	{
 		$this->wp_insert_post(0, 0);
 	}
-	
+
 	/**
 	 * Set flag for cron job to remind about update
 	 *
@@ -372,7 +372,7 @@ class SphinxSearch{
 	{
 		$this->wp_insert_post(0, 0);
 	}
-     
+
 	/**
 	 * Show Admin Options
 	 *
@@ -384,13 +384,13 @@ class SphinxSearch{
         }
     	$this->backend->print_admin_page();
     }
-    
+
     /**
-     * Bind printAdminPage to Show Admin Options 
+     * Bind printAdminPage to Show Admin Options
      *
      */
     function options_page()
-    {        
+    {
     	if (function_exists('add_options_page')) {
             add_options_page('Sphinx Search', 'Sphinx Search', 9, basename(__FILE__), array(&$this, 'print_admin_page'));
         }
@@ -410,7 +410,7 @@ class SphinxSearch{
             $wizard = new WizardController($this->config);
             add_action('wp_ajax_'.$_POST['action'],
             array(&$wizard, $_POST['action'].'_action'));
-         }         
+         }
     }
 
     function load_widgets()
@@ -472,7 +472,7 @@ class SphinxSearch{
     function sphinx_search_friendly_redirect()
     {
         $redirect = true;
-        
+
         if ( !is_search() ||
                 strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) !== false ||
                 strpos( $_SERVER['REQUEST_URI'], '/search/' ) !== false ) {
@@ -480,7 +480,7 @@ class SphinxSearch{
         } else {
             $redirect = true;
         }
-        
+
         if ('true' == $this->config->get_option('seo_url_all')) {
             $redirect = true;
         }
@@ -503,14 +503,18 @@ class SphinxSearch{
 		if (!empty($query_array)){
 			$query_string = "?".implode("&",$query_array);
 		}
-                
+
                 $permalinkOption = get_option('permalink_structure');
                 $permPrefix = '';
                 if (false !== strpos($permalinkOption, '/index.php') ) {
                     $permPrefix = '/index.php';
                 }
 
-		wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
+                if (function_exists('home_url')){
+                    wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
+                } else {
+                    wp_redirect( get_option('home') . $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' . $query_string );
+                }
 		exit();
 	}
     }
