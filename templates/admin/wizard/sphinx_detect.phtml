@@ -7,7 +7,7 @@
         <input type="hidden" name="detection_process" value="1" />
         <input type="hidden" name="action" value="detection" />
         <table class="form-table">
-        <?php if($this->view->detect_system_searchd):?>
+        
             <tr>
                 <th><label>detected system searchd</label></th>
                 <td>
@@ -22,11 +22,21 @@
                            value="<?php echo $this->view->detect_system_indexer?>" />
                 </td>
             </tr>
+        <?php if($this->view->detect_system_searchd):?>
             <tr>
                 <th><label>use system binaries</label></th>
                 <td><input type="radio" name="detected_install"
-                           value="detect_system" checked="checked" /></td>
+                           value="detect_system" checked="checked"/></td>
             </tr>            
+        <?php else : ?>
+            <tr>
+                <th><label>use system binaries</label></th>
+                <td>
+                    <input type="radio" name="detected_install" value="detect_system" />
+                    <i><small>Wizard was unable to find sphinx binaries but you can specify them manually</small></i>
+                </td>
+            </tr>            
+            
         <?php endif; ?>
 
         <?php if($this->view->detect_installed_searchd &&
@@ -55,22 +65,23 @@
         <?php if (empty($this->view->detect_system_searchd) &&
                 empty($this->view->detect_installed_searchd)):?>
             <tr>
-                <th><label>* install sphinx</label></th>
-                <td><input type="radio" name="detected_install"
-                           value="install" checked="checked" /></td>
+                <th><label>install sphinx</label></th>
+                <td>
+                    <input type="radio" name="detected_install" value="install" checked="checked" />
+                    <i><small>Notice that sphinx will be installed at <?php echo $this->view->install_path?></small></i>
+                </td>
             </tr>
        <?php else:?>
             <tr>
-                <th><label>* install sphinx</label></th>
-                <td><input type="radio" name="detected_install"
-                           value="install" /></td>
+                <th><label>install sphinx</label></th>
+                <td>
+                    <input type="radio" name="detected_install"value="install" />
+                    <i><small>Notice that sphinx will be installed at <?php echo $this->view->install_path?></small></i>
+                </td>
             </tr>
         <?php endif; ?>
             
             </table>
-        <p>
-            <i>* Notice that sphinx will be installed at <?php echo $this->view->install_path?></i>
-        </p>
         
         <p class="submit">
             <input class="button-secondary cancel" type="button"

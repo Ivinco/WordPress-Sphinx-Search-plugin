@@ -176,10 +176,20 @@ class WizardController
 
     function folder_action()
     {
-        if (!empty($_POST['skip_wizard_folder'])){
-            $this->view->success_message = 'Step was skipped.';
-            return $this->_next_action('folder');
+        if (!empty($_POST['skip_wizard_folder'])){    
+			$currrent_path_value = $this -> _config -> get_option('sphinx_path');
+			
+        	if (empty($currrent_path_value) or "false" == $currrent_path_value) {
+				$this->view->success_message = 'Sphinx is not installed. Some significant steps were skipped.';
+				return $this->_next_action('config');
+        	} else { 
+    	        $this->view->success_message = 'Step was skipped.';
+	            return $this->_next_action('folder');        		
+        	}
+        	exit;
+            
         }
+        
         if (!empty($_POST['folder_process'])){
             $sphinx_install_path = $_POST['sphinx_path'];
             if (empty($sphinx_install_path)) {
@@ -217,7 +227,7 @@ class WizardController
                     $error_message .= '<br/>Path '.$sphinx_install_path.'/var/log does not exist!';
                 }
             }
-
+            
             if (empty($error_message)) {
                 $this->_setup_sphinx_path();
                 $config_file_name = $this->_generate_config_file_name();
@@ -248,8 +258,19 @@ class WizardController
             $this->view->error_message = $error_message;            
             $this->view->install_path = $_POST['sphinx_path'];
         } else {
-            $this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
+        	
+        	$cur_sphinx_path = $this -> _config -> get_option('sphinx_path');
+        	$this->view->install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
+
+            if (
+        		!empty($cur_sphinx_path) and ("false" !== $cur_sphinx_path) 
+        		and $cur_sphinx_path !== $this->view->install_path 
+        	) {
+        		$this->view->install_path = $cur_sphinx_path; 
+        	}
+            
         }
+        $this->view->default_install_path = SPHINXSEARCH_SPHINX_INSTALL_DIR;
         $this->view->render('admin/wizard/sphinx_folder.phtml');
         exit;
     }

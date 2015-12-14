@@ -4,7 +4,7 @@
     If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
 
     Visit plugin website for the latest news:
-    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class SphinxService
     {
         $this->__construct($config);
     }
-    
+
     function  __construct(SphinxSearch_Config $config)
     {
         $this->_config = $config;
@@ -91,6 +91,12 @@ class SphinxService
       */
      function is_sphinx_running()
      {
+         $sphinx = $this->_config->init_sphinx();
+         $res = $sphinx->Status();
+         if ($res){
+             return true;
+         }
+         
          if ( ini_get("open_basedir") == "" && is_readable("/proc/") ) {
              $pid_filename = $this->_config->get_option('sphinx_searchd_pid');
              if ( file_exists($pid_filename) && is_readable($pid_filename) ){
@@ -132,7 +138,7 @@ class SphinxService
                 }
              }
          }
-         
+
          return false;
      }
      /**
@@ -207,7 +213,7 @@ class SphinxService
             !file_exists($this->_config->get_option('sphinx_conf')) ||
             !file_exists($this->_config->get_option('sphinx_indexer'))){
             return  array('err' =>'Indexer: configuration files not found.');
-	}elseif ('' == $this->_config->get_option('sphinx_index')){            
+	}elseif ('' == $this->_config->get_option('sphinx_index')){
             return  array('err' =>'Indexer: Sphinx index prefix is not specified.');
 	}else {
             $rotate = "";
@@ -227,7 +233,7 @@ class SphinxService
                 //reindex only specified index with restart searchd
                 $command .= " ".$this->_config->get_option('sphinx_index').$index_name;
             }
-            
+
             exec($command, $output, $retval);
             //echo implode("<br/>", $output);
             if ($retval !=0 || preg_match("#ERROR:#", implode(" ", $output))){

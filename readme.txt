@@ -3,8 +3,8 @@ Contributors: Ivinco, Percona
 Donate link: http://www.ivinco.com/
 Tags: search, sphinx
 Requires at least: 2.0.2
-Tested up to: 3.2.1
-Stable tag: 3.3.1
+Tested up to: 4.4
+Stable tag: 3.9.8
 License: GPLv2
 
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
@@ -48,7 +48,7 @@ Websites:
 = Requirements =
 
     * WordPress 2.0.2 or higher
-    * Sphinx Search 0.9.9 or higher
+    * Sphinx Search 2.1.9 or higher
     * Writable WordPress upload directory for Sphinx configuration files, logs and indexes
 
 = Installation guide =
@@ -125,6 +125,12 @@ Q: How to update the search index?
 
 A: The best option to update search index is to setup cron job task for it.
 Also you may manually update search indexes through WordPress Sphinx Search administrative interface.
+
+Q: I have just activated the plugin, however when I try to run the Plugin's Wizard it does not do anything. What is wrong?
+
+A: This might be jQuery version collision. Our plugin uses jQuery v1.4 and supposed to work with WordPress up to 3.8 version
+which uses jQuery v1.x (i.e. 1.10 for WP3.8). Check if your installation has custom plugin or WP is modified to use
+jQuery v2.x. If so then it will impossible to use our plugin's Wizard.
 
 Q: I have just installed and run the wizard, however I have the following error message. What to do?
 
@@ -219,13 +225,13 @@ the following SQL query during the activation process:
 `
 # in MySQL
 CREATE TABLE wp_sph_stats (
-	id int(11) unsigned NOT NULL auto_increment,
-	keywords varchar(255) NOT NULL default '',
-	date_added datetime NOT NULL default '0000-00-00 00:00:00',
-	keywords_full varchar(255) NOT NULL default '',
+    id int(11) unsigned NOT NULL auto_increment,
+    keywords varchar(255) NOT NULL default '',
+    date_added datetime NOT NULL default '0000-00-00 00:00:00',
+    keywords_full varchar(255) NOT NULL default '',
         status tinyint(1) NOT NULL DEFAULT '0',
-	PRIMARY KEY  (id),
-	KEY keywords (keywords)
+    PRIMARY KEY  (id),
+    KEY keywords (keywords)
 );
 `
 If your WordPress installation's table prefix is not "wp_", substitute it with
@@ -246,6 +252,62 @@ the correct value.
  We added new search mode "Freshness & Relevance" which works perfect for blogs and news sites.
 
 == Changelog ==
+
+= 3.9.8 =
+ * Changed plugin release version for WordPress 4.2
+ 
+= 3.9.7 =
+ * Plugin release for WordPress 4.2
+
+= 3.9.6 =
+ * Plugin code was revised, fixed and tested to use with WordPress 4.2
+ 
+= 3.9.5 =
+ * Plugin code was revised and tested with WordPress 4.1
+
+= 3.9.4 =
+ * Plugin code was revised and tested with WordPress 4.0 Benny.
+
+= 3.9.1 =
+ * Updated Sphinx Search engine binaries to version 2.1.9.
+ 
+= 3.9 =
+ * Checked compatibility with WP v 3.9. Updated common styles.
+
+= 3.8.3 =
+ * FAQ page is updated. Added description of the problem with Plugin's Wizard.
+
+= 3.8.2 =
+ * Plugin will use static SSE configuration file now instead of dynamic one.
+
+= 3.8.1 =
+ * Updated installer's auto-detection mechanism which will allow user admin to choose pre-installed Sphinx binaries even on Windows platform.
+
+= 3.8 =
+ * Updated styles to fit new default theme
+
+= 3.7 =
+ * Added support of WP version up to 3.7.1
+ * New feature: Tags search. added missed files.
+ * New feature: Added an opportunity to search within post tags.
+ * Fixed duplicates of statistics when seo URLs are used.
+ * Fixed bug with single quote character.
+ * Updates to layout of sphinx installation wizard.
+ * Small fixes to verification logic of sphinx dirs security.
+ * There is a warning of insecure files has been added to plugin configuration section
+ * Fixed bug with unescaped html in snippets
+
+= 3.3.4 =
+ * fix of the bug related with searching for words that are not in the index
+
+= 3.3.3 =
+ * few miscellaneous fixes in the plugin admin zone
+ * insert into sph_stat table improvement
+
+= 3.3.2 =
+ * Unhooked unnecessary filters
+ * Added checking Sphinx connection on remote or local server to determine is Sphinx running
+
 = 3.3.1 =
  * Fixed bug in search term escaping
  * Fixed bug in redirect for friendly URLs

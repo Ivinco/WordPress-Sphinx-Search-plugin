@@ -13,6 +13,15 @@
                          value="<?php echo $this->view->install_path?>" />
                 </td>
             </tr>
+            <?php if ($this->view->default_install_path) { ?>
+			<tr>
+                <th>Default sphinx files directory:</th>
+                <td><?php echo $this->view->default_install_path ?> 
+                </td>
+            </tr>            
+            <?php
+            }            
+            ?>
         </table>
         <p class="submit">
             <input class="button-secondary cancel" type="button"

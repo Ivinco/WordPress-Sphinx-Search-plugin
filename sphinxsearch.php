@@ -3,7 +3,7 @@
 Plugin Name: WordPress Sphinx Search Plugin
 Plugin URI: http://www.ivinco.com/software/wordpress-sphinx-search-plugin/
 Description: Power of Sphinx Search Engine for Your Blog!
-Version: 3.3.1
+Version: 3.9.8
 Author: Ivinco
 Author URI: http://www.ivinco.com/
 License: A GPL2
@@ -113,7 +113,7 @@ class SphinxSearch{
 	function SphinxSearch()
 	{
 		$this->config = new SphinxSearch_Config();
-                $this->sphinxService = new SphinxService($this->config);
+        $this->sphinxService = new SphinxService($this->config);
 		$this->backend = new SphinxSearch_BackEnd($this->config);
 		$this->frontend = new SphinxSearch_FrontEnd($this->config);
 
@@ -469,23 +469,35 @@ class SphinxSearch{
         }
     }
 
+    /**
+     * Checks weither redirect for friendly URLs is required
+     *
+     * @static
+     * @param  string $seo_url_all
+     *
+     * @return bool
+     */
+    static function sphinx_is_redirect_required($seo_url_all)
+    {
+        if (!is_search()
+            || strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) !== false
+            || strpos( $_SERVER['REQUEST_URI'], '/search/' ) !== false
+        ) {
+            return false;
+        }
+
+        return $seo_url_all == 'true';
+    }
+
+    /**
+     * Templates redirect as action of WP
+     */
     function sphinx_search_friendly_redirect()
     {
-        $redirect = true;
-
-        if ( !is_search() ||
-                strpos( $_SERVER['REQUEST_URI'], '/wp-admin/' ) !== false ||
-                strpos( $_SERVER['REQUEST_URI'], '/search/' ) !== false ) {
+        if (!self::sphinx_is_redirect_required($this->config->get_option('seo_url_all'))) {
             return false;
-        } else {
-            $redirect = true;
         }
 
-        if ('true' == $this->config->get_option('seo_url_all')) {
-            $redirect = true;
-        }
-
-	if ( $redirect ) {
 		$query_array = array();
 		if (!empty($_GET['search_comments'])){
 			$query_array[] = "search_comments=".$_GET['search_comments'];
@@ -496,6 +508,9 @@ class SphinxSearch{
 		if (!empty($_GET['search_pages'])){
 			$query_array[] = "search_pages=".$_GET['search_pages'];
 		}
+        if (!empty($_GET['search_tags'])){
+            $query_array[] = "search_tags=".$_GET['search_tags'];
+        }
 		if (!empty($_GET['search_sortby'])){
 			$query_array[] = "search_sortby=".$_GET['search_sortby'];
 		}
@@ -504,19 +519,19 @@ class SphinxSearch{
 			$query_string = "?".implode("&",$query_array);
 		}
 
-                $permalinkOption = get_option('permalink_structure');
-                $permPrefix = '';
-                if (false !== strpos($permalinkOption, '/index.php') ) {
-                    $permPrefix = '/index.php';
-                }
+        $permalinkOption = get_option('permalink_structure');
+        $permPrefix = '';
+        if (false !== strpos($permalinkOption, '/index.php') ) {
+            $permPrefix = '/index.php';
+        }
 
-                if (function_exists('home_url')){
-                    wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
-                } else {
-                    wp_redirect( get_option('home') . $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' . $query_string );
-                }
+        if (function_exists('home_url')){
+            wp_redirect( home_url( $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' ) . $query_string );
+        } else {
+            wp_redirect( get_option('home') . $permPrefix . '/search/' . urlencode(get_query_var( 's' )) .'/' . $query_string );
+        }
+
 		exit();
-	}
     }
 
 }

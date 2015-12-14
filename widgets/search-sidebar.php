@@ -76,19 +76,23 @@ class SearchSidebarWidget extends WP_Widget
     {
         global $defaultObjectSphinxSearch;
 
-	if ('true' == $defaultObjectSphinxSearch->frontend->params['search_posts'])
+	    if ('true' == $defaultObjectSphinxSearch->frontend->params['search_posts'])
             $search_posts = "checked='checked'";
-	else $search_posts = '';
+	    else $search_posts = '';
 
-	if ('true' == $defaultObjectSphinxSearch->frontend->params['search_pages'])
+	    if ('true' == $defaultObjectSphinxSearch->frontend->params['search_pages'])
             $search_pages = "checked='checked'";
-	else $search_pages = '';
+	    else $search_pages = '';
 
-	if ('true' == $defaultObjectSphinxSearch->frontend->params['search_comments'])
+	    if ('true' == $defaultObjectSphinxSearch->frontend->params['search_comments'])
             $search_comments = "checked='checked'";
-	else $search_comments = '';
+	    else $search_comments = '';
+        
+        if ('true' == $defaultObjectSphinxSearch->frontend->params['search_tags'])
+            $search_tags = "checked='checked'";
+        else $search_tags = '';
 
-	$search_sortby_date_relevance = $search_sortby_relevance = $search_sortby_date = '';
+	    $search_sortby_date_relevance = $search_sortby_relevance = $search_sortby_date = '';
         if (!empty($defaultObjectSphinxSearch->frontend->params['search_sortby'])){
             $ss_sort_by = $defaultObjectSphinxSearch->frontend->params['search_sortby'];
         }

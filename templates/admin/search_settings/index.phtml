@@ -39,29 +39,18 @@
 
                     <table class="form-table" border="0">
                     <tbody>
+                    
+                    <?php foreach (array('search_comments' => 'Comment', 'search_posts' => 'Post', 'search_pages' => 'Page', 'search_tags' => 'Tag')
+                            as $option => $title
+                        ) { ?>
                     <tr valign="top" >
-                        <th ><label for="search_comments">Comment content</label></th>
+                        <th ><label for="<?php echo $option ?>"><?php echo $title ?> content</label></th>
                         <td>
-                        <input type="checkbox" id="search_comments" name="search_comments" value="true"
-                        <?php if ($this->view->devOptions['search_comments'] == "true")
-                        { _e('checked="checked"', "SphinxSearch"); }?>/>
+                            <input type="checkbox" id="<?php echo $option ?>" name="<?php echo $option ?>" value="true"
+                                <?php if ($this->view->devOptions[$option] == "true") {_e('checked="checked"', "SphinxSearch"); }?>/>
                         </td>
                     </tr>
-                    <tr valign="top" >
-                        <th ><label for="search_posts">Post content</label></th>
-                        <td>
-                            <input type="checkbox" id="search_posts" name="search_posts" value="true"
-                            <?php if ($this->view->devOptions['search_posts'] == "true")
-                                { _e('checked="checked"', "SphinxSearch"); }?>/>
-                        </td>
-                    </tr>
-                    <tr valign="top" >
-                        <th ><label for="search_pages">Page content</label></th>
-                        <td><input type="checkbox" id="search_pages" name="search_pages" value="true"
-                            <?php if ($this->view->devOptions['search_pages'] == "true")
-                            { _e('checked="checked"', "SphinxSearch"); }?>/>
-                            </td>
-                    </tr>
+                    <?php } ?>
                     </tbody>
                     </table>
                     </fieldset>

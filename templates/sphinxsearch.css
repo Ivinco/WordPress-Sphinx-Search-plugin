@@ -19,6 +19,17 @@ Styles for search form on the sidebar
     background-image: none;
 }
 
+#searchbar #searchform {
+    width: 100%;
+}
+#searchbar #sphinx_sinput {
+    width: 170px;
+}
+#searchbar #submit {
+    float: right;
+    padding: 3px 2px 4px 4px;
+}
+
 /*
 Styles for search form on the top of search page
 */

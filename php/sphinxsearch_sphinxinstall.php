@@ -4,7 +4,7 @@
     If you need commercial support, or if you’d like this plugin customized for your needs, we can help.
 
     Visit plugin website for the latest news:
-    http://www.ivinco.com/software/wordpress-sphinx-search-plugin  
+    http://www.ivinco.com/software/wordpress-sphinx-search-plugin
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,21 +29,21 @@ class SphinxSearch_Install
 	 * @var string
 	 */
 	var $plugin_sphinx_dir = '';
-	
+
 	/**
 	 * Latest Sphinx Search archive filename
 	 *
 	 * @var string
 	 */
-	var $latest_sphinx_filename = 'sphinx-0.9.9.tar.gz';
-	
+	var $latest_sphinx_filename = 'sphinx-2.1.9.tar.gz';
+
 	/**
 	 * File location to latest Sphinx Search repository without filename
 	 *
 	 * @var string
 	 */
 	var $latest_sphinx_rep_loc = '';
-	
+
 	/**
 	 * Config object
 	 */
@@ -63,11 +63,11 @@ class SphinxSearch_Install
 	function  __construct(SphinxSearch_Config $config)
 	{
 		$this->config = $config;
-		
+
 		$this->plugin_sphinx_dir = SPHINXSEARCH_PLUGIN_DIR;
 		$this->latest_sphinx_rep_loc = $this->plugin_sphinx_dir.'/rep/';
 	}
-	
+
 	/**
 	 * Return installation directory for Sphinx
 	 * by default it /wp-content/uploads/sphinx_install/
@@ -75,13 +75,13 @@ class SphinxSearch_Install
 	 * @return string
 	 */
     function get_install_dir()
-    {     	
+    {
         //save install dir in admin options
 	$this->config->admin_options['sphinx_path'] = SPHINXSEARCH_SPHINX_INSTALL_DIR;
-		
+
      	return $this->config->admin_options['sphinx_path'];
      }
-     
+
 	/**
      * Return sphinx file name, first check if available online copy
      * if not check local copy
@@ -89,9 +89,9 @@ class SphinxSearch_Install
      * @return string
      */
      function get_sphinx_source()
-     {	
+     {
      	if (!file_exists($this->latest_sphinx_rep_loc.$this->latest_sphinx_filename)){
-     		return array('err' => 'Installation: Sphinx repository '. 
+     		return array('err' => 'Installation: Sphinx repository '.
                             $this->latest_sphinx_rep_loc .
                         ' does not exist or is not available.');
      	}else {
@@ -99,7 +99,7 @@ class SphinxSearch_Install
      	}
      	return $sphinx_source;
      }
-     
+
      /**
       * Rewrite reserver variables in config sphinx.conf to real values
       *
@@ -115,12 +115,12 @@ class SphinxSearch_Install
         $template_content = file_get_contents($filename);
 
      	$rewrited_content = $this->generate_config_content($template_content);
-     		
+
      	//file_put_contents in PHP 5
      	$fp = fopen($filename, 'w+');
      	fwrite($fp, $rewrited_content);
      	fclose($fp);
-     		
+
      	return true;
      }
 
@@ -156,10 +156,16 @@ class SphinxSearch_Install
      		'{wp_term_relationships}' => $wpdb->term_relationships,
      		'{wp_term_taxonomy}' => $wpdb->term_taxonomy,
      		'{wp_terms}' => $wpdb->terms,
-                '{path_to_php}' => $wizard->detect_program('php'),
-                '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir))),
-                '{max_matches}' => $this->config->admin_options['sphinx_max_matches']
-     		);
+            '{path_to_php}' => $wizard->detect_program('php'),
+            '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir))),
+            '{max_matches}' => $this->config->admin_options['sphinx_max_matches'],
+
+            '{db_host}' => DB_HOST,
+            '{db_user}' => DB_USER,
+            '{db_pass}' => DB_PASSWORD,
+            '{db_name}' => DB_NAME,
+            '{table_prefix}' => $table_prefix,
+     	);
 
      	$rewrited_content = str_replace(array_keys($search), $search, $template_content);
         return $rewrited_content;
@@ -171,24 +177,24 @@ class SphinxSearch_Install
       * @return array if error or bool true if success
       */
      function install()
-     {	
+     {
      	global $table_prefix, $wpdb;
      	set_time_limit(0);
-     	
+
      	//////////////////
      	//Get Source Filename
      	//////////////////
-  		
+
      	$sphinx_source = $this->get_sphinx_source();
      	if ( is_array($sphinx_source) ){
             return $sphinx_source;
      	}
-     	
+
 	//////////////////
      	//Get Destination dir
      	//////////////////
-     	
-	$dir_inst = $this->get_install_dir();        
+
+	$dir_inst = $this->get_install_dir();
 
 	if ( is_array($dir_inst) ){
 		return $dir_inst;
@@ -225,7 +231,7 @@ class SphinxSearch_Install
      	//Copy Source Filename
      	//to destionation dir
      	//////////////////
-     	
+
 	$res = copy($sphinx_source.$this->latest_sphinx_filename, $dir_inst.'/'.$this->latest_sphinx_filename);
 	if ($res == false) {
             return array('err' => "Installation: Can not copy ".
@@ -233,7 +239,7 @@ class SphinxSearch_Install
                 $dir_inst.'/'.$this->latest_sphinx_filename.
                     ", check the file permissions.");
 	}
-		
+
 	//////////////////
      	//Extract Archive
      	//with repository
@@ -246,10 +252,10 @@ class SphinxSearch_Install
                         $this->latest_sphinx_filename . ' !<br/>'.
                         'Command: '.$openarch."<br/>".
                         "try running it with sudo if it doesn't work");
-                    
+
             $dir_rep = str_replace('.tar.gz', '', $this->latest_sphinx_filename);
             chdir($dir_inst.'/'.$dir_rep);
-		
+
 	//////////////////
      	//Run:
      	//./configure
@@ -298,20 +304,20 @@ class SphinxSearch_Install
                 //echo '<script>alert("'.$msg.'")</script>';
                 return array('err' => $msg);
             }
-		
+
 	//////////////////
-     	//copy our config to 
+     	//copy our config to
      	//new installation
      	//////////////////
-     	
+
 	//copy our config to new installation
 	$res = copy($this->plugin_sphinx_dir.'/rep/sphinx.conf', $dir_inst.'/etc/sphinx.conf');
-	if ($res == false){ 
+	if ($res == false){
 	    return array('err' => "Installation: Can not copy ".$this->plugin_sphinx_dir.'/rep/sphinx.conf'." to ".
                 $dir_inst.'/etc/sphinx.conf'.", check the file permissions.");
 	}
-		
-	if (file_exists($dir_inst.'/bin/indexer') && 
+
+	if (file_exists($dir_inst.'/bin/indexer') &&
             file_exists($dir_inst.'/etc/sphinx.conf') &&
             file_exists($dir_inst.'/bin/searchd')){
                 $admin_options = array(
@@ -322,33 +328,33 @@ class SphinxSearch_Install
 				'sphinx_path' 		=> $dir_inst
 				);
 		//update admin options
-		$this->config->update_admin_options($admin_options);			
+		$this->config->update_admin_options($admin_options);
 	}else {
             return array('err' => 'Installation: Installation completed, but configuration files not found.<br/>
                 Check installation directory: '.$dir_inst);
 	}
-		
+
 	//////////////////
-     	//rewrite pre defined 
-     	//variables in config 
-     	//file to their values  
+     	//rewrite pre defined
+     	//variables in config
+     	//file to their values
      	//////////////////
-     	
-	//rewrite pre defined variables in config file  
-	$res = $this->rewrite_config_variables($this->config->admin_options['sphinx_conf']);	
+
+	//rewrite pre defined variables in config file
+	$res = $this->rewrite_config_variables($this->config->admin_options['sphinx_conf']);
 	if ( is_array($res) ){
             return $res;
 	}
-			
+
 	$res = $this->setup_sphinx_counter_tables();
         if (is_array($res)){
             return $res;
         }
 
         $this->setup_cron_job();
-		
+
 	//////////////////
-	//run re indexing 
+	//run re indexing
 	//////////////////
 	/*$ssb = new SphinxSearch_Backend($this->config);
 	$res = $ssb->reindex_sphinx();
@@ -362,7 +368,7 @@ class SphinxSearch_Install
      function setup_cron_job()
      {
          $search = array(
-                '{path_to_sphinx}' => $this->config->admin_options['sphinx_path'],
+            '{path_to_sphinx}' => $this->config->admin_options['sphinx_path'],
      		'{path_to_indexer}' => $this->config->admin_options['sphinx_indexer'],
      		'{path_to_config}'   => $this->config->admin_options['sphinx_conf'],
      		'{index_prefix}' => $this->config->admin_options['sphinx_index'],
@@ -378,7 +384,7 @@ class SphinxSearch_Install
         $main_rewrited = str_replace(array_keys($search), $search, $main_template);
         $stats_rewrited = str_replace(array_keys($search), $search, $stats_template);
         $cron_dir = $this->config->admin_options['sphinx_path'].'/cron';
-        if (!file_exists($cron_dir)){            
+        if (!file_exists($cron_dir)){
             if ( ! mkdir($cron_dir) ){
                 return array('err' => "Installation: Can not create directory ". $cron_dir .
                         " check the permissions.");
@@ -424,7 +430,13 @@ class SphinxSearch_Install
              );";
 
         dbDelta($sql);
-	
+
+	$sql = "insert into {$table_prefix}sph_counter values(1, 1)";
+        $wpdb->query($sql);
+
+        $sql = "insert into {$table_prefix}sph_counter values(2, 1)";
+        $wpdb->query($sql);
+
 	//////////////////
 	//Create sph_stats
 	//table

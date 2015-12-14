@@ -46,7 +46,7 @@ class SphinxSearch_Config
 	var $admin_options = array();
 	
 	/**
-	 * Sphinx object
+	 * @var SphinxClient
 	 */
 	var $sphinx;
 
@@ -65,18 +65,24 @@ class SphinxSearch_Config
                 $this->_view = new SphinxView();
 	}
 
-        function init_sphinx()
-        {
-            $this->sphinx = new SphinxClient ();
-            $this->sphinx->SetServer ( $this->admin_options['sphinx_host'], intval($this->admin_options['sphinx_port']) );
-            $this->sphinx->SetMatchMode ( SPH_MATCH_EXTENDED2 );
-            return $this->sphinx;
-        }
+    /**
+    * Sphinx server connector initialization
+    * 
+    * @return SphinxClient
+    */
+    function init_sphinx()
+    {
+        $this->sphinx = new SphinxClient ();
+        $this->sphinx->SetServer ( $this->admin_options['sphinx_host'], intval($this->admin_options['sphinx_port']) );
+        $this->sphinx->SetMatchMode ( SPH_MATCH_EXTENDED2 );
+        
+        return $this->sphinx;
+    }
 
-        function get_view()
-        {
-            return $this->_view;
-        }
+    function get_view()
+    {
+        return $this->_view;
+    }
 	
 	/**
     * Load and return array of options 
@@ -85,14 +91,19 @@ class SphinxSearch_Config
     */
    	function get_admin_options() 
    	{
-   		if (!empty($this->admin_options)) return $this->admin_options;
+   		if (!empty($this->admin_options)) {
+            return $this->admin_options;
+        }
    		
    		$adminOptions = array(
-                        'wizard_done'   => 'false',
+            'wizard_done'   => 'false',
+            
+            'seo_url_all'     => 'false',
+            
    			'search_comments' => 'true',
    			'search_pages'    => 'true',
    			'search_posts'    => 'true',
-                        'seo_url_all'     => 'false',
+            'search_tags'     => 'true',
    			
    			'excerpt_before_match' => '<b>',
    			'excerpt_after_match' => '</b>',
@@ -131,19 +142,19 @@ class SphinxSearch_Config
    			
    			);
    		$this->admin_options = get_option($this->adminOptionsName);
-   		if ($this->admin_options['sphinx_installed']){
-                    $sphinxService = new SphinxService($this);
-                    if ( $sphinxService->is_sphinx_running() ){
-                        $this->admin_options['sphinx_running'] = 'true';
-                    } else {
-                        $this->admin_options['sphinx_running'] = 'false';
-                    }
+   		if ($this->admin_options['sphinx_installed']) {
+            $sphinxService = new SphinxService($this);
+            if ( $sphinxService->is_sphinx_running() ){
+                $this->admin_options['sphinx_running'] = 'true';
+            } else {
+                $this->admin_options['sphinx_running'] = 'false';
+            }
    		}
                 
-                if ('' == get_option('permalink_structure')){
-                    $this->admin_options['seo_url_all'] = '';
-                }
-   		
+        if ('' == get_option('permalink_structure')){
+            $this->admin_options['seo_url_all'] = '';
+        }
+
 		if (!empty($this->admin_options)) {
 			foreach ($this->admin_options as $key => $option){
 				$adminOptions[$key] = $option;

@@ -24,6 +24,10 @@
 class SphinxView
 {
     var $view = null;
+    
+    function __construct() {
+        $this->view = new stdClass();
+    }
 
     function render($file)
     {

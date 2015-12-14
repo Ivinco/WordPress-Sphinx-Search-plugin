@@ -12,14 +12,37 @@ function toggle_sidebar(){
 		document.getElementById('searchform_advanced_bar').innerHTML = document.getElementById('searchform_advanced_options_bar').innerHTML;
 	}
 }
+function sphinx_search_submit(form) {
+    var input = document.getElementById('sphinx_sinput');
+    
+    form.s.value = input.value.replace("_", ' ').replace("'", '_');
+    
+    return true;
+}
 </script>
 <div id="searchbar">
     <label for="s">
         <a href="http://www.ivinco.com/software/wordpress-sphinx-search/"
-            title="WordPress Sphinx Search Plugin by Ivinco"><img style="margin-top: 7px;"
-                src="<?php echo plugins_url('img/icon-ivinco.png', __FILE__ );?>"
-            alt="WordPress Sphinx Search Plugin by Ivinco" /></a> <?php _e('Search'); ?>
+            title="WordPress Sphinx Search Plugin by Ivinco"><img src="<?php echo plugins_url('img/icon-ivinco.png', __FILE__ );?>"
+                alt="WordPress Sphinx Search Plugin by Ivinco" /></a> <?php _e('Search'); ?>
     </label>
+    
+    <?php if ($defaultObjectSphinxSearch->config->get_option('seo_url_all') == 'true') {?>
+    <form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>" onsubmit="sphinx_search_submit(this)">
+        <input type="hidden" name="s" size="15" value="<?php echo $defaultObjectSphinxSearch->get_search_string();?>"/>
+        <ul>
+            <li>
+                <input type="text" id="sphinx_sinput" size="25"
+                       value="<?php echo $defaultObjectSphinxSearch->get_search_string();?>"/>
+                <input type="submit" id="submit" value="<?php _e('Search'); ?>" /><br/>
+                <a href="javascript:void(0);" onclick="toggle_sidebar();"
+                   style="font-size:10px;">Advanced</a>
+            </li>
+        </ul>
+
+        <div id="searchform_advanced_bar" style="display:none;"></div>
+    </form>
+    <?php } else { ?>
     <form id="searchform" method="get" action="<?php echo get_bloginfo('url') ?>">
         <ul>
             <li>
@@ -33,6 +56,7 @@ function toggle_sidebar(){
 
         <div id="searchform_advanced_bar" style="display:none;"></div>
     </form>
+    <?php } ?>
 
     <div id="searchform_advanced_options_bar" style="display:none;">
         <ul>
@@ -46,6 +70,9 @@ function toggle_sidebar(){
                 <br/>
                 <input type="checkbox" id="search_comments" name="search_comments" value="true"
                 <?php echo $search_comments; ?> /><label for="search_comments">comments</label>
+                <br/>
+                <input type="checkbox" id="search_tags" name="search_tags" value="true"
+                <?php echo $search_tags; ?> /><label for="search_tags">tags</label>
             </li>
         </ul>
 
