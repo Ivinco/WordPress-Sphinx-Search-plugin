@@ -128,9 +128,16 @@ class SphinxSearch_Install
      {
          global $wpdb, $table_prefix;
 
-          $sql_sock = '';
-          if ('' != trim(ini_get('mysql.default_socket'))){
-              $sql_sock = 'sql_sock = '.ini_get('mysql.default_socket');
+          if (strpos(DB_HOST, ':')) {
+              list($sql_host, $sql_sock) = explode(':', DB_HOST, 2);
+              $sql_sock = 'sql_sock = '.$sql_sock;
+          } else {
+              $sql_host = DB_HOST;
+              if (ini_get('mysql.default_socket')){
+                  $sql_sock = 'sql_sock = '.ini_get('mysql.default_socket');
+              } else {
+                  $sql_sock = '';
+              }
           }
           $wizard = new WizardController($this->config);
 
@@ -160,7 +167,7 @@ class SphinxSearch_Install
             '{path_to_wp_config_php}' => dirname(dirname(dirname($this->plugin_sphinx_dir))),
             '{max_matches}' => $this->config->admin_options['sphinx_max_matches'],
 
-            '{db_host}' => DB_HOST,
+            '{db_host}' => $sql_host,
             '{db_user}' => DB_USER,
             '{db_pass}' => DB_PASSWORD,
             '{db_name}' => DB_NAME,
