@@ -199,7 +199,7 @@ class WizardController
                 @mkdir($sphinx_install_path);
             }
             if (!file_exists($sphinx_install_path)){
-                $error_message = 'Path '.$sphinx_install_path.' does not exist!';
+                $error_message = 'Path '.$sphinx_install_path.' does not exist! Permission denied.';
             } else if (!is_writable($sphinx_install_path)){
                 $error_message = 'Path '.$sphinx_install_path.' is not writeable!';
             } 

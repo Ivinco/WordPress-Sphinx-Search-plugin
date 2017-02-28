@@ -3,7 +3,7 @@
 Plugin Name: WordPress Sphinx Search Plugin
 Plugin URI: http://www.ivinco.com/software/wordpress-sphinx-search-plugin/
 Description: Power of Sphinx Search Engine for Your Blog!
-Version: 3.9.8
+Version: 3.10.4
 Author: Ivinco
 Author URI: http://www.ivinco.com/
 License: A GPL2
@@ -39,14 +39,27 @@ define('SPHINXSEARCH_PLUGIN_DIR', dirname(__FILE__));
  * Sphinx will install in Wordpress default upload directory
  *
  */
-$uploads = wp_upload_dir();
-$uploaddir = $uploads['basedir'];
-if (empty($uploaddir) ){
-    $uploaddir = get_option( 'upload_path' );
-    if (empty($uploaddir)){
-        $uploaddir = WP_CONTENT_DIR . '/uploads';
-    }
-}
+$uploaddir = ''; 
+$uploads = explode('/', ABSPATH); 
+
+if (count($uploads) > 2) { 
+    unset($uploads[count($uploads) - 2]); 
+    $uploaddir = implode('/', $uploads) . 'sphinxsearchplugin'; 
+} 
+
+if (empty($uploaddir)) { 
+    $uploads = wp_upload_dir(); 
+    $uploaddir = $uploads['basedir']; 
+
+    if (empty($uploaddir)) { 
+        $uploaddir = get_option('upload_path'); 
+        if (empty($uploaddir)) { 
+            $uploaddir = WP_CONTENT_DIR . '/uploads'; 
+        }
+    } 
+
+    $uploaddir = $uploaddir . '/sphinx'; 
+} 
 
 define('SPHINXSEARCH_SPHINX_INSTALL_DIR', $uploaddir.'/sphinx');
 
