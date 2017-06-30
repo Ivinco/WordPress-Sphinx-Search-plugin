@@ -3,8 +3,8 @@ Contributors: Ivinco, Percona
 Donate link: http://www.ivinco.com/
 Tags: search, sphinx
 Requires at least: 2.0.2
-Tested up to: 4.7.2
-Stable tag: 3.10.4
+Tested up to: 4.8
+Stable tag: 3.10.5
 License: GPLv2
 
 WordPress Sphinx Search Plugin allows to use Sphinx Search Server power to enable ultra-fast and feature-rich search on WordPress-based websites.
